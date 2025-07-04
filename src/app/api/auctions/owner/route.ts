@@ -1,6 +1,27 @@
-import { NextRequest, NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 import fs from 'fs';
 import path from 'path';
+
+interface AuctionData {
+  auctionId: string;
+  tokenId: string;
+  tokenContract: string;
+  approved: boolean;
+  amount: string;
+  duration: string;
+  firstBidTime: string;
+  reservePrice: string;
+  curatorFeePercentage: number;
+  tokenOwner: string;
+  bidder: string;
+  curator: string;
+  auctionCurrency: string;
+}
+
+interface AuctionDataMap {
+  [key: string]: AuctionData;
+}
 
 export async function GET(request: NextRequest) {
   try {
@@ -48,10 +69,11 @@ export async function GET(request: NextRequest) {
         );
       }
 
-      const auctionData = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
+      const fileContent = fs.readFileSync(dataPath, 'utf8');
+      const auctionData: AuctionDataMap = JSON.parse(fileContent) as AuctionDataMap;
       
       // Filter auctions by owner
-      const auctions = Object.values(auctionData).filter((auction: any) => 
+      const auctions = Object.values(auctionData).filter((auction: AuctionData) => 
         auction.tokenOwner?.toLowerCase() === address.toLowerCase()
       );
 

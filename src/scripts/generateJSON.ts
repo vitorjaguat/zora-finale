@@ -1,16 +1,36 @@
-import { auctionRepo } from "../lib/db/dbClass";
 import fs from "fs";
 import path from "path";
+
+interface AuctionData {
+  auctionId: string;
+  tokenId: string;
+  tokenContract: string;
+  approved: boolean;
+  amount: string;
+  duration: string;
+  firstBidTime: string;
+  reservePrice: string;
+  curatorFeePercentage: number;
+  tokenOwner: string;
+  bidder: string;
+  curator: string;
+  auctionCurrency: string;
+}
+
+interface AuctionDataMap {
+  [key: string]: AuctionData;
+}
 
 async function main() {
   console.log("🔄 Generating JSON data for production...");
 
   try {
-    // Get all auctions from SQLite
-    const allAuctions: any = {};
-    
-    // You might need to add a getAllAuctions method to your repo
-    // For now, let's generate from known data
+    // Import auction repo
+    const { auctionRepo } = await import("../lib/db/dbClass");
+
+    const allAuctions: AuctionDataMap = {};
+
+    // Get auctions from SQLite database
     for (let i = 400; i <= 500; i++) {
       const auction = auctionRepo.getAuction(i.toString());
       if (auction) {
@@ -28,7 +48,6 @@ async function main() {
 
     console.log(`✅ Generated JSON data: ${filePath}`);
     console.log(`📊 Total auctions: ${Object.keys(allAuctions).length}`);
-    
   } catch (error) {
     console.error("❌ Failed to generate JSON:", error);
     process.exit(1);
