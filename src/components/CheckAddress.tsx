@@ -36,9 +36,9 @@ export default function CheckAddress() {
         `/api/auctions/owner?address=${encodeURIComponent(address)}`,
       );
 
-      // Check if response is JSON
+      // Check if response is JSON - FIX: Use optional chaining
       const contentType = response.headers.get("content-type");
-      if (!contentType || !contentType.includes("application/json")) {
+      if (!contentType?.includes("application/json")) {
         throw new Error("API endpoint not found or returned invalid response");
       }
 
