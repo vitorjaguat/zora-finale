@@ -4,7 +4,7 @@ import { CONTRACT } from "@/config/contract";
 import fs from "fs";
 import path from "path";
 
-interface AuctionData {
+export interface AuctionData {
   auctionId: string;
   tokenId: string;
   tokenContract: string;
@@ -25,8 +25,8 @@ interface AuctionDatabase {
   // Indexes for fast lookups
   indexes: {
     byTokenOwner: Record<string, string[]>; // tokenOwner -> auctionIds[]
-    byCurator: Record<string, string[]>;    // curator -> auctionIds[]
-    byBidder: Record<string, string[]>;     // bidder -> auctionIds[]
+    byCurator: Record<string, string[]>; // curator -> auctionIds[]
+    byBidder: Record<string, string[]>; // bidder -> auctionIds[]
     byTokenContract: Record<string, string[]>; // tokenContract -> auctionIds[]
   };
   metadata: {
@@ -42,7 +42,9 @@ const publicClient = createPublicClient({
   transport: http(process.env.ALCHEMY_RPC_URL),
 });
 
-function createIndexes(auctions: Record<string, AuctionData>): AuctionDatabase["indexes"] {
+function createIndexes(
+  auctions: Record<string, AuctionData>,
+): AuctionDatabase["indexes"] {
   const byTokenOwner: Record<string, string[]> = {};
   const byCurator: Record<string, string[]> = {};
   const byBidder: Record<string, string[]> = {};
@@ -211,7 +213,9 @@ async function fetchAuctionsToJSON(): Promise<void> {
 
   console.log(`✅ Generated indexed JSON database: ${filePath}`);
   console.log(`📊 Total auctions: ${database.metadata.totalAuctions}`);
-  console.log(`🔍 Indexed ${Object.keys(indexes.byTokenOwner).length} token owners`);
+  console.log(
+    `🔍 Indexed ${Object.keys(indexes.byTokenOwner).length} token owners`,
+  );
   console.log(`🔍 Indexed ${Object.keys(indexes.byCurator).length} curators`);
   console.log(`🔍 Indexed ${Object.keys(indexes.byBidder).length} bidders`);
 }

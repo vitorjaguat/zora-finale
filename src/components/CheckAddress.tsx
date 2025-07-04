@@ -1,6 +1,5 @@
 "use client";
-
-import type { AuctionData } from "@/lib/db/dbClass";
+import type { AuctionData } from "@/scripts/generateJSON";
 import { useRef, useState } from "react";
 
 interface CheckResult {
@@ -86,7 +85,7 @@ export default function CheckAddress() {
       <button
         onClick={handleButtonClick}
         disabled={loading}
-        className="rounded-lg bg-neutral-300 px-4 py-2.5 tracking-wider text-black uppercase duration-300 ease-out hover:bg-neutral-100 disabled:opacity-50 disabled:cursor-not-allowed"
+        className="rounded-lg bg-neutral-300 px-4 py-2.5 tracking-wider text-black uppercase duration-300 ease-out hover:bg-neutral-100 disabled:cursor-not-allowed disabled:opacity-50"
       >
         {loading ? "Checking..." : "Submit"}
       </button>
