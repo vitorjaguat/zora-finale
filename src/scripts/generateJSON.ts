@@ -22,12 +22,11 @@ export interface AuctionData {
 
 interface AuctionDatabase {
   auctions: Record<string, AuctionData>;
-  // Indexes for fast lookups
   indexes: {
-    byTokenOwner: Record<string, string[]>; // tokenOwner -> auctionIds[]
-    byCurator: Record<string, string[]>; // curator -> auctionIds[]
-    byBidder: Record<string, string[]>; // bidder -> auctionIds[]
-    byTokenContract: Record<string, string[]>; // tokenContract -> auctionIds[]
+    byTokenOwner: Record<string, string[]>;
+    byCurator: Record<string, string[]>;
+    byBidder: Record<string, string[]>;
+    byTokenContract: Record<string, string[]>;
   };
   metadata: {
     totalAuctions: number;
@@ -42,41 +41,31 @@ const publicClient = createPublicClient({
   transport: http(process.env.ALCHEMY_RPC_URL),
 });
 
-function createIndexes(
-  auctions: Record<string, AuctionData>,
-): AuctionDatabase["indexes"] {
+function createIndexes(auctions: Record<string, AuctionData>): AuctionDatabase["indexes"] {
   const byTokenOwner: Record<string, string[]> = {};
   const byCurator: Record<string, string[]> = {};
   const byBidder: Record<string, string[]> = {};
   const byTokenContract: Record<string, string[]> = {};
 
   for (const [auctionId, auction] of Object.entries(auctions)) {
-    // Index by tokenOwner
+    // Index by tokenOwner - FIX: Use nullish coalescing assignment
     const tokenOwner = auction.tokenOwner.toLowerCase();
-    if (!byTokenOwner[tokenOwner]) {
-      byTokenOwner[tokenOwner] = [];
-    }
+    byTokenOwner[tokenOwner] ??= [];
     byTokenOwner[tokenOwner].push(auctionId);
 
-    // Index by curator
+    // Index by curator - FIX: Use nullish coalescing assignment
     const curator = auction.curator.toLowerCase();
-    if (!byCurator[curator]) {
-      byCurator[curator] = [];
-    }
+    byCurator[curator] ??= [];
     byCurator[curator].push(auctionId);
 
-    // Index by bidder
+    // Index by bidder - FIX: Use nullish coalescing assignment
     const bidder = auction.bidder.toLowerCase();
-    if (!byBidder[bidder]) {
-      byBidder[bidder] = [];
-    }
+    byBidder[bidder] ??= [];
     byBidder[bidder].push(auctionId);
 
-    // Index by tokenContract
+    // Index by tokenContract - FIX: Use nullish coalescing assignment
     const tokenContract = auction.tokenContract.toLowerCase();
-    if (!byTokenContract[tokenContract]) {
-      byTokenContract[tokenContract] = [];
-    }
+    byTokenContract[tokenContract] ??= [];
     byTokenContract[tokenContract].push(auctionId);
   }
 
@@ -213,9 +202,7 @@ async function fetchAuctionsToJSON(): Promise<void> {
 
   console.log(`✅ Generated indexed JSON database: ${filePath}`);
   console.log(`📊 Total auctions: ${database.metadata.totalAuctions}`);
-  console.log(
-    `🔍 Indexed ${Object.keys(indexes.byTokenOwner).length} token owners`,
-  );
+  console.log(`🔍 Indexed ${Object.keys(indexes.byTokenOwner).length} token owners`);
   console.log(`🔍 Indexed ${Object.keys(indexes.byCurator).length} curators`);
   console.log(`🔍 Indexed ${Object.keys(indexes.byBidder).length} bidders`);
 }

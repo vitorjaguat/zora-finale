@@ -3,15 +3,36 @@ import { NextResponse } from "next/server";
 import fs from 'fs';
 import path from 'path';
 
+interface AuctionData {
+  auctionId: string;
+  tokenId: string;
+  tokenContract: string;
+  approved: boolean;
+  amount: string;
+  duration: string;
+  firstBidTime: string;
+  reservePrice: string;
+  curatorFeePercentage: number;
+  tokenOwner: string;
+  bidder: string;
+  curator: string;
+  auctionCurrency: string;
+}
+
 interface AuctionDatabase {
-  auctions: Record<string, any>;
+  auctions: Record<string, AuctionData>;
   indexes: {
     byTokenOwner: Record<string, string[]>;
     byCurator: Record<string, string[]>;
     byBidder: Record<string, string[]>;
     byTokenContract: Record<string, string[]>;
   };
-  metadata: any;
+  metadata: {
+    totalAuctions: number;
+    generatedAt: string;
+    startId: number;
+    endId: number;
+  };
 }
 
 export async function GET(request: NextRequest) {
@@ -49,7 +70,7 @@ export async function GET(request: NextRequest) {
     const normalizedAddress = address.toLowerCase();
     
     // Use curator index for fast lookup
-    const auctionIds = database.indexes.byCurator[normalizedAddress] || [];
+    const auctionIds = database.indexes.byCurator[normalizedAddress] ?? [];
     const auctions = auctionIds.map(id => database.auctions[id]).filter(Boolean);
 
     return NextResponse.json({

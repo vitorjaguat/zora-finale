@@ -1,7 +1,7 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import fs from "fs";
-import path from "path";
+import fs from 'fs';
+import path from 'path';
 
 interface AuctionData {
   auctionId: string;
@@ -37,13 +37,15 @@ interface AuctionDatabase {
 
 export async function GET(request: NextRequest) {
   try {
+    console.log('API route called');
+    
     const { searchParams } = new URL(request.url);
     const address = searchParams.get("address");
 
     if (!address) {
       return NextResponse.json(
         { error: "Address parameter is required" },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -51,39 +53,37 @@ export async function GET(request: NextRequest) {
     if (!addressRegex.test(address)) {
       return NextResponse.json(
         { error: "Invalid Ethereum address format" },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
     // Read auction database from JSON file
-    const dataPath = path.join(
-      process.cwd(),
-      "public",
-      "data",
-      "auctions.json",
-    );
-
+    const dataPath = path.join(process.cwd(), 'public', 'data', 'auctions.json');
+    
+    console.log(`Looking for database at: ${dataPath}`);
+    
     if (!fs.existsSync(dataPath)) {
+      console.error(`Database file not found at: ${dataPath}`);
       return NextResponse.json(
-        { error: "Auction database not available" },
-        { status: 503 },
+        { error: "Auction database not available. Please generate the database first." },
+        { status: 503 }
       );
     }
 
-    const fileContent = fs.readFileSync(dataPath, "utf8");
-    const database: AuctionDatabase = JSON.parse(
-      fileContent,
-    ) as AuctionDatabase;
-
+    const fileContent = fs.readFileSync(dataPath, 'utf8');
+    const database: AuctionDatabase = JSON.parse(fileContent) as AuctionDatabase;
+    
+    console.log(`Database loaded. Total auctions: ${database.metadata.totalAuctions}`);
+    
     const normalizedAddress = address.toLowerCase();
-
-    // Use indexes for fast lookup
-    const auctionIds = database.indexes.byTokenOwner[normalizedAddress] || [];
-
+    
+    // Use indexes for fast lookup - FIX: Use nullish coalescing
+    const auctionIds = database.indexes.byTokenOwner[normalizedAddress] ?? [];
+    
+    console.log(`Found ${auctionIds.length} auctions for address ${normalizedAddress}`);
+    
     // Get auction data for found IDs
-    const auctions = auctionIds
-      .map((id) => database.auctions[id])
-      .filter(Boolean);
+    const auctions = auctionIds.map(id => database.auctions[id]).filter(Boolean);
 
     return NextResponse.json({
       address: normalizedAddress,
@@ -95,13 +95,12 @@ export async function GET(request: NextRequest) {
         totalAuctionsInDB: database.metadata.totalAuctions,
       },
     });
+    
   } catch (error) {
-    console.error("API error:", error);
+    console.error('API error:', error);
     return NextResponse.json(
-      {
-        error: `Server error: ${error instanceof Error ? error.message : "Unknown error"}`,
-      },
-      { status: 500 },
+      { error: `Server error: ${error instanceof Error ? error.message : 'Unknown error'}` },
+      { status: 500 }
     );
   }
 }
