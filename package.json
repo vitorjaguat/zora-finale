@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "prebuild": "tsx src/scripts/generateStaticDB.ts",
+    "prebuild": "tsx src/scripts/generateStaticDB.ts && tsx src/scripts/generateJSON.ts",
     "build": "next build --turbopack",
     "dev": "next dev --turbopack",
     "test-db": "tsx src/lib/db/dbTest.ts",
@@ -17,7 +17,8 @@
     "preview": "next build && next start",
     "start": "next start",
     "typecheck": "tsc --noEmit",
-    "fetch-auctions": "tsx src/lib/db/dbFetcher.ts"
+    "fetch-auctions": "tsx src/lib/db/dbFetcher.ts",
+    "generate-json": "tsx src/scripts/generateJSON.ts"
   },
   "dependencies": {
     "@rainbow-me/rainbowkit": "^2.2.6",
