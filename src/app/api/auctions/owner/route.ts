@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auctionRepo } from "@/lib/db/dbClass";
 
 export async function GET(request: NextRequest) {
   try {
+    // Dynamic import to handle potential issues
+    const { auctionRepo } = await import("@/lib/db/dbClass");
+
     const { searchParams } = new URL(request.url);
     const address = searchParams.get("address");
 
@@ -10,7 +12,7 @@ export async function GET(request: NextRequest) {
     if (!address) {
       return NextResponse.json(
         { error: "Address parameter is required" },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -19,7 +21,7 @@ export async function GET(request: NextRequest) {
     if (!addressRegex.test(address)) {
       return NextResponse.json(
         { error: "Invalid Ethereum address format" },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -33,10 +35,14 @@ export async function GET(request: NextRequest) {
       auctions: auctions,
     });
   } catch (error) {
-    console.error("Database error:", error);
+    console.error("API error:", error);
     return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 },
+      {
+        error: `Database error: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`,
+      },
+      { status: 500 }
     );
   }
 }

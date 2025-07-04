@@ -36,6 +36,12 @@ export default function CheckAddress() {
         `/api/auctions/owner?address=${encodeURIComponent(address)}`,
       );
 
+      // Check if response is JSON
+      const contentType = response.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        throw new Error("API endpoint not found or returned invalid response");
+      }
+
       if (!response.ok) {
         const errorData = (await response.json()) as ErrorResponse;
         throw new Error(errorData.error ?? "Failed to check address.");
@@ -45,9 +51,11 @@ export default function CheckAddress() {
       setResult(data);
       console.dir(data, { depth: null });
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "An unknown error occurred.",
-      );
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("An unknown error occurred.");
+      }
     } finally {
       setLoading(false);
     }
