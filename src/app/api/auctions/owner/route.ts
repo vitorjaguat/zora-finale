@@ -19,9 +19,7 @@ interface AuctionData {
   auctionCurrency: string;
 }
 
-interface AuctionDataMap {
-  [key: string]: AuctionData;
-}
+type AuctionDataMap = Record<string, AuctionData>;
 
 export async function GET(request: NextRequest) {
   try {

@@ -17,9 +17,7 @@ interface AuctionData {
   auctionCurrency: string;
 }
 
-interface AuctionDataMap {
-  [key: string]: AuctionData;
-}
+type AuctionDataMap = Record<string, AuctionData>;
 
 async function main() {
   console.log("🔄 Generating JSON data for production...");
@@ -48,6 +46,7 @@ async function main() {
 
     console.log(`✅ Generated JSON data: ${filePath}`);
     console.log(`📊 Total auctions: ${Object.keys(allAuctions).length}`);
+    
   } catch (error) {
     console.error("❌ Failed to generate JSON:", error);
     process.exit(1);
