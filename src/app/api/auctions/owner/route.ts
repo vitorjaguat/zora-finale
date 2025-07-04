@@ -1,7 +1,7 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import fs from 'fs';
-import path from 'path';
+import fs from "fs";
+import path from "path";
 
 interface AuctionData {
   auctionId: string;
@@ -19,76 +19,89 @@ interface AuctionData {
   auctionCurrency: string;
 }
 
-type AuctionDataMap = Record<string, AuctionData>;
+interface AuctionDatabase {
+  auctions: Record<string, AuctionData>;
+  indexes: {
+    byTokenOwner: Record<string, string[]>;
+    byCurator: Record<string, string[]>;
+    byBidder: Record<string, string[]>;
+    byTokenContract: Record<string, string[]>;
+  };
+  metadata: {
+    totalAuctions: number;
+    generatedAt: string;
+    startId: number;
+    endId: number;
+  };
+}
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const address = searchParams.get("address");
 
-    // Validate address parameter
     if (!address) {
       return NextResponse.json(
         { error: "Address parameter is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
-    // Basic address format validation (Ethereum address)
     const addressRegex = /^0x[a-fA-F0-9]{40}$/;
     if (!addressRegex.test(address)) {
       return NextResponse.json(
         { error: "Invalid Ethereum address format" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
-    // Try SQLite first, fallback to JSON
-    try {
-      const { auctionRepo } = await import("@/lib/db/dbClass");
-      const auctions = auctionRepo.getAuctionsByOwner(address);
-      
-      return NextResponse.json({
-        address: address.toLowerCase(),
-        hasAuctions: auctions.length > 0,
-        auctionCount: auctions.length,
-        auctions: auctions,
-      });
-    } catch (dbError) {
-      console.log('SQLite failed, trying JSON fallback:', dbError);
-      
-      // Fallback to JSON file
-      const dataPath = path.join(process.cwd(), 'public', 'data', 'auctions.json');
-      
-      if (!fs.existsSync(dataPath)) {
-        return NextResponse.json(
-          { error: "Database not available" },
-          { status: 503 }
-        );
-      }
+    // Read auction database from JSON file
+    const dataPath = path.join(
+      process.cwd(),
+      "public",
+      "data",
+      "auctions.json",
+    );
 
-      const fileContent = fs.readFileSync(dataPath, 'utf8');
-      const auctionData: AuctionDataMap = JSON.parse(fileContent) as AuctionDataMap;
-      
-      // Filter auctions by owner
-      const auctions = Object.values(auctionData).filter((auction: AuctionData) => 
-        auction.tokenOwner?.toLowerCase() === address.toLowerCase()
+    if (!fs.existsSync(dataPath)) {
+      return NextResponse.json(
+        { error: "Auction database not available" },
+        { status: 503 },
       );
-
-      return NextResponse.json({
-        address: address.toLowerCase(),
-        hasAuctions: auctions.length > 0,
-        auctionCount: auctions.length,
-        auctions: auctions,
-        source: 'json-fallback'
-      });
     }
-    
+
+    const fileContent = fs.readFileSync(dataPath, "utf8");
+    const database: AuctionDatabase = JSON.parse(
+      fileContent,
+    ) as AuctionDatabase;
+
+    const normalizedAddress = address.toLowerCase();
+
+    // Use indexes for fast lookup
+    const auctionIds = database.indexes.byTokenOwner[normalizedAddress] || [];
+
+    // Get auction data for found IDs
+    const auctions = auctionIds
+      .map((id) => database.auctions[id])
+      .filter(Boolean);
+
+    return NextResponse.json({
+      address: normalizedAddress,
+      hasAuctions: auctions.length > 0,
+      auctionCount: auctions.length,
+      auctions: auctions,
+      metadata: {
+        databaseGenerated: database.metadata.generatedAt,
+        totalAuctionsInDB: database.metadata.totalAuctions,
+      },
+    });
   } catch (error) {
-    console.error('API error:', error);
+    console.error("API error:", error);
     return NextResponse.json(
-      { error: `Server error: ${error instanceof Error ? error.message : 'Unknown error'}` },
-      { status: 500 }
+      {
+        error: `Server error: ${error instanceof Error ? error.message : "Unknown error"}`,
+      },
+      { status: 500 },
     );
   }
 }

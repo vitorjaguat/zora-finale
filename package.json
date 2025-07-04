@@ -4,11 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "prebuild": "tsx src/scripts/generateStaticDB.ts && tsx src/scripts/generateJSON.ts",
+    "prebuild": "tsx src/scripts/generateJSON.ts",
     "build": "next build --turbopack",
     "dev": "next dev --turbopack",
-    "test-db": "tsx src/lib/db/dbTest.ts",
-    "generate-db": "tsx src/scripts/generateStaticDB.ts",
     "check": "next lint && tsc --noEmit",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,mdx}\" --cache",
     "format:write": "prettier --write \"**/*.{ts,tsx,js,jsx,mdx}\" --cache",
@@ -17,13 +15,11 @@
     "preview": "next build && next start",
     "start": "next start",
     "typecheck": "tsc --noEmit",
-    "fetch-auctions": "tsx src/lib/db/dbFetcher.ts",
     "generate-json": "tsx src/scripts/generateJSON.ts"
   },
   "dependencies": {
     "@rainbow-me/rainbowkit": "^2.2.6",
     "@tanstack/react-query": "^5.69.0",
-    "better-sqlite3": "^12.2.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.515.0",
@@ -37,7 +33,6 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",
     "@tailwindcss/postcss": "^4.0.15",
-    "@types/better-sqlite3": "^7.6.13",
     "@types/node": "^20.14.10",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
