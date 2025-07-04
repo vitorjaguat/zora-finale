@@ -10,13 +10,17 @@ interface CheckResult {
   auctions: AuctionData[];
 }
 
+interface ErrorResponse {
+  error: string;
+}
+
 export default function CheckAddress() {
   const addressRef = useRef<HTMLInputElement>(null);
   const [result, setResult] = useState<CheckResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (): Promise<void> => {
     if (!addressRef.current?.value) {
       setError("Please enter a valid address.");
       return;
@@ -33,11 +37,11 @@ export default function CheckAddress() {
       );
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to check address.");
+        const errorData = (await response.json()) as ErrorResponse;
+        throw new Error(errorData.error ?? "Failed to check address.");
       }
 
-      const data: CheckResult = await response.json();
+      const data = (await response.json()) as CheckResult;
       setResult(data);
       console.dir(data, { depth: null });
     } catch (err) {
@@ -49,10 +53,14 @@ export default function CheckAddress() {
     }
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
+  const handleKeyPress = (e: React.KeyboardEvent): void => {
     if (e.key === "Enter") {
-      handleSubmit();
+      void handleSubmit();
     }
+  };
+
+  const handleButtonClick = (): void => {
+    void handleSubmit();
   };
 
   return (
@@ -68,11 +76,13 @@ export default function CheckAddress() {
         placeholder="0x1234...abcd"
       />
       <button
-        onClick={handleSubmit}
-        className="rounded-lg bg-neutral-300 px-4 py-2.5 tracking-wider text-black uppercase duration-300 ease-out hover:bg-neutral-100"
+        onClick={handleButtonClick}
+        disabled={loading}
+        className="rounded-lg bg-neutral-300 px-4 py-2.5 tracking-wider text-black uppercase duration-300 ease-out hover:bg-neutral-100 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {loading ? "Checking..." : "Submit"}
       </button>
+
       {/* Error Display */}
       {error && (
         <div className="w-full rounded-lg border border-red-600 bg-red-900/50 p-4 text-red-200">
