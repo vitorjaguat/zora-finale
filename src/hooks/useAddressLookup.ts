@@ -53,7 +53,7 @@ export function useAddressLookup() {
       }
     }
 
-    // API call
+    // API call //
     try {
       const response = await fetch(
         `/api/auctions/owner?address=${encodeURIComponent(address)}`,
