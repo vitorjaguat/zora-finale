@@ -4,7 +4,6 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "prebuild": "tsx src/scripts/generateJSON.ts",
     "build": "next build --turbopack",
     "dev": "next dev --turbopack",
     "check": "next lint && tsc --noEmit",
