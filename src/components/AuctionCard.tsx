@@ -3,6 +3,8 @@ import { formatEther, zeroAddress } from "viem";
 import { AddressDisplay } from "./AddressDisplay";
 import { cn } from "@/lib/utils";
 import { NFTPreview } from "./NFTPreview";
+import { FaEthereum } from "react-icons/fa";
+import { PiImageFill } from "react-icons/pi";
 
 interface AuctionCardProps {
   auction: AuctionData;
@@ -84,7 +86,7 @@ export function AuctionCard({
                 : "This auction did not receive any bids."
             }
           >
-            💰
+            <FaEthereum className="h-6 w-6 text-blue-400" />
           </div>
           <div
             className="flex flex-1 items-center justify-center bg-neutral-700"
@@ -94,7 +96,7 @@ export function AuctionCard({
                 : "You can settle this auction to reclaim your NFT."
             }
           >
-            🖼
+            <PiImageFill className="h-6 w-6 text-purple-400" />
           </div>
         </div>
       </div>
