@@ -1,140 +1,36 @@
 "use client";
-import type { AuctionData } from "@/scripts/generateJSON";
-import { useRef, useState } from "react";
-
-interface CheckResult {
-  address: string;
-  hasAuctions: boolean;
-  auctionCount: number;
-  auctions: AuctionData[];
-}
-
-interface ErrorResponse {
-  error: string;
-}
+import { AddressSearch } from "./AddressSearch";
+import { ResultsDisplay } from "./ResultsDisplay";
+import { ErrorDisplay } from "./ErrorDisplay";
+import { useAddressLookup } from "@/hooks/useAddressLookup";
+import { useEffect } from "react";
 
 export default function CheckAddress() {
-  const addressRef = useRef<HTMLInputElement>(null);
-  const [result, setResult] = useState<CheckResult | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const {
+    result,
+    loading,
+    error,
+    selectedAuctions,
+    handleSubmit,
+    handleSelectionChange,
+  } = useAddressLookup();
 
-  const handleSubmit = async (): Promise<void> => {
-    if (!addressRef.current?.value) {
-      setError("Please enter a valid address.");
-      return;
-    }
-
-    const address = addressRef.current.value;
-    setLoading(true);
-    setError(null);
-    setResult(null);
-
-    try {
-      const response = await fetch(
-        `/api/auctions/owner?address=${encodeURIComponent(address)}`,
-      );
-
-      // Check if response is JSON - FIX: Use optional chaining
-      const contentType = response.headers.get("content-type");
-      if (!contentType?.includes("application/json")) {
-        throw new Error("API endpoint not found or returned invalid response");
-      }
-
-      if (!response.ok) {
-        const errorData = (await response.json()) as ErrorResponse;
-        throw new Error(errorData.error ?? "Failed to check address.");
-      }
-
-      const data = (await response.json()) as CheckResult;
-      setResult(data);
-      console.dir(data, { depth: null });
-    } catch (err) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError("An unknown error occurred.");
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent): void => {
-    if (e.key === "Enter") {
-      void handleSubmit();
-    }
-  };
-
-  const handleButtonClick = (): void => {
-    void handleSubmit();
-  };
+  useEffect(() => {
+    console.log("Selected Auctions:", selectedAuctions);
+  }, [selectedAuctions]);
 
   return (
-    <div className="flex flex-col items-center gap-2">
-      <div className="text-3xl text-neutral-200">Check Address</div>
-      <input
-        ref={addressRef}
-        className="w-2xl rounded-lg bg-neutral-500 p-2 text-center text-white outline-0"
-        type="text"
-        name="address"
-        id="address"
-        onKeyDown={handleKeyPress}
-        placeholder="0x1234...abcd"
-      />
-      <button
-        onClick={handleButtonClick}
-        disabled={loading}
-        className="rounded-lg bg-neutral-300 px-4 py-2.5 tracking-wider text-black uppercase duration-300 ease-out hover:bg-neutral-100 disabled:cursor-not-allowed disabled:opacity-50"
-      >
-        {loading ? "Checking..." : "Submit"}
-      </button>
+    <div className="flex flex-col items-center gap-2 font-mono">
+      <AddressSearch onSubmit={handleSubmit} loading={loading} />
 
-      {/* Error Display */}
-      {error && (
-        <div className="w-full rounded-lg border border-red-600 bg-red-900/50 p-4 text-red-200">
-          <strong>Error:</strong> {error}
-        </div>
-      )}
+      {error && <ErrorDisplay error={error} />}
 
-      {/* Results Display */}
       {result && (
-        <div className="w-full rounded-lg border border-neutral-600 bg-neutral-800 p-6">
-          <h3 className="mb-4 text-xl text-neutral-200">
-            Results for {result.address}
-          </h3>
-
-          {result.hasAuctions ? (
-            <div className="space-y-4">
-              <div className="font-semibold text-green-400">
-                ✅ This address owns {result.auctionCount} auction
-                {result.auctionCount !== 1 ? "s" : ""}
-              </div>
-
-              <div className="space-y-2">
-                {result.auctions.map((auction) => (
-                  <div
-                    key={auction.auctionId}
-                    className="rounded bg-neutral-700 p-3"
-                  >
-                    <div className="text-neutral-200">
-                      <strong>Auction #{auction.auctionId}</strong>
-                    </div>
-                    <div className="space-y-1 text-sm text-neutral-400">
-                      <div>Token ID: {auction.tokenId}</div>
-                      <div>Reserve Price: {auction.reservePrice} wei</div>
-                      <div>Token Contract: {auction.tokenContract}</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ) : (
-            <div className="font-semibold text-red-400">
-              ❌ This address does not own any auctions
-            </div>
-          )}
-        </div>
+        <ResultsDisplay
+          result={result}
+          selectedAuctions={selectedAuctions}
+          onSelectionChange={handleSelectionChange}
+        />
       )}
     </div>
   );

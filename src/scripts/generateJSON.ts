@@ -41,7 +41,9 @@ const publicClient = createPublicClient({
   transport: http(process.env.ALCHEMY_RPC_URL),
 });
 
-function createIndexes(auctions: Record<string, AuctionData>): AuctionDatabase["indexes"] {
+function createIndexes(
+  auctions: Record<string, AuctionData>,
+): AuctionDatabase["indexes"] {
   const byTokenOwner: Record<string, string[]> = {};
   const byCurator: Record<string, string[]> = {};
   const byBidder: Record<string, string[]> = {};
@@ -78,8 +80,8 @@ function createIndexes(auctions: Record<string, AuctionData>): AuctionDatabase["
 }
 
 async function fetchAuctionsToJSON(): Promise<void> {
-  const startId = 400n;
-  const endId = 500n;
+  const startId = 1n;
+  const endId = 8410n;
   const allAuctions: Record<string, AuctionData> = {};
 
   console.log(`🔄 Fetching auctions from ${startId} to ${endId} via RPC...`);
@@ -202,7 +204,9 @@ async function fetchAuctionsToJSON(): Promise<void> {
 
   console.log(`✅ Generated indexed JSON database: ${filePath}`);
   console.log(`📊 Total auctions: ${database.metadata.totalAuctions}`);
-  console.log(`🔍 Indexed ${Object.keys(indexes.byTokenOwner).length} token owners`);
+  console.log(
+    `🔍 Indexed ${Object.keys(indexes.byTokenOwner).length} token owners`,
+  );
   console.log(`🔍 Indexed ${Object.keys(indexes.byCurator).length} curators`);
   console.log(`🔍 Indexed ${Object.keys(indexes.byBidder).length} bidders`);
 }

@@ -7,9 +7,9 @@ export default function Connect() {
   const { address, isConnected } = useAccount();
 
   return (
-    <div className="flex flex-col items-center justify-center gap-5">
+    <div className="flex w-full items-center justify-end gap-5">
       <ConnectButton />
-      {isConnected && <div className="text-xs">{address}</div>}
+      {/* {isConnected && <div className="text-xs">{address}</div>} */}
     </div>
   );
 }

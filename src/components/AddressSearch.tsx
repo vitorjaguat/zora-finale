@@ -1,0 +1,47 @@
+"use client";
+import { useRef } from "react";
+
+interface AddressSearchProps {
+  onSubmit: (address: string) => void;
+  loading: boolean;
+}
+
+export function AddressSearch({ onSubmit, loading }: AddressSearchProps) {
+  const addressRef = useRef<HTMLInputElement>(null);
+
+  const handleKeyPress = (e: React.KeyboardEvent): void => {
+    if (e.key === "Enter" && !loading) {
+      handleSubmit();
+    }
+  };
+
+  const handleSubmit = (): void => {
+    const address = addressRef.current?.value?.trim();
+    if (address) {
+      onSubmit(address);
+    }
+  };
+
+  return (
+    <div className="flex flex-col items-center gap-8 rounded-lg border border-neutral-600 bg-neutral-800 p-6">
+      <div className="w-full text-2xl text-neutral-200">Check Address</div>
+      <input
+        ref={addressRef}
+        className="w-2xl rounded-lg bg-neutral-500 p-2 text-center text-white outline-0"
+        type="text"
+        name="address"
+        id="address"
+        onKeyDown={handleKeyPress}
+        placeholder="0x1234...abcd"
+        disabled={loading}
+      />
+      <button
+        onClick={handleSubmit}
+        disabled={loading}
+        className="cursor-pointer rounded-lg bg-neutral-300 px-4 py-2.5 tracking-wider text-black uppercase duration-300 ease-out hover:bg-neutral-100 disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        {loading ? "Checking..." : "Submit"}
+      </button>
+    </div>
+  );
+}
