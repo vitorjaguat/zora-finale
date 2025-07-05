@@ -26,13 +26,13 @@ export function AddressDisplay({
   };
 
   return (
-    <div className={`flex items-center space-x-2 ${className}`}>
-      <span title={address} className="cursor-default font-mono text-sm">
+    <div className={`flex items-end space-x-2 text-sm ${className}`}>
+      <span title={address} className="cursor-default font-mono">
         {formatAddress(address)}
       </span>
       <button
         onClick={copyToClipboard}
-        className="flex-shrink-0 p-1 text-neutral-400 transition-colors hover:text-neutral-200"
+        className="flex-shrink-0 text-neutral-400 transition-colors hover:text-neutral-200"
         title={copied ? "Copied!" : "Copy address"}
       >
         {copied ? (

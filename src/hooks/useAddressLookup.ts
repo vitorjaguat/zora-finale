@@ -18,7 +18,6 @@ export function useAddressLookup() {
   const [result, setResult] = useState<CheckResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [selectedAuctions, setSelectedAuctions] = useState<AuctionData[]>([]);
 
   const handleSubmit = async (inputAddress: string): Promise<void> => {
     let address = inputAddress.trim();
@@ -31,7 +30,6 @@ export function useAddressLookup() {
     setLoading(true);
     setError(null);
     setResult(null);
-    setSelectedAuctions([]);
 
     // ENS resolution
     if (isLikelyENSName(address)) {
@@ -83,20 +81,10 @@ export function useAddressLookup() {
     }
   };
 
-  const handleSelectionChange = (auction: AuctionData, selected: boolean) => {
-    setSelectedAuctions((prev) =>
-      selected
-        ? [...prev, auction]
-        : prev.filter((a) => a.auctionId !== auction.auctionId),
-    );
-  };
-
   return {
     result,
     loading,
     error,
-    selectedAuctions,
     handleSubmit,
-    handleSelectionChange,
   };
 }
