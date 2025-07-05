@@ -1,13 +1,25 @@
 "use client";
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
 
 interface AddressSearchProps {
   onSubmit: (address: string) => void;
   loading: boolean;
+  initialValue?: string;
 }
 
-export function AddressSearch({ onSubmit, loading }: AddressSearchProps) {
+export function AddressSearch({
+  onSubmit,
+  loading,
+  initialValue = "",
+}: AddressSearchProps) {
   const addressRef = useRef<HTMLInputElement>(null);
+
+  // Set initial value when component mounts or initialValue changes
+  useEffect(() => {
+    if (addressRef.current && initialValue) {
+      addressRef.current.value = initialValue;
+    }
+  }, [initialValue]);
 
   const handleKeyPress = (e: React.KeyboardEvent): void => {
     if (e.key === "Enter" && !loading) {
@@ -34,6 +46,7 @@ export function AddressSearch({ onSubmit, loading }: AddressSearchProps) {
         onKeyDown={handleKeyPress}
         placeholder="0x1234...abcd"
         disabled={loading}
+        defaultValue={initialValue}
       />
       <button
         onClick={handleSubmit}

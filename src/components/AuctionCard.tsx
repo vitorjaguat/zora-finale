@@ -102,7 +102,7 @@ export function AuctionCard({
       </div>
       {/* Action buttons */}
       <div className="w-full">
-        <button className="w-full cursor-pointer rounded bg-purple-700 py-3 text-center text-neutral-300">
+        <button className="w-full cursor-pointer rounded bg-purple-700 py-3 text-center text-neutral-200 transition-colors duration-200 hover:bg-purple-600">
           Settle Auction
         </button>
       </div>
