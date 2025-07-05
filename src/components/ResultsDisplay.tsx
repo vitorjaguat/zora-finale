@@ -62,7 +62,9 @@ export function ResultsDisplay({
         <div className="fixed bottom-10 left-1/2 flex -translate-x-1/2 flex-col items-center rounded-lg bg-neutral-200/10 p-4 shadow-lg backdrop-blur-lg">
           <div className="text-center text-xs text-neutral-50">
             <div className="">Select the auctions you want to settle,</div>
-            <div className="">then click the "Settle Auctions" button.</div>
+            <div className="">
+              then click the &quot;Settle Auctions&quot; button.
+            </div>
           </div>
           <button
             className="mt-2 cursor-pointer rounded-lg bg-green-600 px-4 py-2 text-white transition-colors duration-200 hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50"

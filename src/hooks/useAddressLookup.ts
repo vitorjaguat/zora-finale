@@ -7,7 +7,7 @@ interface CheckResult {
   address: string;
   hasAuctions: boolean;
   auctionCount: number;
-  auctions: any[];
+  auctions: AuctionData[]; // Changed from any[] to AuctionData[]
 }
 
 interface ErrorResponse {
@@ -83,14 +83,11 @@ export function useAddressLookup() {
     }
   };
 
-  const handleSelectionChange = (
-    auctionData: AuctionData,
-    selected: boolean,
-  ) => {
+  const handleSelectionChange = (auction: AuctionData, selected: boolean) => {
     setSelectedAuctions((prev) =>
       selected
-        ? [...prev, auctionData]
-        : prev.filter((auction) => auctionData.auctionId !== auction.auctionId),
+        ? [...prev, auction]
+        : prev.filter((a) => a.auctionId !== auction.auctionId),
     );
   };
 
