@@ -5,26 +5,89 @@ import { cn } from "@/lib/utils";
 import { NFTPreview } from "./NFTPreview";
 import { FaEthereum } from "react-icons/fa";
 import { PiImageFill } from "react-icons/pi";
+import { useSettleAuction } from "@/hooks/useSettleAuction";
+import { useState } from "react";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 interface AuctionCardProps {
   auction: AuctionData;
   isSelected?: boolean;
   onSelectionChange?: (auction: AuctionData, selected: boolean) => void;
+  onAuctionSettled?: (auctionId: string, transactionHash: string) => void;
 }
 
 export function AuctionCard({
   auction,
   isSelected = false,
   onSelectionChange,
+  onAuctionSettled,
 }: AuctionCardProps) {
+  const {
+    settleAuction,
+    loading,
+    error,
+    success,
+    transactionHash,
+    reset,
+    isConnected,
+  } = useSettleAuction();
+  const [isSettled, setIsSettled] = useState(false);
+
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     onSelectionChange?.(auction, e.target.checked);
   };
 
+  const handleSettleAuction = async () => {
+    if (loading || isSettled) return;
+
+    if (!isConnected) {
+      // Wallet connection will be handled by the ConnectButton
+      return;
+    }
+
+    try {
+      const result = await settleAuction(auction.auctionId, auction.bidder);
+
+      if (result?.success && result.transactionHash) {
+        setIsSettled(true);
+        onAuctionSettled?.(auction.auctionId, result.transactionHash);
+      }
+    } catch (err) {
+      console.error("Settlement failed:", err);
+    }
+  };
+
+  const getButtonText = () => {
+    if (!isConnected) return "Connect Wallet";
+    if (isSettled) return "✅ Settled";
+    if (loading) return "Settling...";
+    if (auction.bidder === zeroAddress) return "Cancel Auction";
+    return "End Auction";
+  };
+
+  const getButtonColor = () => {
+    if (!isConnected) return "bg-blue-600 hover:bg-blue-500";
+    if (isSettled) return "bg-green-600 hover:bg-green-600 cursor-default";
+    if (loading) return "bg-purple-500 cursor-not-allowed";
+    if (auction.bidder === zeroAddress) return "bg-red-600 hover:bg-red-500";
+    return "bg-purple-700 hover:bg-purple-600";
+  };
+
   return (
     <div className="flex flex-col gap-3 rounded bg-neutral-700 p-3 font-mono opacity-80 transition-opacity duration-200 hover:opacity-100">
+      {/* COL 0 - Checkbox */}
+      <div className="flex w-10 items-center justify-center pr-3">
+        <input
+          type="checkbox"
+          checked={isSelected}
+          onChange={handleCheckboxChange}
+          className="h-4 w-4 cursor-pointer appearance-none rounded border-2 border-neutral-500 bg-neutral-700 outline-0 transition-colors duration-200 checked:border-green-600 checked:bg-green-600 focus:ring-1 focus:ring-neutral-500 focus:ring-offset-0 focus:ring-offset-neutral-800"
+        />
+      </div>
+
       {/* NFT PREVIEW */}
       <NFTPreview id={auction.tokenId} contract={auction.tokenContract} />
+
       <div className="flex h-full min-h-[100px] items-stretch">
         {/* COL 1 - Auction Content */}
         <div className="flex flex-1 flex-col justify-center">
@@ -43,20 +106,29 @@ export function AuctionCard({
               <span>Has Bid:</span>
               <span
                 className={cn(
-                  "ml-3 font-semibold",
+                  "ml-3",
                   auction.bidder != zeroAddress
-                    ? "text-green-400"
+                    ? "text-green-600"
                     : "text-red-400",
                 )}
               >
                 {auction.bidder != zeroAddress ? "Yes" : "No"}
               </span>
             </div>
+            <div>
+              Latest Bid:{" "}
+              <span className="text-green-600">
+                {formatEther(BigInt(auction.amount))} ETH
+              </span>
+            </div>
 
             {auction?.bidder != zeroAddress && (
-              <div className="flex items-center justify-between">
-                <span>Bidder:</span>
-                <AddressDisplay address={auction.bidder} />
+              <div className="flex items-center">
+                <span className="mr-3">Bidder:</span>
+                <AddressDisplay
+                  className="items-center"
+                  address={auction.bidder}
+                />
               </div>
             )}
 
@@ -100,11 +172,53 @@ export function AuctionCard({
           </div>
         </div>
       </div>
+
       {/* Action buttons */}
-      <div className="w-full">
-        <button className="w-full cursor-pointer rounded bg-purple-700 py-3 text-center text-neutral-200 transition-colors duration-200 hover:bg-purple-600">
-          Settle Auction
-        </button>
+      <div className="w-full space-y-2">
+        {!isConnected ? (
+          <div className="flex justify-center">
+            <ConnectButton />
+          </div>
+        ) : (
+          <button
+            onClick={handleSettleAuction}
+            disabled={loading || isSettled}
+            className={cn(
+              "w-full cursor-pointer rounded py-3 text-center text-neutral-200 transition-colors duration-200",
+              getButtonColor(),
+            )}
+          >
+            {getButtonText()}
+          </button>
+        )}
+
+        {/* Error Display */}
+        {error && (
+          <div className="rounded bg-red-900/50 p-2 text-xs text-red-200">
+            <strong>Error:</strong> {error}
+            <button
+              onClick={reset}
+              className="ml-2 underline hover:no-underline"
+            >
+              Retry
+            </button>
+          </div>
+        )}
+
+        {/* Success Display */}
+        {success && transactionHash && (
+          <div className="rounded bg-green-900/50 p-2 text-xs text-green-200">
+            <strong>Success!</strong>{" "}
+            <a
+              href={`https://etherscan.io/tx/${transactionHash}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline hover:no-underline"
+            >
+              View on Etherscan
+            </a>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -107,7 +107,7 @@ export function NFTPreview({ id, contract, className = "" }: NFTPreviewProps) {
       />
 
       {loading ? (
-        <div className="flex items-center justify-center p-4">
+        <div className="flex justify-center p-4">
           <span className="text-neutral-400">Loading NFT data...</span>
         </div>
       ) : (
@@ -124,7 +124,7 @@ export function NFTPreview({ id, contract, className = "" }: NFTPreviewProps) {
           <div className="text-neutral-400">
             Token Contract:{" "}
             <AddressDisplay
-              className="inline text-xs"
+              className="inline items-end! text-xs"
               address={nftData?.contract.address!}
             />
           </div>

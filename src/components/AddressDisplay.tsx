@@ -26,7 +26,7 @@ export function AddressDisplay({
   };
 
   return (
-    <div className={`flex items-end space-x-2 text-sm ${className}`}>
+    <div className={`flex space-x-2 text-sm ${className}`}>
       <span title={address} className="cursor-default font-mono">
         {formatAddress(address)}
       </span>
