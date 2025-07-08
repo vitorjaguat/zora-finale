@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState, useCallback } from "react"; // Removed unused useEffect
 import { isAddress } from "viem";
 import { isLikelyENSName, resolveAddressOrENS } from "@/lib/ensUtils";
 import type { AuctionData } from "@/scripts/generateJSON";
@@ -7,7 +7,7 @@ interface CheckResult {
   address: string;
   hasAuctions: boolean;
   auctionCount: number;
-  auctions: AuctionData[]; // Changed from any[] to AuctionData[]
+  auctions: AuctionData[];
 }
 
 interface ErrorResponse {
@@ -18,73 +18,97 @@ export function useAddressLookup() {
   const [result, setResult] = useState<CheckResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [selectedAuctions, setSelectedAuctions] = useState<AuctionData[]>([]);
+  const [lastSearchedAddress, setLastSearchedAddress] = useState<string>("");
 
-  const handleSubmit = async (inputAddress: string): Promise<void> => {
-    let address = inputAddress.trim();
+  const handleSubmit = useCallback(
+    async (inputAddress: string): Promise<void> => {
+      let address = inputAddress.trim();
 
-    if (!address || (!isAddress(address) && !isLikelyENSName(address))) {
-      setError("Please enter a valid address.");
-      return;
-    }
+      // Prevent duplicate searches
+      if (address === lastSearchedAddress && result) {
+        return;
+      }
 
-    setLoading(true);
-    setError(null);
-    setResult(null);
+      if (!address || (!isAddress(address) && !isLikelyENSName(address))) {
+        setError("Please enter a valid address.");
+        return;
+      }
 
-    // ENS resolution
-    if (isLikelyENSName(address)) {
-      try {
-        const resolved = await resolveAddressOrENS(address);
-        if (resolved.wasResolved) {
-          address = resolved.address;
-        } else {
-          setError("Failed to resolve ENS name to an address.");
+      setLoading(true);
+      setError(null);
+      setResult(null);
+      setSelectedAuctions([]);
+
+      // ENS resolution
+      if (isLikelyENSName(address)) {
+        try {
+          const resolved = await resolveAddressOrENS(address);
+          if (resolved.wasResolved) {
+            address = resolved.address;
+          } else {
+            setError("Failed to resolve ENS name to an address.");
+            setLoading(false);
+            return;
+          }
+        } catch (err) {
+          setError(
+            err instanceof Error ? err.message : "Unknown error resolving ENS",
+          );
           setLoading(false);
           return;
         }
-      } catch (err) {
-        setError(
-          err instanceof Error ? err.message : "Unknown error resolving ENS",
+      }
+
+      // Store the address we're searching for
+      setLastSearchedAddress(address);
+
+      // API call
+      try {
+        const response = await fetch(
+          `/api/auctions/owner?address=${encodeURIComponent(address)}`,
         );
+
+        const contentType = response.headers.get("content-type");
+        if (!contentType?.includes("application/json")) {
+          throw new Error("API endpoint not found or returned invalid response");
+        }
+
+        if (!response.ok) {
+          const errorData = (await response.json()) as ErrorResponse;
+          throw new Error(errorData.error ?? "Failed to check address.");
+        }
+
+        const data = (await response.json()) as CheckResult;
+        setResult(data);
+        console.dir(data, { depth: null });
+      } catch (err) {
+        if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError("An unknown error occurred.");
+        }
+      } finally {
         setLoading(false);
-        return;
       }
-    }
+    },
+    [lastSearchedAddress, result],
+  );
 
-    // API call //
-    try {
-      const response = await fetch(
-        `/api/auctions/owner?address=${encodeURIComponent(address)}`,
-      );
-
-      const contentType = response.headers.get("content-type");
-      if (!contentType?.includes("application/json")) {
-        throw new Error("API endpoint not found or returned invalid response");
-      }
-
-      if (!response.ok) {
-        const errorData = (await response.json()) as ErrorResponse;
-        throw new Error(errorData.error ?? "Failed to check address.");
-      }
-
-      const data = (await response.json()) as CheckResult;
-      setResult(data);
-      console.dir(data, { depth: null });
-    } catch (err) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError("An unknown error occurred.");
-      }
-    } finally {
-      setLoading(false);
-    }
+  const handleSelectionChange = (auction: AuctionData, selected: boolean) => {
+    setSelectedAuctions((prev) =>
+      selected
+        ? [...prev, auction]
+        : prev.filter((a) => a.auctionId !== auction.auctionId),
+    );
   };
 
   return {
     result,
     loading,
     error,
+    selectedAuctions,
     handleSubmit,
+    handleSelectionChange,
   };
 }

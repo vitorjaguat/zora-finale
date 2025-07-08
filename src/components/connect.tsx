@@ -1,10 +1,10 @@
 "use client";
 
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { useAccount } from "wagmi";
+// import { useAccount } from "wagmi";
 
 export default function Connect() {
-  const { address, isConnected } = useAccount();
+  // const { address, isConnected } = useAccount();
 
   return (
     <div className="flex w-full items-center justify-end gap-5">

@@ -1,5 +1,9 @@
 import { useState } from "react";
-import { useWriteContract, useWaitForTransactionReceipt, useAccount } from "wagmi";
+import {
+  useWriteContract,
+  useWaitForTransactionReceipt,
+  useAccount,
+} from "wagmi";
 import { CONTRACT } from "@/config/contract";
 import { zeroAddress } from "viem";
 
@@ -10,14 +14,22 @@ interface SettleResponse {
 
 export function useSettleAuction() {
   const { address, isConnected } = useAccount();
-  const { writeContract, data: hash, error: writeError, isPending } = useWriteContract();
+  const {
+    writeContract,
+    data: hash,
+    error: writeError,
+    isPending,
+  } = useWriteContract();
   const [isSettling, setIsSettling] = useState(false);
 
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
     hash,
   });
 
-  const settleAuction = async (auctionId: string, bidder: string): Promise<SettleResponse | null> => {
+  const settleAuction = async (
+    auctionId: string,
+    bidder: string,
+  ): Promise<SettleResponse | null> => {
     if (!isConnected || !address) {
       throw new Error("Please connect your wallet first");
     }
@@ -26,12 +38,15 @@ export function useSettleAuction() {
 
     try {
       // Determine which function to call
-      const functionName = bidder === zeroAddress ? "cancelAuction" : "endAuction";
-      
-      console.log(`Settling auction ${auctionId} with function: ${functionName}`);
+      const functionName =
+        bidder === zeroAddress ? "cancelAuction" : "endAuction";
+
+      console.log(
+        `Settling auction ${auctionId} with function: ${functionName}`,
+      );
 
       // Call the contract function
-      await writeContract({
+      writeContract({
         address: CONTRACT.address,
         abi: CONTRACT.abi,
         functionName,
@@ -54,7 +69,7 @@ export function useSettleAuction() {
   return {
     settleAuction,
     loading: isPending || isConfirming || isSettling,
-    error: writeError?.message || null,
+    error: writeError?.message ?? null, // Fixed: Use nullish coalescing
     success: isSuccess,
     transactionHash: hash,
     reset,

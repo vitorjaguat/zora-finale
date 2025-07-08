@@ -13,10 +13,6 @@ interface ResultsDisplayProps {
 }
 
 export function ResultsDisplay({ result }: ResultsDisplayProps) {
-  const handleSettleAuctions = async () => {
-    // Handle settle auctions logic here
-  };
-
   return (
     <>
       <div className="mb-24 w-full rounded-lg border border-neutral-600 bg-neutral-800 p-6">

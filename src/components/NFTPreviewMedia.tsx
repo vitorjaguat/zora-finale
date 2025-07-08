@@ -1,6 +1,6 @@
 import type { AlchemyNFTResponse } from "./NFTPreview";
 import Image from "next/image";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { PiPlayCircleBold, PiPauseCircleBold } from "react-icons/pi";
 
 interface NFTPreviewMediaProps {
@@ -26,7 +26,7 @@ export default function NFTPreviewMedia({
   const [progress, setProgress] = useState(0);
   const audioRef = useRef<HTMLAudioElement>(null);
 
-  const resolveIPFSUrl = (url: string): string => {
+  const resolveIPFSUrl = useCallback((url: string): string => {
     if (!url) return "";
 
     if (url.startsWith("ipfs://")) {
@@ -36,37 +36,37 @@ export default function NFTPreviewMedia({
       return `https://ipfs.io/ipfs/${url.slice(5)}`;
     }
     return url;
-  };
+  }, []);
 
-  const getMediaUrl = (): string => {
+  const getMediaUrl = useCallback((): string => {
     if (!nftData) return "";
 
-    // Priority order for media URLs
+    // Priority order for media URLs - Fixed: Use nullish coalescing
     const mediaUrl =
-      nftData.image?.cachedUrl ||
-      nftData.image?.thumbnailUrl ||
-      nftData.image?.pngUrl ||
-      nftData.image?.originalUrl ||
-      nftData.media?.[0]?.gateway ||
-      nftData.media?.[0]?.thumbnail ||
-      nftData.raw?.metadata?.image ||
-      nftData.raw?.metadata?.animation_url ||
-      nftData.tokenUri?.gateway ||
+      nftData.image?.cachedUrl ??
+      nftData.image?.thumbnailUrl ??
+      nftData.image?.pngUrl ??
+      nftData.image?.originalUrl ??
+      nftData.media?.[0]?.gateway ??
+      nftData.media?.[0]?.thumbnail ??
+      nftData.raw?.metadata?.image ??
+      nftData.raw?.metadata?.animation_url ??
+      nftData.tokenUri?.gateway ??
       "";
 
     return resolveIPFSUrl(mediaUrl);
-  };
+  }, [nftData, resolveIPFSUrl]);
 
   // Detect media type by checking content-type header
-  const detectMediaType = async (
+  const detectMediaType = useCallback(async (
     url: string,
   ): Promise<"image" | "audio" | "video" | "unknown"> => {
     if (!url) return "unknown";
 
     try {
-      // First check if we have content type from the API
+      // First check if we have content type from the API - Fixed: Use nullish coalescing
       const apiContentType =
-        nftData?.image?.contentType || nftData?.media?.[0]?.format || "";
+        nftData?.image?.contentType ?? nftData?.media?.[0]?.format ?? "";
       if (apiContentType) {
         if (apiContentType.startsWith("audio/")) return "audio";
         if (apiContentType.startsWith("video/")) return "video";
@@ -80,7 +80,7 @@ export default function NFTPreviewMedia({
       });
 
       if (response.ok) {
-        const contentType = response.headers.get("content-type") || "";
+        const contentType = response.headers.get("content-type") ?? "";
         if (contentType.startsWith("audio/")) return "audio";
         if (contentType.startsWith("video/")) return "video";
         if (contentType.startsWith("image/")) return "image";
@@ -129,7 +129,7 @@ export default function NFTPreviewMedia({
 
     // Default to image for browser detection
     return "image";
-  };
+  }, [nftData]);
 
   useEffect(() => {
     if (nftData) {
@@ -138,10 +138,10 @@ export default function NFTPreviewMedia({
         detectMediaType(mediaUrl).then(setMediaType);
       }
     }
-  }, [nftData]);
+  }, [nftData, getMediaUrl, detectMediaType]); // Fixed: Added missing dependencies
 
   const mediaUrl = getMediaUrl();
-  const nftName = nftData?.name || `NFT #${id}`;
+  const nftName = nftData?.name ?? `NFT #${id}`; // Fixed: Use nullish coalescing
 
   const handleAudioToggle = () => {
     const audio = audioRef.current;

@@ -7,7 +7,7 @@ import { FaEthereum } from "react-icons/fa";
 import { PiImageFill } from "react-icons/pi";
 import { useSettleAuction } from "@/hooks/useSettleAuction";
 import { useState } from "react";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { ConnectButtonCustom } from "@/components/ConnectButton";
 
 interface AuctionCardProps {
   auction: AuctionData;
@@ -33,9 +33,9 @@ export function AuctionCard({
   } = useSettleAuction();
   const [isSettled, setIsSettled] = useState(false);
 
-  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onSelectionChange?.(auction, e.target.checked);
-  };
+  //   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //     onSelectionChange?.(auction, e.target.checked);
+  //   };
 
   const handleSettleAuction = async () => {
     if (loading || isSettled) return;
@@ -75,16 +75,6 @@ export function AuctionCard({
 
   return (
     <div className="flex flex-col gap-3 rounded bg-neutral-700 p-3 font-mono opacity-80 transition-opacity duration-200 hover:opacity-100">
-      {/* COL 0 - Checkbox */}
-      <div className="flex w-10 items-center justify-center pr-3">
-        <input
-          type="checkbox"
-          checked={isSelected}
-          onChange={handleCheckboxChange}
-          className="h-4 w-4 cursor-pointer appearance-none rounded border-2 border-neutral-500 bg-neutral-700 outline-0 transition-colors duration-200 checked:border-green-600 checked:bg-green-600 focus:ring-1 focus:ring-neutral-500 focus:ring-offset-0 focus:ring-offset-neutral-800"
-        />
-      </div>
-
       {/* NFT PREVIEW */}
       <NFTPreview id={auction.tokenId} contract={auction.tokenContract} />
 
@@ -177,7 +167,7 @@ export function AuctionCard({
       <div className="w-full space-y-2">
         {!isConnected ? (
           <div className="flex justify-center">
-            <ConnectButton />
+            <ConnectButtonCustom className="" />
           </div>
         ) : (
           <button
