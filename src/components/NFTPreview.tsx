@@ -84,8 +84,15 @@ export function NFTPreview({ id, contract, className = "" }: NFTPreviewProps) {
           );
         }
 
-        const data: AlchemyNFTResponse = await response.json();
-        setNftData(data);
+        const rawData: unknown = await response.json(); // Fixed: Type as unknown first
+
+        // Type guard or safe casting
+        if (rawData && typeof rawData === "object" && rawData !== null) {
+          const data = rawData as AlchemyNFTResponse; // Fixed: Safe type assertion
+          setNftData(data);
+        } else {
+          throw new Error("Invalid response format from Alchemy API");
+        }
       } catch (error) {
         console.error("Error fetching NFT metadata:", error);
       } finally {

@@ -15,7 +15,7 @@ export default function CheckAddress() {
   useEffect(() => {
     const addressFromUrl = searchParams.get("address");
     if (addressFromUrl && !result && !loading) {
-      handleSubmit(addressFromUrl);
+      void handleSubmit(addressFromUrl); // Fixed: Use void operator to handle floating promise
     }
   }, [searchParams, result, loading, handleSubmit]);
 
@@ -43,7 +43,7 @@ export default function CheckAddress() {
       <AddressSearch
         onSubmit={handleSubmit}
         loading={loading}
-        initialValue={searchParams.get("address") ?? ""} // Fixed: Use nullish coalescing
+        initialValue={searchParams.get("address") ?? ""}
       />
 
       {error && <ErrorDisplay error={error} />}
