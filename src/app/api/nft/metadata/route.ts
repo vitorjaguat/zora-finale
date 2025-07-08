@@ -1,4 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+import type { AlchemyNFTResponse } from "@/hooks/useNFTMetadata";
 
 const ALCHEMY_API_KEY = process.env.ALCHEMY_API_KEY; // No NEXT_PUBLIC prefix
 
@@ -15,7 +17,7 @@ export async function GET(request: NextRequest) {
     if (!contractAddress || !tokenId) {
       return NextResponse.json(
         { error: "Missing contractAddress or tokenId" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -35,18 +37,22 @@ export async function GET(request: NextRequest) {
 
     if (!response.ok) {
       throw new Error(
-        `Alchemy API error: ${response.status} ${response.statusText}`
+        `Alchemy API error: ${response.status} ${response.statusText}`,
       );
     }
 
-    const data = await response.json();
-    return NextResponse.json(data);
-
+    const rawData: unknown = await response.json();
+    if (rawData && typeof rawData === "object" && rawData !== null) {
+      const data = rawData as AlchemyNFTResponse;
+      return NextResponse.json(data);
+    } else {
+      throw new Error("Invalid response format from Alchemy API");
+    }
   } catch (error) {
     console.error("Error fetching NFT metadata:", error);
     return NextResponse.json(
       { error: "Failed to fetch NFT metadata" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
