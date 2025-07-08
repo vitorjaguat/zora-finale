@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
 import NFTPreviewMedia from "./NFTPreviewMedia";
 import { AddressDisplay } from "./AddressDisplay";
+import { useNFTMetadata } from "@/hooks/useNFTMetadata";
 
 interface NFTPreviewProps {
   id: string;
@@ -8,100 +8,11 @@ interface NFTPreviewProps {
   className?: string;
 }
 
-export interface AlchemyNFTResponse {
-  contract: {
-    address: string;
-  };
-  tokenId: string;
-  tokenType: string;
-  name?: string;
-  description?: string;
-  image?: {
-    cachedUrl?: string;
-    thumbnailUrl?: string;
-    pngUrl?: string;
-    contentType?: string;
-    size?: number;
-    originalUrl?: string;
-  };
-  raw?: {
-    metadata?: {
-      image?: string;
-      animation_url?: string;
-    };
-  };
-  tokenUri?: {
-    gateway?: string;
-    raw?: string;
-  };
-  media?: Array<{
-    gateway?: string;
-    thumbnail?: string;
-    raw?: string;
-    format?: string;
-    bytes?: number;
-  }>;
-}
-
 export function NFTPreview({ id, contract, className = "" }: NFTPreviewProps) {
-  const [nftData, setNftData] = useState<AlchemyNFTResponse | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    console.dir(nftData, {
-      depth: null,
-      colors: true,
-    });
-  }, [nftData]);
-
-  useEffect(() => {
-    const fetchNFTMetadata = async () => {
-      try {
-        const apiKey = process.env.NEXT_PUBLIC_ALCHEMY_API_KEY;
-        if (!apiKey) {
-          console.error("Alchemy API key not found");
-          setLoading(false);
-          return;
-        }
-
-        const url = `https://eth-mainnet.g.alchemy.com/nft/v3/${apiKey}/getNFTMetadata`;
-        const params = new URLSearchParams({
-          contractAddress: contract,
-          tokenId: id,
-          refreshCache: "false",
-        });
-
-        const response = await fetch(`${url}?${params}`, {
-          method: "GET",
-          headers: {
-            accept: "application/json",
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error(
-            `Alchemy API error: ${response.status} ${response.statusText}`,
-          );
-        }
-
-        const rawData: unknown = await response.json(); // Fixed: Type as unknown first
-
-        // Type guard or safe casting
-        if (rawData && typeof rawData === "object" && rawData !== null) {
-          const data = rawData as AlchemyNFTResponse; // Fixed: Safe type assertion
-          setNftData(data);
-        } else {
-          throw new Error("Invalid response format from Alchemy API");
-        }
-      } catch (error) {
-        console.error("Error fetching NFT metadata:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    void fetchNFTMetadata();
-  }, [id, contract]);
+  const { nftData, loading, error } = useNFTMetadata({
+    contractAddress: contract,
+    tokenId: id,
+  });
 
   return (
     <div className="flex gap-3 bg-white/5">
@@ -115,6 +26,10 @@ export function NFTPreview({ id, contract, className = "" }: NFTPreviewProps) {
       {loading ? (
         <div className="flex justify-center p-4">
           <span className="text-neutral-400">Loading NFT data...</span>
+        </div>
+      ) : error ? (
+        <div className="flex justify-center p-4">
+          <span className="text-red-400">Error: {error}</span>
         </div>
       ) : (
         <div className="flex flex-col justify-end gap-2 pr-3 pb-3 text-xs">
