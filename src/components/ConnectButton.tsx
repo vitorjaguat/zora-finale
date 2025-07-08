@@ -1,10 +1,12 @@
 import { ConnectButton } from "@rainbow-me/rainbowkit";
+import Image from "next/image";
 
 interface ConnectButtonCustomProps {
   className?: string;
 }
+
 export const ConnectButtonCustom = ({
-  className,
+  className: _className, // Fixed: Prefix with underscore to mark as allowed unused
 }: ConnectButtonCustomProps) => {
   return (
     <ConnectButton.Custom>
@@ -65,9 +67,11 @@ export const ConnectButtonCustom = ({
                         }}
                       >
                         {chain.iconUrl && (
-                          <img
+                          <Image // Fixed: Use Next.js Image component
                             alt={chain.name ?? "Chain icon"}
                             src={chain.iconUrl}
+                            width={12}
+                            height={12}
                             style={{ width: 12, height: 12 }}
                           />
                         )}

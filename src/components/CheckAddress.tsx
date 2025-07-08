@@ -43,7 +43,7 @@ export default function CheckAddress() {
       <AddressSearch
         onSubmit={handleSubmit}
         loading={loading}
-        initialValue={searchParams.get("address") || ""}
+        initialValue={searchParams.get("address") ?? ""} // Fixed: Use nullish coalescing
       />
 
       {error && <ErrorDisplay error={error} />}

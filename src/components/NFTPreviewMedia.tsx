@@ -41,7 +41,6 @@ export default function NFTPreviewMedia({
   const getMediaUrl = useCallback((): string => {
     if (!nftData) return "";
 
-    // Priority order for media URLs - Fixed: Use nullish coalescing
     const mediaUrl =
       nftData.image?.cachedUrl ??
       nftData.image?.thumbnailUrl ??
@@ -57,14 +56,12 @@ export default function NFTPreviewMedia({
     return resolveIPFSUrl(mediaUrl);
   }, [nftData, resolveIPFSUrl]);
 
-  // Detect media type by checking content-type header
   const detectMediaType = useCallback(async (
     url: string,
   ): Promise<"image" | "audio" | "video" | "unknown"> => {
     if (!url) return "unknown";
 
     try {
-      // First check if we have content type from the API - Fixed: Use nullish coalescing
       const apiContentType =
         nftData?.image?.contentType ?? nftData?.media?.[0]?.format ?? "";
       if (apiContentType) {
@@ -73,7 +70,6 @@ export default function NFTPreviewMedia({
         if (apiContentType.startsWith("image/")) return "image";
       }
 
-      // Try to fetch just the headers to get content-type
       const response = await fetch(url, {
         method: "HEAD",
         mode: "cors",
@@ -85,11 +81,10 @@ export default function NFTPreviewMedia({
         if (contentType.startsWith("video/")) return "video";
         if (contentType.startsWith("image/")) return "image";
       }
-    } catch (error) {
+    } catch (_error) {
       console.log("Could not fetch headers, will try browser detection");
     }
 
-    // Fallback: check if URL has any extension hints
     const cleanUrl = url.split("?")[0];
     const extension = cleanUrl?.split(".").pop()?.toLowerCase();
 
@@ -127,7 +122,6 @@ export default function NFTPreviewMedia({
       return "image";
     }
 
-    // Default to image for browser detection
     return "image";
   }, [nftData]);
 
@@ -135,13 +129,13 @@ export default function NFTPreviewMedia({
     if (nftData) {
       const mediaUrl = getMediaUrl();
       if (mediaUrl) {
-        detectMediaType(mediaUrl).then(setMediaType);
+        void detectMediaType(mediaUrl).then(setMediaType);
       }
     }
-  }, [nftData, getMediaUrl, detectMediaType]); // Fixed: Added missing dependencies
+  }, [nftData, getMediaUrl, detectMediaType]);
 
   const mediaUrl = getMediaUrl();
-  const nftName = nftData?.name ?? `NFT #${id}`; // Fixed: Use nullish coalescing
+  const nftName = nftData?.name ?? `NFT #${id}`;
 
   const handleAudioToggle = () => {
     const audio = audioRef.current;
@@ -164,7 +158,6 @@ export default function NFTPreviewMedia({
     }
   };
 
-  // Add audio event listeners
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
@@ -222,7 +215,6 @@ export default function NFTPreviewMedia({
       );
     }
 
-    // If we don't know the type yet, start with image and fallback
     if (mediaType === "unknown") {
       return (
         <Image
@@ -243,7 +235,6 @@ export default function NFTPreviewMedia({
           <div className="flex h-full w-full flex-col items-center justify-center bg-gradient-to-br from-neutral-900 to-neutral-500 p-1">
             {!audioError ? (
               <>
-                {/* Large play button overlay */}
                 <div className="relative flex flex-1 items-center justify-center">
                   <audio
                     ref={audioRef}
@@ -256,7 +247,6 @@ export default function NFTPreviewMedia({
                   >
                     <source src={mediaUrl} />
                   </audio>
-                  {/* Custom play button */}
                   <button
                     onClick={handleAudioToggle}
                     className="bg-opacity-30 hover:bg-opacity-50 absolute inset-0 flex items-center justify-center rounded transition-all duration-200"
@@ -271,8 +261,6 @@ export default function NFTPreviewMedia({
                     </div>
                   </button>
                 </div>
-
-                {/* Simple progress indicator */}
                 <div className="h-1 w-full overflow-hidden rounded-full bg-purple-700">
                   <div
                     className="h-full bg-purple-300 transition-all duration-100"
@@ -302,7 +290,6 @@ export default function NFTPreviewMedia({
                 preload="none"
                 onError={() => {
                   setVideoError(true);
-                  // If video fails, try as image
                   setMediaType("image");
                 }}
               >

@@ -1,5 +1,4 @@
-import { useState, useEffect, useRef } from "react";
-import Image from "next/image";
+import { useState, useEffect } from "react";
 import NFTPreviewMedia from "./NFTPreviewMedia";
 import { AddressDisplay } from "./AddressDisplay";
 
@@ -53,7 +52,7 @@ export function NFTPreview({ id, contract, className = "" }: NFTPreviewProps) {
       depth: null,
       colors: true,
     });
-  });
+  }, [nftData]);
 
   useEffect(() => {
     const fetchNFTMetadata = async () => {
@@ -94,7 +93,7 @@ export function NFTPreview({ id, contract, className = "" }: NFTPreviewProps) {
       }
     };
 
-    fetchNFTMetadata();
+    void fetchNFTMetadata();
   }, [id, contract]);
 
   return (
@@ -125,7 +124,7 @@ export function NFTPreview({ id, contract, className = "" }: NFTPreviewProps) {
             Token Contract:{" "}
             <AddressDisplay
               className="inline items-end! text-xs"
-              address={nftData?.contract.address!}
+              address={nftData?.contract.address ?? ""}
             />
           </div>
         </div>
