@@ -1,4 +1,4 @@
-import CheckAddress from "@/components/CheckAddress";
+import CheckAddressWrapper from "@/components/CheckAddressWrapper";
 import Connect from "@/components/connect";
 
 export default function HomePage() {
@@ -10,7 +10,9 @@ export default function HomePage() {
           Zora Finale
         </h1>
 
-        <CheckAddress />
+        <div className="mx-auto max-w-4xl">
+          <CheckAddressWrapper />
+        </div>
       </div>
     </main>
   );
