@@ -1,4 +1,4 @@
-import type { AlchemyNFTResponse } from "./NFTPreview";
+import type { AlchemyNFTResponse } from "../hooks/useNFTMetadata";
 import Image from "next/image";
 import { useEffect, useState, useRef, useCallback } from "react";
 import { PiPlayCircleBold, PiPauseCircleBold } from "react-icons/pi";
@@ -56,74 +56,83 @@ export default function NFTPreviewMedia({
     return resolveIPFSUrl(mediaUrl);
   }, [nftData, resolveIPFSUrl]);
 
-  const detectMediaType = useCallback(async (
-    url: string,
-  ): Promise<"image" | "audio" | "video" | "unknown"> => {
-    if (!url) return "unknown";
+  const detectMediaType = useCallback(
+    async (url: string): Promise<"image" | "audio" | "video" | "unknown"> => {
+      if (!url) return "unknown";
 
-    try {
-      const apiContentType =
-        nftData?.image?.contentType ?? nftData?.media?.[0]?.format ?? "";
-      if (apiContentType) {
-        if (apiContentType.startsWith("audio/")) return "audio";
-        if (apiContentType.startsWith("video/")) return "video";
-        if (apiContentType.startsWith("image/")) return "image";
+      try {
+        const apiContentType =
+          nftData?.image?.contentType ?? nftData?.media?.[0]?.format ?? "";
+        if (apiContentType) {
+          if (apiContentType.startsWith("audio/")) return "audio";
+          if (apiContentType.startsWith("video/")) return "video";
+          if (apiContentType.startsWith("image/")) return "image";
+        }
+
+        const response = await fetch(url, {
+          method: "HEAD",
+          mode: "cors",
+        });
+
+        if (response.ok) {
+          const contentType = response.headers.get("content-type") ?? "";
+          if (contentType.startsWith("audio/")) return "audio";
+          if (contentType.startsWith("video/")) return "video";
+          if (contentType.startsWith("image/")) return "image";
+        }
+      } catch (_error) {
+        console.log("Could not fetch headers, will try browser detection");
       }
 
-      const response = await fetch(url, {
-        method: "HEAD",
-        mode: "cors",
-      });
+      const cleanUrl = url.split("?")[0];
+      const extension = cleanUrl?.split(".").pop()?.toLowerCase();
 
-      if (response.ok) {
-        const contentType = response.headers.get("content-type") ?? "";
-        if (contentType.startsWith("audio/")) return "audio";
-        if (contentType.startsWith("video/")) return "video";
-        if (contentType.startsWith("image/")) return "image";
+      if (
+        extension &&
+        ["mp3", "wav", "ogg", "flac", "m4a", "aac", "wma", "opus"].includes(
+          extension,
+        )
+      ) {
+        return "audio";
       }
-    } catch (_error) {
-      console.log("Could not fetch headers, will try browser detection");
-    }
+      if (
+        extension &&
+        [
+          "mp4",
+          "webm",
+          "mov",
+          "avi",
+          "mkv",
+          "flv",
+          "wmv",
+          "m4v",
+          "ogv",
+        ].includes(extension)
+      ) {
+        return "video";
+      }
+      if (
+        extension &&
+        [
+          "jpg",
+          "jpeg",
+          "png",
+          "gif",
+          "svg",
+          "webp",
+          "bmp",
+          "tiff",
+          "ico",
+          "avif",
+        ].includes(extension)
+      ) {
+        return "image";
+      }
 
-    const cleanUrl = url.split("?")[0];
-    const extension = cleanUrl?.split(".").pop()?.toLowerCase();
-
-    if (
-      extension &&
-      ["mp3", "wav", "ogg", "flac", "m4a", "aac", "wma", "opus"].includes(
-        extension,
-      )
-    ) {
-      return "audio";
-    }
-    if (
-      extension &&
-      ["mp4", "webm", "mov", "avi", "mkv", "flv", "wmv", "m4v", "ogv"].includes(
-        extension,
-      )
-    ) {
-      return "video";
-    }
-    if (
-      extension &&
-      [
-        "jpg",
-        "jpeg",
-        "png",
-        "gif",
-        "svg",
-        "webp",
-        "bmp",
-        "tiff",
-        "ico",
-        "avif",
-      ].includes(extension)
-    ) {
       return "image";
-    }
-
-    return "image";
-  }, [nftData]);
+    },
+    [nftData],
+  );
 
   useEffect(() => {
     if (nftData) {
