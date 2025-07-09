@@ -166,8 +166,11 @@ export function AuctionCard({
       {/* Action buttons */}
       <div className="w-full space-y-2">
         {!isConnected ? (
-          <div className="flex justify-center">
-            <ConnectButtonCustom className="" />
+          <div className="flex h-full w-full justify-center">
+            <ConnectButtonCustom
+              text="Connect Wallet to Proceed"
+              className="w-full rounded bg-blue-600 py-3 font-semibold text-neutral-100 hover:bg-blue-500"
+            />
           </div>
         ) : (
           <button

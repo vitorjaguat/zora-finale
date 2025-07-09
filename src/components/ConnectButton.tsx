@@ -1,12 +1,17 @@
+"use client";
+
+import { cn } from "@/lib/utils";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import Image from "next/image";
 
 interface ConnectButtonCustomProps {
   className?: string;
+  text?: string;
 }
 
 export const ConnectButtonCustom = ({
-  className: _className, // Fixed: Prefix with underscore to mark as allowed unused
+  className: _className,
+  text = "Connect Wallet",
 }: ConnectButtonCustomProps) => {
   return (
     <ConnectButton.Custom>
@@ -18,26 +23,30 @@ export const ConnectButtonCustom = ({
         openConnectModal,
         mounted,
       }) => {
-        // Note: If your app doesn't use authentication, you
-        // can remove all 'authenticationStatus' checks
         const ready = mounted;
         const connected = ready && account && chain;
         return (
           <div
+            className={cn("cursor-pointer", _className)}
             {...(!ready && {
               "aria-hidden": true,
               style: {
                 opacity: 0,
                 pointerEvents: "none",
                 userSelect: "none",
+                width: "100%",
               },
             })}
           >
             {(() => {
               if (!connected) {
                 return (
-                  <button onClick={openConnectModal} type="button">
-                    Connect Wallet
+                  <button
+                    onClick={openConnectModal}
+                    type="button"
+                    className="w-full cursor-pointer text-center"
+                  >
+                    {text}
                   </button>
                 );
               }
