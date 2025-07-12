@@ -1,4 +1,4 @@
-import { createPublicClient, http } from "viem";
+import { createPublicClient, http, zeroAddress } from "viem";
 import { mainnet } from "viem/chains";
 import { CONTRACT } from "@/config/contract";
 import fs from "fs";
@@ -50,22 +50,24 @@ function createIndexes(
   const byTokenContract: Record<string, string[]> = {};
 
   for (const [auctionId, auction] of Object.entries(auctions)) {
-    // Index by tokenOwner - FIX: Use nullish coalescing assignment
+    // Index by tokenOwner
     const tokenOwner = auction.tokenOwner.toLowerCase();
     byTokenOwner[tokenOwner] ??= [];
     byTokenOwner[tokenOwner].push(auctionId);
 
-    // Index by curator - FIX: Use nullish coalescing assignment
+    // Index by curator
     const curator = auction.curator.toLowerCase();
     byCurator[curator] ??= [];
     byCurator[curator].push(auctionId);
 
-    // Index by bidder - FIX: Use nullish coalescing assignment
+    // Index by bidder
     const bidder = auction.bidder.toLowerCase();
-    byBidder[bidder] ??= [];
-    byBidder[bidder].push(auctionId);
+    if (bidder != zeroAddress) {
+      byBidder[bidder] ??= [];
+      byBidder[bidder].push(auctionId);
+    }
 
-    // Index by tokenContract - FIX: Use nullish coalescing assignment
+    // Index by tokenContract
     const tokenContract = auction.tokenContract.toLowerCase();
     byTokenContract[tokenContract] ??= [];
     byTokenContract[tokenContract].push(auctionId);

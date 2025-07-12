@@ -39,7 +39,7 @@ export default function CheckAddress() {
   }, [result?.address, router, searchParams]);
 
   return (
-    <div className="flex flex-col items-center gap-2 font-mono">
+    <div className="flex flex-col items-stretch gap-4 font-mono">
       <AddressSearch
         onSubmit={handleSubmit}
         loading={loading}

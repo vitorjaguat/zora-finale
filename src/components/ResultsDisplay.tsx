@@ -1,11 +1,17 @@
-import type { AuctionData } from "@/scripts/generateJSON";
 import { AuctionCard } from "./AuctionCard";
+import { AddressDisplay } from "./AddressDisplay";
+import type { AuctionData } from "@/scripts/generateJSON";
 
 interface CheckResult {
   address: string;
   hasAuctions: boolean;
   auctionCount: number;
   auctions: AuctionData[];
+  breakdown: {
+    asTokenOwner: number;
+    asCurator: number;
+    asBidder: number;
+  };
 }
 
 interface ResultsDisplayProps {
@@ -13,49 +19,57 @@ interface ResultsDisplayProps {
 }
 
 export function ResultsDisplay({ result }: ResultsDisplayProps) {
+  if (!result.hasAuctions) {
+    return (
+      <div className="w-full max-w-4xl rounded-lg border border-neutral-600 bg-neutral-800 p-6">
+        <h2 className="mb-4 text-xl font-semibold text-neutral-200">
+          No auctions found for <AddressDisplay address={result.address} />
+        </h2>
+        <p className="text-neutral-400">
+          This address has no auctions as token owner, curator, or bidder.
+        </p>
+      </div>
+    );
+  }
+
   return (
-    <>
-      <div className="mb-24 w-full rounded-lg border border-neutral-600 bg-neutral-800 p-6">
-        <h3 className="mb-4 text-xl text-neutral-200">
-          Results for {result.address}
-        </h3>
+    <div className="w-full">
+      {/* Header with breakdown */}
+      <div className="mb-4 rounded-lg border border-neutral-600 bg-neutral-800 p-6">
+        <h2 className="mb-4 text-xl font-semibold text-neutral-200">
+          Found {result.auctionCount} auction
+          {result.auctionCount !== 1 ? "s" : ""} for{" "}
+          <AddressDisplay address={result.address} />
+        </h2>
 
-        {result.hasAuctions ? (
-          <div className="space-y-4">
-            <div className="font-semibold text-green-400">
-              ✅ This address has {result.auctionCount} locked token
-              {result.auctionCount !== 1 ? "s" : ""}
-            </div>
-
-            <div className="space-y-2">
-              {result.auctions.map((auction) => (
-                <AuctionCard key={auction.auctionId} auction={auction} />
-              ))}
+        <div className="grid grid-cols-1 gap-4 text-sm md:grid-cols-3">
+          <div className="rounded bg-neutral-700 p-3">
+            <div className="font-semibold text-green-400">As Token Owner</div>
+            <div className="text-lg text-neutral-200">
+              {result.breakdown.asTokenOwner}
             </div>
           </div>
-        ) : (
-          <div className="font-semibold text-red-400">
-            ❌ This address does not have any locked tokens.
+          <div className="rounded bg-neutral-700 p-3">
+            <div className="font-semibold text-blue-400">As Curator</div>
+            <div className="text-lg text-neutral-200">
+              {result.breakdown.asCurator}
+            </div>
           </div>
-        )}
+          <div className="rounded bg-neutral-700 p-3">
+            <div className="font-semibold text-purple-400">As Bidder</div>
+            <div className="text-lg text-neutral-200">
+              {result.breakdown.asBidder}
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* {result.hasAuctions && (
-        <div className="fixed bottom-10 left-1/2 flex -translate-x-1/2 flex-col items-center rounded-lg bg-neutral-200/10 p-4 shadow-lg backdrop-blur-lg">
-          <div className="text-center text-xs text-neutral-50">
-            <div className="">Select the auctions you want to settle,</div>
-            <div className="">
-              then click the &quot;Settle Auctions&quot; button.
-            </div>
-          </div>
-          <button
-            className="mt-2 cursor-pointer rounded-lg bg-green-600 px-4 py-2 text-white transition-colors duration-200 hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50"
-            onClick={handleSettleAuctions}
-          >
-            Settle Auctions
-          </button>
-        </div>
-      )} */}
-    </>
+      {/* Auctions grid */}
+      <div className="grid grid-cols-1 gap-4">
+        {result.auctions.map((auction) => (
+          <AuctionCard key={auction.auctionId} auction={auction} />
+        ))}
+      </div>
+    </div>
   );
 }
