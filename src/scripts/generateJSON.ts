@@ -57,8 +57,10 @@ function createIndexes(
 
     // Index by curator
     const curator = auction.curator.toLowerCase();
-    byCurator[curator] ??= [];
-    byCurator[curator].push(auctionId);
+    if (curator != tokenOwner) {
+      byCurator[curator] ??= [];
+      byCurator[curator].push(auctionId);
+    }
 
     // Index by bidder
     const bidder = auction.bidder.toLowerCase();

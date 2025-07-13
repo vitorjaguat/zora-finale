@@ -9,11 +9,11 @@ export default function HomePage() {
       <div className="flex w-full justify-end">
         <ConnectButtonCustom
           text="Connect"
-          className="rounded-lg bg-green-500 px-4 py-2 font-semibold text-neutral-900 transition-colors duration-200 hover:bg-green-400"
+          className="rounded-lg bg-green-400 px-4 py-2 font-mono font-semibold text-neutral-900 transition-colors duration-200 hover:bg-green-600"
         />
       </div>
       <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16">
-        <h1 className="text-5xl font-extrabold tracking-tight text-neutral-200 sm:text-[5rem]">
+        <h1 className="text-7xl font-extrabold tracking-tight text-neutral-200">
           Zora Finale
         </h1>
 

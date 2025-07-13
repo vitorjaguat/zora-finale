@@ -67,7 +67,11 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
       {/* Auctions grid */}
       <div className="grid grid-cols-1 gap-4">
         {result.auctions.map((auction) => (
-          <AuctionCard key={auction.auctionId} auction={auction} />
+          <AuctionCard
+            key={auction.auctionId}
+            auction={auction}
+            inputAddress={result.address}
+          />
         ))}
       </div>
     </div>

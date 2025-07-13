@@ -27,7 +27,9 @@ export const ConnectButtonCustom = ({
         const connected = ready && account && chain;
         return (
           <div
-            className={cn("cursor-pointer", _className)}
+            className={cn("cursor-pointer", _className, {
+              "bg-red-500": chain?.unsupported,
+            })}
             {...(!ready && {
               "aria-hidden": true,
               style: {
@@ -54,6 +56,7 @@ export const ConnectButtonCustom = ({
                 return (
                   <button onClick={openChainModal} type="button">
                     Wrong network
+                    <div className="text-xs">Click to switch chain</div>
                   </button>
                 );
               }
@@ -61,7 +64,7 @@ export const ConnectButtonCustom = ({
                 <div style={{ display: "flex", gap: 12 }}>
                   <button
                     onClick={openChainModal}
-                    style={{ display: "flex", alignItems: "center" }}
+                    className="flex items-center text-sm font-normal"
                     type="button"
                   >
                     {chain.hasIcon && (
@@ -76,7 +79,7 @@ export const ConnectButtonCustom = ({
                         }}
                       >
                         {chain.iconUrl && (
-                          <Image // Fixed: Use Next.js Image component
+                          <Image
                             alt={chain.name ?? "Chain icon"}
                             src={chain.iconUrl}
                             width={12}
@@ -90,9 +93,11 @@ export const ConnectButtonCustom = ({
                   </button>
                   <button onClick={openAccountModal} type="button">
                     {account.displayName}
-                    {account.displayBalance
-                      ? ` (${account.displayBalance})`
-                      : ""}
+                    <span className="text-sm font-normal">
+                      {account.displayBalance
+                        ? ` (${account.displayBalance})`
+                        : ""}
+                    </span>
                   </button>
                 </div>
               );
