@@ -1,5 +1,6 @@
 import dotenv from "dotenv";
 import { resolve } from "path";
+import { readFileSync } from "fs";
 
 // Load environment variables FIRST
 dotenv.config({ path: resolve(process.cwd(), ".env.local"), override: true });
@@ -22,10 +23,37 @@ import {
   auctionCurators,
   auctionBidders,
 } from "@/lib/db/schema";
-import auctionsData from "../../public/data/auctions.json";
 import type { AuctionData } from "./generateJSON";
 import { zeroAddress } from "viem";
 import { sql } from "drizzle-orm";
+
+// Load auctions data from JSON file (development only)
+function loadAuctionsData(): { 
+  auctions: Record<string, AuctionData>; 
+  indexes: {
+    byTokenOwner: Record<string, string[]>;
+    byCurator: Record<string, string[]>;
+    byBidder: Record<string, string[]>;
+  };
+} {
+  try {
+    const auctionsPath = resolve(process.cwd(), "public/data/auctions.json");
+    const fileContent = readFileSync(auctionsPath, "utf-8");
+    return JSON.parse(fileContent) as { 
+      auctions: Record<string, AuctionData>; 
+      indexes: {
+        byTokenOwner: Record<string, string[]>;
+        byCurator: Record<string, string[]>;
+        byBidder: Record<string, string[]>;
+      };
+    };
+  } catch {
+    console.error("❌ Could not load auctions.json file");
+    console.error("This script requires the auctions.json file for seeding");
+    console.error("Make sure you have public/data/auctions.json in your local environment");
+    process.exit(1);
+  }
+}
 
 async function migrateToDatabase() {
   try {
@@ -127,8 +155,11 @@ async function migrateToDatabase() {
     console.log("Cleared auctions");
     console.log("All existing data cleared successfully");
 
+    // Load auctions data from JSON file
+    const auctionsData = loadAuctionsData();
+    
     // Convert the auctions object to an array
-    const auctionsArray = Object.values(auctionsData.auctions) as AuctionData[];
+    const auctionsArray = Object.values(auctionsData.auctions);
     const { indexes } = auctionsData;
 
     // Insert auction data
