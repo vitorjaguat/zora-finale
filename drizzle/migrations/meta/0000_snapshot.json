@@ -1,0 +1,247 @@
+{
+  "id": "9b9d09df-42c4-455e-a37a-b57d87fef16c",
+  "prevId": "00000000-0000-0000-0000-000000000000",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.auction_bidders": {
+      "name": "auction_bidders",
+      "schema": "",
+      "columns": {
+        "auction_id": {
+          "name": "auction_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "bidder_address": {
+          "name": "bidder_address",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "idx_bidders_address": {
+          "name": "idx_bidders_address",
+          "columns": [
+            {
+              "expression": "bidder_address",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "auction_bidders_auction_id_auctions_id_fk": {
+          "name": "auction_bidders_auction_id_auctions_id_fk",
+          "tableFrom": "auction_bidders",
+          "tableTo": "auctions",
+          "columnsFrom": [
+            "auction_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "auction_bidders_auction_id_bidder_address_pk": {
+          "name": "auction_bidders_auction_id_bidder_address_pk",
+          "columns": [
+            "auction_id",
+            "bidder_address"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.auction_curators": {
+      "name": "auction_curators",
+      "schema": "",
+      "columns": {
+        "auction_id": {
+          "name": "auction_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "curator_address": {
+          "name": "curator_address",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "idx_curators_address": {
+          "name": "idx_curators_address",
+          "columns": [
+            {
+              "expression": "curator_address",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "auction_curators_auction_id_auctions_id_fk": {
+          "name": "auction_curators_auction_id_auctions_id_fk",
+          "tableFrom": "auction_curators",
+          "tableTo": "auctions",
+          "columnsFrom": [
+            "auction_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "auction_curators_auction_id_curator_address_pk": {
+          "name": "auction_curators_auction_id_curator_address_pk",
+          "columns": [
+            "auction_id",
+            "curator_address"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.auction_token_owners": {
+      "name": "auction_token_owners",
+      "schema": "",
+      "columns": {
+        "auction_id": {
+          "name": "auction_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "owner_address": {
+          "name": "owner_address",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "idx_token_owners_address": {
+          "name": "idx_token_owners_address",
+          "columns": [
+            {
+              "expression": "owner_address",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "auction_token_owners_auction_id_auctions_id_fk": {
+          "name": "auction_token_owners_auction_id_auctions_id_fk",
+          "tableFrom": "auction_token_owners",
+          "tableTo": "auctions",
+          "columnsFrom": [
+            "auction_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "auction_token_owners_auction_id_owner_address_pk": {
+          "name": "auction_token_owners_auction_id_owner_address_pk",
+          "columns": [
+            "auction_id",
+            "owner_address"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.auctions": {
+      "name": "auctions",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigint",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "data": {
+          "name": "data",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

@@ -29,7 +29,7 @@ export function AuctionCard({
     reset,
     isConnected,
   } = useSettleAuction();
-  const [isSettled, setIsSettled] = useState(false);
+  const [isSettled, setIsSettled] = useState(auction.isSettled || false);
 
   const handleSettleAuction = async () => {
     if (loading || isSettled) return;

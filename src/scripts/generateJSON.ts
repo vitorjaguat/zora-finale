@@ -18,6 +18,7 @@ export interface AuctionData {
   bidder: string;
   curator: string;
   auctionCurrency: string;
+  isSettled: boolean;
 }
 
 interface AuctionDatabase {
@@ -147,6 +148,7 @@ async function fetchAuctionsToJSON(): Promise<void> {
             bidder,
             curator,
             auctionCurrency,
+            isSettled = false, // Default to false if not present
           ] = data;
 
           // Only include auctions that actually exist
@@ -168,6 +170,7 @@ async function fetchAuctionsToJSON(): Promise<void> {
               bidder: String(bidder),
               curator: String(curator),
               auctionCurrency: String(auctionCurrency),
+              isSettled: Boolean(isSettled),
             };
 
             allAuctions[auctionId] = parsedAuction;

@@ -13,7 +13,7 @@ export default function HomePage() {
         />
       </div>
       <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16">
-        <h1 className="text-7xl font-extrabold tracking-tight text-neutral-200">
+        <h1 className="text-7xl font-extrabold tracking-wide text-neutral-200">
           Zora Finale
         </h1>
 

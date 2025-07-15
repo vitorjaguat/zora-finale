@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   useWriteContract,
   useWaitForTransactionReceipt,
@@ -21,10 +21,38 @@ export function useSettleAuction() {
     isPending,
   } = useWriteContract();
   const [isSettling, setIsSettling] = useState(false);
+  const [auctionIdToUpdate, setAuctionIdToUpdate] = useState<string | null>(
+    null,
+  );
 
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
     hash,
   });
+
+  // Update database when transaction is confirmed
+  useEffect(() => {
+    if (isSuccess && auctionIdToUpdate) {
+      void updateAuctionInDatabase(auctionIdToUpdate);
+      setAuctionIdToUpdate(null);
+    }
+  }, [isSuccess, auctionIdToUpdate]);
+
+  const updateAuctionInDatabase = async (auctionId: string) => {
+    try {
+      // Call API to update auction settlement status
+      const response = await fetch(`/api/auctions/${auctionId}/settle`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isSettled: true }),
+      });
+
+      if (!response.ok) {
+        console.error("Failed to update auction in database");
+      }
+    } catch (error) {
+      console.error("Error updating auction database:", error);
+    }
+  };
 
   const settleAuction = async (
     auctionId: string,
@@ -35,6 +63,7 @@ export function useSettleAuction() {
     }
 
     setIsSettling(true);
+    setAuctionIdToUpdate(auctionId); // Store for later database update
 
     try {
       // Determine which function to call
@@ -56,6 +85,7 @@ export function useSettleAuction() {
       return { success: true, transactionHash: hash };
     } catch (error) {
       console.error("Error settling auction:", error);
+      setAuctionIdToUpdate(null); // Clear on error
       throw error;
     } finally {
       setIsSettling(false);
