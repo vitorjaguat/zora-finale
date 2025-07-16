@@ -21,7 +21,7 @@ interface ResultsDisplayProps {
 export function ResultsDisplay({ result }: ResultsDisplayProps) {
   if (!result.hasAuctions) {
     return (
-      <div className="w-full max-w-4xl rounded-lg border border-neutral-600 bg-neutral-800 p-6">
+      <div className="w-4xl rounded-lg border border-neutral-600 bg-neutral-800 p-6">
         <h2 className="mb-4 text-xl font-semibold text-neutral-200">
           No auctions found for <AddressDisplay address={result.address} />
         </h2>

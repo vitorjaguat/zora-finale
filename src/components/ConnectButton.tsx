@@ -71,8 +71,8 @@ export const ConnectButtonCustom = ({
                       <div
                         style={{
                           background: chain.iconBackground,
-                          width: 12,
-                          height: 12,
+                          width: 16,
+                          height: 16,
                           borderRadius: 999,
                           overflow: "hidden",
                           marginRight: 4,
@@ -82,9 +82,9 @@ export const ConnectButtonCustom = ({
                           <Image
                             alt={chain.name ?? "Chain icon"}
                             src={chain.iconUrl}
-                            width={12}
-                            height={12}
-                            style={{ width: 12, height: 12 }}
+                            width={16}
+                            height={16}
+                            style={{ width: 16, height: 16 }}
                           />
                         )}
                       </div>

@@ -184,7 +184,7 @@ export function AuctionCard({
         {/* Action buttons */}
         <div
           className={cn(
-            "w-full space-y-2 transition-all duration-200",
+            "w-full space-y-0 transition-all duration-200",
             getButtonColor(),
           )}
         >
@@ -209,11 +209,11 @@ export function AuctionCard({
 
           {/* Error Display */}
           {error && (
-            <div className="rounded bg-red-900/50 p-2 text-xs text-red-200">
+            <div className="bg-red-900/50 p-2 text-xs text-red-200">
               <strong>Error:</strong> {error}
               <button
                 onClick={reset}
-                className="ml-2 underline hover:no-underline"
+                className="ml-2 cursor-pointer underline hover:no-underline"
               >
                 Retry
               </button>
@@ -222,7 +222,7 @@ export function AuctionCard({
 
           {/* Success Display */}
           {success && transactionHash && (
-            <div className="rounded bg-green-900/50 p-2 text-xs text-green-200">
+            <div className="bg-green-900/50 p-2 text-xs text-green-200">
               <strong>Success!</strong>{" "}
               <a
                 href={`https://etherscan.io/tx/${transactionHash}`}
