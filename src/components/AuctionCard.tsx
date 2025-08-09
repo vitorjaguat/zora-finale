@@ -1,4 +1,4 @@
-import type { AuctionData } from "@/scripts/generateJSON";
+import type { AuctionData } from "@/hooks/useAddressLookup";
 import { formatEther, zeroAddress } from "viem";
 import { AddressDisplay } from "./AddressDisplay";
 import { cn } from "@/lib/utils";

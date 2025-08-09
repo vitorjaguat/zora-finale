@@ -1,6 +1,6 @@
 import { AuctionCard } from "./AuctionCard";
 import { AddressDisplay } from "./AddressDisplay";
-import type { AuctionData } from "@/scripts/generateJSON";
+import type { AuctionData } from "@/hooks/useAddressLookup";
 import BidCard from "./BidCard";
 import { HiArrowTurnRightDown, HiArrowTurnLeftDown } from "react-icons/hi2";
 

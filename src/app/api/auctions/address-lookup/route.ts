@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { sql } from "drizzle-orm";
-import type { AuctionData } from "@/scripts/generateJSON";
+import type { AuctionData } from "@/hooks/useAddressLookup";
 
 interface CheckResult {
   address: string;

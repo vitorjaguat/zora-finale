@@ -1,7 +1,23 @@
 import { useState, useCallback } from "react"; // Removed unused useEffect
 import { isAddress } from "viem";
 import { isLikelyENSName, resolveAddressOrENS } from "@/lib/ensUtils";
-import type { AuctionData } from "@/scripts/generateJSON";
+
+export interface AuctionData {
+  auctionId: string;
+  tokenId: string;
+  tokenContract: string;
+  approved: boolean;
+  amount: string;
+  duration: string;
+  firstBidTime: string;
+  reservePrice: string;
+  curatorFeePercentage: number;
+  tokenOwner: string;
+  bidder: string;
+  curator: string;
+  auctionCurrency: string;
+  isSettled: boolean;
+}
 
 export interface ActiveBid {
   eventType: string;

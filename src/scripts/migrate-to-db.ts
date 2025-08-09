@@ -23,7 +23,7 @@ import {
   auctionCurators,
   auctionBidders,
 } from "@/lib/db/schema";
-import type { AuctionData } from "./generateJSON";
+import type { AuctionData } from "../hooks/useAddressLookup";
 import { zeroAddress } from "viem";
 import { sql } from "drizzle-orm";
 
