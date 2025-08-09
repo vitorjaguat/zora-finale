@@ -16,6 +16,63 @@ db.sqlite
 # auction data (for local seeding only)
 public/data/auctions.json
 
+# Development/Analysis Scripts (not needed for production)
+src/scripts/analyze-*.ts
+src/scripts/check-active-bids-contract.ts
+src/scripts/comprehensive-*.ts
+src/scripts/cross-reference-bids.ts
+src/scripts/decode-*.ts
+src/scripts/explore-*.ts
+src/scripts/fetch-recent-bid-events.ts
+src/scripts/final-*.ts
+src/scripts/find-*.ts
+src/scripts/investigate-*.ts
+src/scripts/market-bid-*.ts
+src/scripts/market-first-*.ts
+src/scripts/migrate-*.ts
+src/scripts/production-bid-aggregator.ts
+src/scripts/production-bid-finalized-aggregator*.ts
+src/scripts/save-market-json.ts
+src/scripts/test-*.ts
+src/scripts/update-auction-settlement.ts
+src/scripts/archived-experiments/
+src/scripts/*.ts
+
+# Analysis Data Files (generated from scripts, not needed for production)
+public/data/active-bids-*.json
+public/data/market-backup-*.json
+public/data/unfinalised-bids*.json
+public/data/finalized.json
+public/data/new-bid-events-*.json
+public/data/market.json
+
+# All JSON data files (now using database instead)
+public/data/
+
+# Database migrations and scripts (tables already seeded in production)
+drizzle/
+scripts/
+src/scripts/
+
+# Development documentation and changelogs
+BIDCREATED_AGGREGATOR_SUMMARY.md
+CLEANUP_COMPLETE.md
+DATABASE_MIGRATION_GUIDE.md
+JSON_STORAGE_COMPLETE.md
+MULTI_CURRENCY_FIX.md
+TYPE_ERRORS_FIXED.md
+WORKSPACE_CLEANUP_SUMMARY.md
+
+# Test and development files
+test-api.js
+
+# Backup files from development
+src/app/api/active-bids/address-lookup/route-json-backup.ts
+src/app/api/active-bids/address-lookup/route-db.ts
+
+# Build/Development Files
+Makefile
+
 # next.js
 /.next/
 /out/
@@ -48,6 +105,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 
+# TypeScript build info
+tsconfig.tsbuildinfo
+
 # idea files
 .idea
 
@@ -55,3 +115,4 @@ yarn-error.log*
 .code-workspace
 .vscode
 
+src/scripts/generateJSON.ts

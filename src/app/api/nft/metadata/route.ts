@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
     const params = new URLSearchParams({
       contractAddress,
       tokenId,
-      refreshCache: "false",
+      refreshCache: "true",
     });
 
     const response = await fetch(`${url}?${params}`, {

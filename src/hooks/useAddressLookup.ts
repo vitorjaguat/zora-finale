@@ -3,7 +3,40 @@ import { isAddress } from "viem";
 import { isLikelyENSName, resolveAddressOrENS } from "@/lib/ensUtils";
 import type { AuctionData } from "@/scripts/generateJSON";
 
-interface CheckResult {
+export interface ActiveBid {
+  eventType: string;
+  implementation: string;
+  eventSignature: string;
+  tokenId: string;
+  amount: string;
+  amountFormatted: string;
+  currency: string;
+  currencySymbol: string;
+  currencyDecimals: number;
+  bidder: string;
+  recipient: string;
+  transactionHash: string;
+  blockNumber: number;
+  timestamp: string;
+  logIndex: number;
+  processedAt: string;
+  decodingMethod: string;
+  rawData: Record<string, unknown>;
+  contractVerification: Record<string, unknown>;
+  tokenOwner: string;
+}
+
+export interface ActiveBidsResult {
+  hasActiveBids: boolean;
+  bidsCount: number;
+  bids: ActiveBid[];
+  breakdown: {
+    asTokenOwner: number;
+    asBidder: number;
+  };
+}
+
+export interface Result {
   address: string;
   hasAuctions: boolean;
   auctionCount: number;
@@ -13,6 +46,7 @@ interface CheckResult {
     asCurator: number;
     asBidder: number;
   };
+  activeBids: ActiveBidsResult | null;
 }
 
 interface ErrorResponse {
@@ -20,7 +54,7 @@ interface ErrorResponse {
 }
 
 export function useAddressLookup() {
-  const [result, setResult] = useState<CheckResult | null>(null);
+  const [result, setResult] = useState<Result | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [lastSearchedAddress, setLastSearchedAddress] = useState<string>("");
@@ -66,27 +100,81 @@ export function useAddressLookup() {
       // Store the address we're searching for
       setLastSearchedAddress(address);
 
-      // API call
+      // Make parallel API calls to both endpoints
       try {
-        const response = await fetch(
-          `/api/auctions/address-lookup?address=${encodeURIComponent(address)}`,
+        const [auctionsResponse, activeBidsResponse] = await Promise.allSettled(
+          [
+            fetch(
+              `/api/auctions/address-lookup?address=${encodeURIComponent(address)}`,
+            ),
+            fetch(
+              `/api/active-bids/address-lookup?address=${encodeURIComponent(address)}`,
+            ),
+          ],
         );
 
-        const contentType = response.headers.get("content-type");
-        if (!contentType?.includes("application/json")) {
-          throw new Error(
-            "API endpoint not found or returned invalid response",
+        let auctionsData: Result | null = null;
+        let activeBidsData: ActiveBidsResult | null = null;
+
+        // Process auctions response
+        if (auctionsResponse.status === "fulfilled") {
+          const contentType =
+            auctionsResponse.value.headers.get("content-type");
+          if (!contentType?.includes("application/json")) {
+            throw new Error(
+              "Auctions API endpoint not found or returned invalid response",
+            );
+          }
+
+          if (!auctionsResponse.value.ok) {
+            const errorData =
+              (await auctionsResponse.value.json()) as ErrorResponse;
+            throw new Error(errorData.error ?? "Failed to check auctions.");
+          }
+
+          auctionsData = (await auctionsResponse.value.json()) as Result;
+        } else {
+          console.warn("Auctions API call failed:", auctionsResponse.reason);
+        }
+
+        // Process active bids response
+        if (activeBidsResponse.status === "fulfilled") {
+          const contentType =
+            activeBidsResponse.value.headers.get("content-type");
+          if (
+            contentType?.includes("application/json") &&
+            activeBidsResponse.value.ok
+          ) {
+            const activeBidsFullResponse =
+              (await activeBidsResponse.value.json()) as {
+                activeBids: ActiveBidsResult;
+              };
+            activeBidsData = activeBidsFullResponse.activeBids;
+          } else {
+            console.warn(
+              "Active bids API call failed or returned invalid response",
+            );
+          }
+        } else {
+          console.warn(
+            "Active bids API call failed:",
+            activeBidsResponse.reason,
           );
         }
 
-        if (!response.ok) {
-          const errorData = (await response.json()) as ErrorResponse;
-          throw new Error(errorData.error ?? "Failed to check address.");
+        // If auctions API failed completely, throw error
+        if (!auctionsData) {
+          throw new Error("Failed to fetch auction data");
         }
 
-        const data = (await response.json()) as CheckResult;
-        setResult(data);
-        console.dir(data, { depth: null });
+        // Combine the results
+        const combinedResult: Result = {
+          ...auctionsData,
+          activeBids: activeBidsData,
+        };
+
+        setResult(combinedResult);
+        console.dir(combinedResult, { depth: null });
       } catch (err) {
         if (err instanceof Error) {
           setError(err.message);
@@ -99,6 +187,8 @@ export function useAddressLookup() {
     },
     [lastSearchedAddress, result],
   );
+
+  console.dir(result);
 
   return {
     result,

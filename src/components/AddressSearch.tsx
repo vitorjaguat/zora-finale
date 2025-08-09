@@ -39,7 +39,7 @@ export function AddressSearch({
       <div className="w-full text-2xl text-neutral-200">Check Address</div>
       <input
         ref={addressRef}
-        className="w-2xl rounded-lg bg-neutral-500 p-2 text-center text-white outline-0"
+        className="w-2xl max-w-full rounded-lg bg-neutral-500 p-2 text-center text-white outline-0"
         type="text"
         name="address"
         id="address"

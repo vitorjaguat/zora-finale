@@ -28,8 +28,8 @@ import { zeroAddress } from "viem";
 import { sql } from "drizzle-orm";
 
 // Load auctions data from JSON file (development only)
-function loadAuctionsData(): { 
-  auctions: Record<string, AuctionData>; 
+function loadAuctionsData(): {
+  auctions: Record<string, AuctionData>;
   indexes: {
     byTokenOwner: Record<string, string[]>;
     byCurator: Record<string, string[]>;
@@ -39,8 +39,8 @@ function loadAuctionsData(): {
   try {
     const auctionsPath = resolve(process.cwd(), "public/data/auctions.json");
     const fileContent = readFileSync(auctionsPath, "utf-8");
-    return JSON.parse(fileContent) as { 
-      auctions: Record<string, AuctionData>; 
+    return JSON.parse(fileContent) as {
+      auctions: Record<string, AuctionData>;
       indexes: {
         byTokenOwner: Record<string, string[]>;
         byCurator: Record<string, string[]>;
@@ -50,7 +50,9 @@ function loadAuctionsData(): {
   } catch {
     console.error("❌ Could not load auctions.json file");
     console.error("This script requires the auctions.json file for seeding");
-    console.error("Make sure you have public/data/auctions.json in your local environment");
+    console.error(
+      "Make sure you have public/data/auctions.json in your local environment",
+    );
     process.exit(1);
   }
 }
@@ -157,7 +159,7 @@ async function migrateToDatabase() {
 
     // Load auctions data from JSON file
     const auctionsData = loadAuctionsData();
-    
+
     // Convert the auctions object to an array
     const auctionsArray = Object.values(auctionsData.auctions);
     const { indexes } = auctionsData;

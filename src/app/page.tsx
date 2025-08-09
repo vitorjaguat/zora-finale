@@ -17,7 +17,7 @@ export default function HomePage() {
           Zora Finale
         </h1>
 
-        <div className="mx-auto max-w-4xl">
+        <div className="mx-auto max-w-5xl">
           <CheckAddressWrapper />
         </div>
       </div>

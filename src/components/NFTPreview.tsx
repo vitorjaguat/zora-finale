@@ -14,6 +14,8 @@ export function NFTPreview({ id, contract, className = "" }: NFTPreviewProps) {
     tokenId: id,
   });
 
+  // if (nftData?.tokenId == "178") console.dir(nftData);
+
   return (
     <div className="flex gap-3 bg-white/5">
       <NFTPreviewMedia
