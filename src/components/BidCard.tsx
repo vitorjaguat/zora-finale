@@ -12,20 +12,7 @@ import {
   useWriteContract,
   useWaitForTransactionReceipt,
 } from "wagmi";
-
-// Media contract configuration
-const MEDIA_CONTRACT = {
-  address: "0xabEFBc9fD2F806065b4f3C237d4b59D9A97Bcac7" as const,
-  abi: [
-    {
-      inputs: [{ internalType: "uint256", name: "tokenId", type: "uint256" }],
-      name: "removeBid",
-      outputs: [],
-      stateMutability: "nonpayable",
-      type: "function",
-    },
-  ] as const,
-};
+import { MEDIA_CONTRACT } from "@/config/contract";
 
 interface BidCardProps {
   bid: ActiveBid;
@@ -65,24 +52,49 @@ export default function BidCard({ bid, inputAddress }: BidCardProps) {
       return;
     }
 
-    // Check if connected address is the bidder
-    if (address.toLowerCase() !== bid.bidder.toLowerCase()) {
-      setError("You can only withdraw your own bids");
+    const isBidder = address.toLowerCase() === bid.bidder.toLowerCase();
+    const isTokenOwner = address.toLowerCase() === bid.tokenOwner.toLowerCase();
+
+    // Check if connected address has permission to perform an action
+    if (!isBidder && !isTokenOwner) {
+      setError(
+        "You can only interact with bids where you are the bidder or token owner",
+      );
       return;
     }
 
     try {
       setError(null);
 
-      // Call removeBid function on the Media contract
-      writeContract({
-        address: MEDIA_CONTRACT.address,
-        abi: MEDIA_CONTRACT.abi,
-        functionName: "removeBid",
-        args: [BigInt(bid.tokenId)],
-      });
+      if (isBidder) {
+        // Bidder can withdraw their bid
+        writeContract({
+          address: MEDIA_CONTRACT.address,
+          abi: MEDIA_CONTRACT.abi,
+          functionName: "removeBid",
+          args: [BigInt(bid.tokenId)],
+        });
+      } else if (isTokenOwner) {
+        // Token owner can accept the bid
+        const bidStruct = {
+          amount: BigInt(bid.amount),
+          currency: bid.currency as `0x${string}`,
+          bidder: bid.bidder as `0x${string}`,
+          recipient: bid.recipient as `0x${string}`,
+          sellOnShare: {
+            value: BigInt(bid.sellOnShareValue ?? "0"),
+          },
+        };
+
+        writeContract({
+          address: MEDIA_CONTRACT.address,
+          abi: MEDIA_CONTRACT.abi,
+          functionName: "acceptBid",
+          args: [BigInt(bid.tokenId), bidStruct],
+        });
+      }
     } catch (err) {
-      console.error("Remove bid failed:", err);
+      console.error("Transaction failed:", err);
       setError(err instanceof Error ? err.message : "Unknown error occurred");
     }
   };

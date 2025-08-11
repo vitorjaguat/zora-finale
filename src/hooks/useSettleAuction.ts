@@ -4,7 +4,7 @@ import {
   useWaitForTransactionReceipt,
   useAccount,
 } from "wagmi";
-import { CONTRACT } from "@/config/contract";
+import { AUCTION_HOUSE_CONTRACT } from "@/config/contract";
 import { zeroAddress } from "viem";
 
 interface SettleResponse {
@@ -76,8 +76,8 @@ export function useSettleAuction() {
 
       // Call the contract function
       writeContract({
-        address: CONTRACT.address,
-        abi: CONTRACT.abi,
+        address: AUCTION_HOUSE_CONTRACT.address,
+        abi: AUCTION_HOUSE_CONTRACT.abi,
         functionName,
         args: [BigInt(auctionId)],
       });

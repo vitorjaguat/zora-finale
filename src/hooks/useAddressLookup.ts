@@ -31,6 +31,7 @@ export interface ActiveBid {
   currencyDecimals: number;
   bidder: string;
   recipient: string;
+  sellOnShareValue?: string;
   transactionHash: string;
   blockNumber: number;
   timestamp: string;
