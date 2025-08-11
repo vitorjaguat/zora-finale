@@ -7,7 +7,25 @@ import { PiImageFill } from "react-icons/pi";
 import { formatUnits } from "viem";
 import { useState } from "react";
 import { ConnectButtonCustom } from "@/components/ConnectButton";
-import { useAccount } from "wagmi";
+import {
+  useAccount,
+  useWriteContract,
+  useWaitForTransactionReceipt,
+} from "wagmi";
+
+// Media contract configuration
+const MEDIA_CONTRACT = {
+  address: "0xabEFBc9fD2F806065b4f3C237d4b59D9A97Bcac7" as const,
+  abi: [
+    {
+      inputs: [{ internalType: "uint256", name: "tokenId", type: "uint256" }],
+      name: "removeBid",
+      outputs: [],
+      stateMutability: "nonpayable",
+      type: "function",
+    },
+  ] as const,
+};
 
 interface BidCardProps {
   bid: ActiveBid;
@@ -15,11 +33,19 @@ interface BidCardProps {
 }
 
 export default function BidCard({ bid, inputAddress }: BidCardProps) {
-  const { isConnected } = useAccount();
-  const [loading, setLoading] = useState(false);
+  const { isConnected, address } = useAccount();
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
-  const [transactionHash, setTransactionHash] = useState<string | null>(null);
+
+  const {
+    data: hash,
+    writeContract,
+    isPending,
+    error: writeError,
+  } = useWriteContract();
+
+  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
+    hash,
+  });
 
   const formatAmount = () => {
     try {
@@ -32,37 +58,40 @@ export default function BidCard({ bid, inputAddress }: BidCardProps) {
   if (bid.tokenId == "7") console.dir(bid);
 
   const handleSettleBid = async () => {
-    if (loading) return;
+    if (isPending || isConfirming) return;
 
-    if (!isConnected) {
+    if (!isConnected || !address) {
       // Wallet connection will be handled by the ConnectButton
       return;
     }
 
+    // Check if connected address is the bidder
+    if (address.toLowerCase() !== bid.bidder.toLowerCase()) {
+      setError("You can only withdraw your own bids");
+      return;
+    }
+
     try {
-      setLoading(true);
       setError(null);
-      setSuccess(false);
 
-      // TODO: Implement bid settlement logic here
-      // For now, just simulate loading
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-
-      // Placeholder success
-      setSuccess(true);
-      setTransactionHash("0x" + "placeholder".repeat(8));
+      // Call removeBid function on the Media contract
+      writeContract({
+        address: MEDIA_CONTRACT.address,
+        abi: MEDIA_CONTRACT.abi,
+        functionName: "removeBid",
+        args: [BigInt(bid.tokenId)],
+      });
     } catch (err) {
-      console.error("Settlement failed:", err);
+      console.error("Remove bid failed:", err);
       setError(err instanceof Error ? err.message : "Unknown error occurred");
-    } finally {
-      setLoading(false);
     }
   };
 
   const getButtonText = () => {
     if (!isConnected) return "Connect Wallet";
-    if (loading) return "Processing...";
-    if (success) return "✅ Completed";
+    if (isPending) return "Confirming...";
+    if (isConfirming) return "Processing...";
+    if (isSuccess) return "✅ Completed";
 
     const role = getRelationshipToUser();
     if (role === "Token Owner") return "Accept Bid";
@@ -73,27 +102,25 @@ export default function BidCard({ bid, inputAddress }: BidCardProps) {
   const getButtonColor = () => {
     if (!isConnected)
       return "bg-gradient-to-r from-green-400 hover:from-purple-400 via-blue-400 hover:via-green-400 to-purple-400 hover:to-blue-400";
-    if (success) return "bg-neutral-400 cursor-default";
-    if (loading) return "bg-purple-500 cursor-not-allowed";
+    if (isSuccess) return "bg-neutral-400 cursor-default";
+    if (isPending || isConfirming) return "bg-purple-500 cursor-not-allowed";
 
     const role = getRelationshipToUser();
     if (role === "Token Owner") return "bg-green-400 hover:bg-green-600";
-    if (role === "Bidder") return "bg-blue-400 hover:bg-blue-600";
-    return "bg-purple-400 hover:bg-purple-600";
+    if (role === "Bidder") return "bg-purple-400 hover:bg-purple-600";
+    return "bg-blue-400 hover:bg-blue-600";
   };
 
   const reset = () => {
     setError(null);
-    setSuccess(false);
-    setTransactionHash(null);
   };
 
   const getColorBarColor = () => {
     if (bid.tokenOwner.toLowerCase() === inputAddress.toLowerCase())
       return "bg-green-400";
     if (bid.bidder.toLowerCase() === inputAddress.toLowerCase())
-      return "bg-blue-400";
-    return "bg-purple-400";
+      return "bg-purple-400";
+    return "bg-blue-400";
   };
 
   const getRelationshipToUser = () => {
@@ -135,8 +162,8 @@ export default function BidCard({ bid, inputAddress }: BidCardProps) {
                     "font-semibold",
                     getRelationshipToUser() === "Token Owner" &&
                       "text-green-400",
-                    getRelationshipToUser() === "Bidder" && "text-blue-400",
-                    getRelationshipToUser() === "Observer" && "text-purple-400",
+                    getRelationshipToUser() === "Bidder" && "text-purple-400",
+                    getRelationshipToUser() === "Observer" && "text-blue-400",
                   )}
                 >
                   {getRelationshipToUser()}
@@ -256,9 +283,10 @@ export default function BidCard({ bid, inputAddress }: BidCardProps) {
           ) : (
             <button
               onClick={handleSettleBid}
-              disabled={loading || success}
+              disabled={isPending || isConfirming || isSuccess}
               className={cn(
                 "w-full cursor-pointer rounded py-3 text-center text-white transition-colors duration-200",
+                getButtonColor(),
               )}
             >
               {getButtonText()}
@@ -266,9 +294,10 @@ export default function BidCard({ bid, inputAddress }: BidCardProps) {
           )}
 
           {/* Error Display */}
-          {error && (
+          {(error ?? writeError) && (
             <div className="bg-red-900/50 p-2 text-xs text-red-200">
-              <strong>Error:</strong> {error}
+              <strong>Error:</strong>{" "}
+              {error ?? writeError?.message ?? "An error occurred"}
               <button
                 onClick={reset}
                 className="ml-2 cursor-pointer underline hover:no-underline"
@@ -279,11 +308,11 @@ export default function BidCard({ bid, inputAddress }: BidCardProps) {
           )}
 
           {/* Success Display */}
-          {success && transactionHash && (
+          {isSuccess && hash && (
             <div className="bg-green-900/50 p-2 text-xs text-green-200">
               <strong>Success!</strong>{" "}
               <a
-                href={`https://etherscan.io/tx/${transactionHash}`}
+                href={`https://etherscan.io/tx/${hash}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="underline hover:no-underline"

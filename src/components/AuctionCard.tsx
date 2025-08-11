@@ -77,6 +77,14 @@ export function AuctionCard({
     return "bg-purple-400";
   };
 
+  const getRelationshipToUser = () => {
+    if (auction.tokenOwner.toLowerCase() === inputAddress.toLowerCase())
+      return "Token Owner";
+    if (auction.bidder.toLowerCase() === inputAddress.toLowerCase())
+      return "Bidder";
+    return "Observer";
+  };
+
   return (
     <div className="flex justify-stretch gap-3 overflow-hidden rounded bg-neutral-700 font-mono opacity-80 transition-opacity duration-200 hover:opacity-100">
       {/* COLOR BAR */}
