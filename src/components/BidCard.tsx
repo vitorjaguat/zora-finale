@@ -5,7 +5,7 @@ import { NFTPreview } from "./NFTPreview";
 import { FaEthereum } from "react-icons/fa";
 import { PiImageFill } from "react-icons/pi";
 import { formatUnits } from "viem";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ConnectButtonCustom } from "@/components/ConnectButton";
 import {
   useAccount,
@@ -16,10 +16,13 @@ import { MEDIA_CONTRACT } from "@/config/contract";
 
 interface BidCardProps {
   bid: ActiveBid;
-  inputAddress: string;
+  inputAddress: string; // Keep for potential future use, but unused in current logic
 }
 
-export default function BidCard({ bid, inputAddress }: BidCardProps) {
+export default function BidCard({
+  bid,
+  inputAddress: _inputAddress,
+}: BidCardProps) {
   const { isConnected, address } = useAccount();
   const [error, setError] = useState<string | null>(null);
 
@@ -33,6 +36,71 @@ export default function BidCard({ bid, inputAddress }: BidCardProps) {
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
     hash,
   });
+
+  // Handle database state update after successful transaction
+  useEffect(() => {
+    const updateBidState = async () => {
+      try {
+        // Determine the action based on user's role
+        const isBidder = address?.toLowerCase() === bid.bidder.toLowerCase();
+        const isTokenOwner =
+          address?.toLowerCase() === bid.tokenOwner.toLowerCase();
+
+        const action = isBidder ? "withdraw" : isTokenOwner ? "accept" : null;
+
+        if (!action) {
+          console.error("Unable to determine action type for bid state update");
+          return;
+        }
+
+        const response = await fetch(`/api/bids/update-bid-state`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            tokenId: bid.tokenId,
+            bidder: bid.bidder,
+            transactionHash: bid.transactionHash,
+            action: action,
+          }),
+        });
+
+        if (!response.ok) {
+          console.error(
+            "Failed to update bid state in database:",
+            response.statusText,
+          );
+        } else {
+          const result = (await response.json()) as {
+            message: string;
+            success: boolean;
+            action: string;
+          };
+          console.log("Bid state successfully updated:", result.message);
+        }
+      } catch (error) {
+        console.error("Error updating bid state in database:", error);
+      }
+    };
+
+    if (isSuccess && hash && address) {
+      void updateBidState();
+    }
+  }, [
+    isSuccess,
+    hash,
+    bid.tokenId,
+    bid.bidder,
+    bid.transactionHash,
+    address,
+    bid.tokenOwner,
+  ]);
+
+  useEffect(() => {
+    // Clear errors when the connected address changes
+    setError(null);
+  }, [address]);
 
   const formatAmount = () => {
     try {
@@ -108,7 +176,7 @@ export default function BidCard({ bid, inputAddress }: BidCardProps) {
     const role = getRelationshipToUser();
     if (role === "Token Owner") return "Accept Bid";
     if (role === "Bidder") return "Withdraw Bid";
-    return "View Bid";
+    return "Only owner or bidder can interact.";
   };
 
   const getButtonColor = () => {
@@ -117,10 +185,12 @@ export default function BidCard({ bid, inputAddress }: BidCardProps) {
     if (isSuccess) return "bg-neutral-400 cursor-default";
     if (isPending || isConfirming) return "bg-purple-500 cursor-not-allowed";
 
-    const role = getRelationshipToUser();
-    if (role === "Token Owner") return "bg-green-400 hover:bg-green-600";
-    if (role === "Bidder") return "bg-purple-400 hover:bg-purple-600";
-    return "bg-blue-400 hover:bg-blue-600";
+    return "bg-neutral-500";
+
+    // const role = getRelationshipToUser();
+    // if (role === "Token Owner") return "bg-green-400 hover:bg-green-600";
+    // if (role === "Bidder") return "bg-purple-400 hover:bg-purple-600";
+    // return "bg-neutral-500 hover:bg-neutral-600";
   };
 
   const reset = () => {
@@ -128,18 +198,19 @@ export default function BidCard({ bid, inputAddress }: BidCardProps) {
   };
 
   const getColorBarColor = () => {
-    if (bid.tokenOwner.toLowerCase() === inputAddress.toLowerCase())
-      return "bg-green-400";
-    if (bid.bidder.toLowerCase() === inputAddress.toLowerCase())
-      return "bg-purple-400";
-    return "bg-blue-400";
+    if (!isConnected || !address) return "bg-neutral-500";
+    if (bid.tokenOwner.toLowerCase() === address.toLowerCase())
+      return "bg-green-500";
+    if (bid.bidder.toLowerCase() === address.toLowerCase())
+      return "bg-purple-500";
+    return "bg-neutral-500";
   };
 
   const getRelationshipToUser = () => {
-    if (bid.tokenOwner.toLowerCase() === inputAddress.toLowerCase())
+    if (!isConnected || !address) return "Observer";
+    if (bid.tokenOwner.toLowerCase() === address.toLowerCase())
       return "Token Owner";
-    if (bid.bidder.toLowerCase() === inputAddress.toLowerCase())
-      return "Bidder";
+    if (bid.bidder.toLowerCase() === address.toLowerCase()) return "Bidder";
     return "Observer";
   };
 
@@ -152,7 +223,7 @@ export default function BidCard({ bid, inputAddress }: BidCardProps) {
   };
 
   return (
-    <div className="flex justify-stretch gap-3 overflow-hidden rounded bg-neutral-700 font-mono opacity-80 transition-opacity duration-200 hover:opacity-100">
+    <div className="flex justify-stretch gap-3 overflow-hidden rounded bg-neutral-700 opacity-80 transition-opacity duration-200 hover:opacity-100">
       <div className="flex w-full flex-col gap-3 p-3 pr-0">
         {/* NFT PREVIEW */}
         <NFTPreview
@@ -175,12 +246,29 @@ export default function BidCard({ bid, inputAddress }: BidCardProps) {
                     getRelationshipToUser() === "Token Owner" &&
                       "text-green-400",
                     getRelationshipToUser() === "Bidder" && "text-purple-400",
-                    getRelationshipToUser() === "Observer" && "text-blue-400",
+                    getRelationshipToUser() === "Observer" &&
+                      "text-neutral-400",
                   )}
                 >
                   {getRelationshipToUser()}
                 </span>
               </div>
+
+              {/* <div className="flex items-center gap-2">
+                <span>Status:</span>
+                <span
+                  className={cn(
+                    "font-semibold",
+                    bid.status === "active" && "text-green-400",
+                    bid.status === "withdrawn" && "text-red-400",
+                    bid.status === "accepted" && "text-blue-400",
+                  )}
+                >
+                  {bid.status === "active" && "Active Bid"}
+                  {bid.status === "withdrawn" && "Withdrawn Bid"}
+                  {bid.status === "accepted" && "Accepted Bid"}
+                </span>
+              </div> */}
 
               <div>
                 Bid Amount:{" "}
@@ -196,24 +284,28 @@ export default function BidCard({ bid, inputAddress }: BidCardProps) {
                 </span>
               </div>
 
-              {bid.bidder.toLowerCase() !== inputAddress.toLowerCase() && (
+              {(!isConnected ||
+                !address ||
+                bid.bidder.toLowerCase() !== address.toLowerCase()) && (
                 <div className="flex items-center gap-2">
                   <span>Bidder:</span>
-                  <AddressDisplay address={bid.bidder} />
+                  <AddressDisplay address={bid.bidder} showENS={true} />
                 </div>
               )}
 
-              {bid.tokenOwner.toLowerCase() !== inputAddress.toLowerCase() && (
+              {(!isConnected ||
+                !address ||
+                bid.tokenOwner.toLowerCase() !== address.toLowerCase()) && (
                 <div className="flex items-center gap-2">
                   <span>Token Owner:</span>
-                  <AddressDisplay address={bid.tokenOwner} />
+                  <AddressDisplay address={bid.tokenOwner} showENS={true} />
                 </div>
               )}
 
               {bid.recipient !== bid.bidder && (
                 <div className="flex items-center gap-2">
                   <span>Recipient:</span>
-                  <AddressDisplay address={bid.recipient} />
+                  <AddressDisplay address={bid.recipient} showENS={true} />
                 </div>
               )}
 
@@ -264,76 +356,95 @@ export default function BidCard({ bid, inputAddress }: BidCardProps) {
         <div className="w-full rounded bg-neutral-600 p-3 text-center text-sm">
           <div className="flex items-center justify-between">
             <span className="text-neutral-300">Status:</span>
-            <span className="font-semibold text-yellow-400">🟡 Active Bid</span>
+            <span
+              className={cn(
+                "font-semibold",
+                bid.status === "active" && "text-yellow-400",
+                bid.status === "withdrawn" && "text-red-400",
+                bid.status === "accepted" && "text-green-400",
+              )}
+            >
+              {bid.status === "active" && "🟡 Active Bid"}
+              {bid.status === "withdrawn" && "🔴 Withdrawn Bid"}
+              {bid.status === "accepted" && "🟢 Accepted Bid"}
+            </span>
           </div>
-          {getRelationshipToUser() === "Token Owner" && (
-            <div className="mt-2 text-xs text-neutral-400">
-              You can accept this bid and receive your payment.
-            </div>
-          )}
-          {getRelationshipToUser() === "Bidder" && (
+          {getRelationshipToUser() === "Token Owner" &&
+            bid.status === "active" && (
+              <div className="mt-2 text-xs text-neutral-400">
+                You can accept this bid and receive your payment.
+              </div>
+            )}
+          {getRelationshipToUser() === "Bidder" && bid.status === "active" && (
             <div className="mt-3 flex flex-col gap-1 pl-6 text-left text-xs text-neutral-400">
               <p>Your bid is active and waiting for owner response.</p>
               <p>You can withdraw this bid if you want.</p>
             </div>
           )}
         </div>
-        {/* Action buttons */}
-        <div
-          className={cn(
-            "w-full space-y-0 transition-all duration-200",
-            getButtonColor(),
-          )}
-        >
-          {!isConnected ? (
-            <div className="flex h-full w-full justify-center">
-              <ConnectButtonCustom
-                text="Connect Wallet to Proceed"
-                className="w-full rounded py-3 font-semibold text-white"
-              />
-            </div>
-          ) : (
-            <button
-              onClick={handleSettleBid}
-              disabled={isPending || isConfirming || isSuccess}
-              className={cn(
-                "w-full cursor-pointer rounded py-3 text-center text-white transition-colors duration-200",
-                getButtonColor(),
-              )}
-            >
-              {getButtonText()}
-            </button>
-          )}
-
-          {/* Error Display */}
-          {(error ?? writeError) && (
-            <div className="bg-red-900/50 p-2 text-xs text-red-200">
-              <strong>Error:</strong>{" "}
-              {error ?? writeError?.message ?? "An error occurred"}
+        {/* Action buttons - only show for active bids */}
+        {bid.status === "active" && (
+          <div
+            className={cn(
+              "w-full space-y-0 transition-all duration-200",
+              getButtonColor(),
+            )}
+          >
+            {!isConnected ? (
+              <div className="flex h-full w-full justify-center">
+                <ConnectButtonCustom
+                  text="Connect Wallet to Proceed"
+                  className="w-full rounded py-3 font-semibold text-white"
+                />
+              </div>
+            ) : (
               <button
-                onClick={reset}
-                className="ml-2 cursor-pointer underline hover:no-underline"
+                onClick={handleSettleBid}
+                disabled={
+                  isPending ||
+                  isConfirming ||
+                  isSuccess ||
+                  getRelationshipToUser() == "Observer"
+                }
+                className={cn(
+                  "w-full cursor-pointer rounded py-3 text-center text-white transition-colors duration-200 disabled:cursor-not-allowed",
+                  getButtonColor(),
+                )}
               >
-                Retry
+                {getButtonText()}
               </button>
-            </div>
-          )}
+            )}
 
-          {/* Success Display */}
-          {isSuccess && hash && (
-            <div className="bg-green-900/50 p-2 text-xs text-green-200">
-              <strong>Success!</strong>{" "}
-              <a
-                href={`https://etherscan.io/tx/${hash}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="underline hover:no-underline"
-              >
-                View on Etherscan
-              </a>
-            </div>
-          )}
-        </div>
+            {/* Error Display */}
+            {(error ?? writeError) && (
+              <div className="bg-red-900/50 p-2 text-xs text-red-200">
+                <strong>Error:</strong>{" "}
+                {error ?? writeError?.message ?? "An error occurred"}
+                <button
+                  onClick={reset}
+                  className="ml-2 cursor-pointer underline hover:no-underline"
+                >
+                  Retry
+                </button>
+              </div>
+            )}
+
+            {/* Success Display */}
+            {isSuccess && hash && (
+              <div className="bg-green-900/50 p-2 text-xs text-green-200">
+                <strong>Success!</strong>{" "}
+                <a
+                  href={`https://etherscan.io/tx/${hash}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline hover:no-underline"
+                >
+                  View on Etherscan
+                </a>
+              </div>
+            )}
+          </div>
+        )}
       </div>
       {/* COLOR BAR */}
       <div className={cn("h-full max-w-2 min-w-2", getColorBarColor())} />

@@ -41,6 +41,11 @@ export interface ActiveBid {
   rawData: Record<string, unknown>;
   contractVerification: Record<string, unknown>;
   tokenOwner: string;
+  // Status fields
+  isActive: boolean;
+  isWithdrawn: boolean;
+  isAccepted: boolean;
+  status: "active" | "withdrawn" | "accepted";
 }
 
 export interface ActiveBidsResult {
@@ -55,6 +60,7 @@ export interface ActiveBidsResult {
 
 export interface Result {
   address: string;
+  originalInput: string; // Keep track of original input (ENS or 0x)
   hasAuctions: boolean;
   auctionCount: number;
   auctions: AuctionData[];
@@ -79,9 +85,10 @@ export function useAddressLookup() {
   const handleSubmit = useCallback(
     async (inputAddress: string): Promise<void> => {
       let address = inputAddress.trim();
+      const originalInput = address; // Store the original input
 
-      // Prevent duplicate searches
-      if (address === lastSearchedAddress && result) {
+      // Prevent duplicate searches (compare against original input)
+      if (originalInput === lastSearchedAddress && result) {
         return;
       }
 
@@ -94,12 +101,12 @@ export function useAddressLookup() {
       setError(null);
       setResult(null);
 
-      // ENS resolution
+      // ENS resolution - resolve to 0x address but keep original input for UI
       if (isLikelyENSName(address)) {
         try {
           const resolved = await resolveAddressOrENS(address);
           if (resolved.wasResolved) {
-            address = resolved.address;
+            address = resolved.address; // Use resolved address for API calls
           } else {
             setError("Failed to resolve ENS name to an address.");
             setLoading(false);
@@ -114,8 +121,8 @@ export function useAddressLookup() {
         }
       }
 
-      // Store the address we're searching for
-      setLastSearchedAddress(address);
+      // Store the original input we're searching for (not the resolved address)
+      setLastSearchedAddress(originalInput);
 
       // Make parallel API calls to both endpoints
       try {
@@ -187,6 +194,7 @@ export function useAddressLookup() {
         // Combine the results
         const combinedResult: Result = {
           ...auctionsData,
+          originalInput: originalInput, // Include the original input (ENS or 0x)
           activeBids: activeBidsData,
         };
 

@@ -59,11 +59,13 @@ export async function GET(request: NextRequest) {
           SELECT 
             b.id,
             b.data,
+            b.is_active,
+            b.is_withdrawn,
+            b.is_accepted,
             'bidder' as role
           FROM bids b
           JOIN bid_bidders bb ON b.id = bb.bid_id
           WHERE LOWER(bb.bidder_address) = LOWER(${address})
-          AND b.is_active = 'true'
           
           UNION
           
@@ -71,11 +73,13 @@ export async function GET(request: NextRequest) {
           SELECT 
             b.id,
             b.data,
+            b.is_active,
+            b.is_withdrawn,
+            b.is_accepted,
             'token_owner' as role
           FROM bids b
           JOIN bid_token_owners bto ON b.id = bto.bid_id
           WHERE LOWER(bto.owner_address) = LOWER(${address})
-          AND b.is_active = 'true'
         ),
         role_counts AS (
           SELECT 
@@ -84,13 +88,30 @@ export async function GET(request: NextRequest) {
           FROM address_bids
         ),
         unique_bids AS (
-          SELECT DISTINCT id, data
+          SELECT DISTINCT 
+            id, 
+            data,
+            is_active,
+            is_withdrawn,
+            is_accepted
           FROM address_bids
         )
         SELECT 
           COALESCE(
             JSON_AGG(
-              ub.data ORDER BY ub.id
+              json_build_object(
+                'data', ub.data,
+                'isActive', ub.is_active = 'true',
+                'isWithdrawn', ub.is_withdrawn = 'true',
+                'isAccepted', ub.is_accepted = 'true',
+                'status', 
+                CASE 
+                  WHEN ub.is_accepted = 'true' THEN 'accepted'
+                  WHEN ub.is_withdrawn = 'true' THEN 'withdrawn'
+                  WHEN ub.is_active = 'true' THEN 'active'
+                  ELSE 'active'
+                END
+              ) ORDER BY ub.id
             ) FILTER (WHERE ub.id IS NOT NULL), 
             '[]'
           ) as bids,
@@ -107,28 +128,40 @@ export async function GET(request: NextRequest) {
         bidder_count: 0,
       };
 
-      // Handle the bids data - it should already be parsed JSON from the database
+      // Handle the bids data - now includes status information
+      interface BidWithStatus {
+        data: ActiveBid;
+        isActive: boolean;
+        isWithdrawn: boolean;
+        isAccepted: boolean;
+        status: "active" | "withdrawn" | "accepted";
+      }
+
       let bidsData: ActiveBid[] = [];
-      if ((result as { bids: string | ActiveBid[] | null }).bids) {
+      if ((result as { bids: string | unknown[] | null }).bids) {
+        let parsedBids: BidWithStatus[] = [];
+
         if (
-          typeof (result as { bids: string | ActiveBid[] | null }).bids ===
+          typeof (result as { bids: string | unknown[] | null }).bids ===
           "string"
         ) {
           if (typeof result.bids === "string") {
-            bidsData = JSON.parse(result.bids) as ActiveBid[];
+            parsedBids = JSON.parse(result.bids) as BidWithStatus[];
           }
         } else if (
-          Array.isArray((result as { bids: ActiveBid[] | string | null }).bids)
+          Array.isArray((result as { bids: unknown[] | string | null }).bids)
         ) {
-          bidsData = (result as { bids: ActiveBid[] }).bids;
-        } else {
-          console.log(
-            "Unexpected bids data type:",
-            typeof (result as { bids: string | ActiveBid[] | null }).bids,
-            (result as { bids: string | ActiveBid[] | null }).bids,
-          );
-          bidsData = [];
+          parsedBids = (result as { bids: BidWithStatus[] }).bids;
         }
+
+        // Transform the data to merge status fields with bid data
+        bidsData = parsedBids.map((bid: BidWithStatus) => ({
+          ...bid.data,
+          isActive: bid.isActive,
+          isWithdrawn: bid.isWithdrawn,
+          isAccepted: bid.isAccepted,
+          status: bid.status,
+        }));
       }
 
       const tokenOwnerCount =

@@ -23,8 +23,9 @@ export default function CheckAddress() {
   useEffect(() => {
     const params = new URLSearchParams(searchParams.toString());
 
-    if (result?.address) {
-      params.set("address", result.address);
+    if (result?.originalInput) {
+      // Use originalInput (ENS name or 0x address) instead of resolved address
+      params.set("address", result.originalInput);
     } else {
       params.delete("address");
     }
@@ -36,10 +37,10 @@ export default function CheckAddress() {
     if (newUrl !== currentUrl) {
       router.replace(newUrl, { scroll: false });
     }
-  }, [result?.address, router, searchParams]);
+  }, [result?.originalInput, router, searchParams]);
 
   return (
-    <div className="flex flex-col items-stretch gap-4 font-mono">
+    <div className="z-10 mx-auto flex w-full max-w-7xl flex-col items-stretch gap-4">
       <AddressSearch
         onSubmit={handleSubmit}
         loading={loading}

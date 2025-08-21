@@ -35,7 +35,7 @@ export function AddressSearch({
   };
 
   return (
-    <div className="flex flex-col items-center gap-8 rounded-lg border border-neutral-600 bg-neutral-800 p-6">
+    <div className="z-10 flex flex-col items-center gap-8 rounded-lg border border-neutral-600 bg-neutral-800 p-6">
       <div className="w-full text-2xl text-neutral-200">Check Address</div>
       <input
         ref={addressRef}
