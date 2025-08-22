@@ -178,7 +178,9 @@ export function AuctionCard({
               <div>
                 Reserve Price:{" "}
                 <span className="text-green-600">
-                  {auction.amountFormatted || formatEther(BigInt(auction.reservePrice))} {auction.currencySymbol}
+                  {auction.amountFormatted ||
+                    formatEther(BigInt(auction.reservePrice))}{" "}
+                  {auction.currencySymbol}
                 </span>
               </div>
               <div className="flex items-center">
@@ -198,7 +200,9 @@ export function AuctionCard({
                 <div>
                   Latest Bid:{" "}
                   <span className="text-green-600">
-                    {auction.amountFormatted || formatEther(BigInt(auction.amount))} {auction.currencySymbol}
+                    {auction.amountFormatted ||
+                      formatEther(BigInt(auction.amount))}{" "}
+                    {auction.currencySymbol}
                   </span>
                 </div>
               )}
