@@ -31,18 +31,19 @@ export async function POST(
       return NextResponse.json({ error: "Auction not found" }, { status: 404 });
     }
 
-    // Update the auction data with new settlement status
+    // Update the auction settlement status using structured columns
     const currentData = auction.data as Record<string, unknown>;
     const updatedData = {
       ...currentData,
       isSettled,
     };
 
-    // Update the auction in the database
+    // Update both the structured column and the JSON data for consistency
     await db
       .update(auctions)
       .set({
-        data: updatedData,
+        isSettled, // Update the structured column
+        data: updatedData, // Update the JSON data for backward compatibility
         updatedAt: new Date(),
       })
       .where(eq(auctions.id, BigInt(auctionId)));

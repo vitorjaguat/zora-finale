@@ -6,11 +6,41 @@ import {
   primaryKey,
   index,
   jsonb,
+  integer,
+  boolean,
 } from "drizzle-orm/pg-core";
 
 export const auctions = pgTable("auctions", {
   id: bigint("id", { mode: "bigint" }).primaryKey(),
-  data: jsonb("data").notNull(), // Store full auction data as JSON
+
+  // Core auction properties
+  tokenId: text("token_id").notNull(),
+  tokenContract: text("token_contract").notNull(),
+  approved: boolean("approved").notNull(),
+  amount: text("amount").notNull(), // Store as string to preserve precision
+  amountFormatted: text("amount_formatted").notNull(),
+  duration: text("duration").notNull(),
+  firstBidTime: text("first_bid_time").notNull(),
+  reservePrice: text("reserve_price").notNull(),
+  curatorFeePercentage: integer("curator_fee_percentage").notNull(),
+
+  // Address fields
+  tokenOwner: text("token_owner").notNull(),
+  bidder: text("bidder").notNull(),
+  curator: text("curator").notNull(),
+
+  // Currency information
+  currency: text("currency").notNull(), // The auctionCurrency address
+  currencySymbol: text("currency_symbol").notNull(),
+  currencyDecimals: integer("currency_decimals").notNull(),
+
+  // Status
+  isSettled: boolean("is_settled").notNull(),
+
+  // Full JSON data for complete information
+  data: jsonb("data").notNull(),
+
+  // Metadata
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

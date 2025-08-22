@@ -8,6 +8,7 @@ export interface AuctionData {
   tokenContract: string;
   approved: boolean;
   amount: string;
+  amountFormatted: string;
   duration: string;
   firstBidTime: string;
   reservePrice: string;
@@ -15,7 +16,9 @@ export interface AuctionData {
   tokenOwner: string;
   bidder: string;
   curator: string;
-  auctionCurrency: string;
+  currency: string; // The auctionCurrency address
+  currencySymbol: string;
+  currencyDecimals: number;
   isSettled: boolean;
 }
 

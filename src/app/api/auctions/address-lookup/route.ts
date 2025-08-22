@@ -33,7 +33,23 @@ export async function GET(request: NextRequest) {
         -- Get auctions where address is token owner
         SELECT 
           a.id,
-          a.data,
+          a.token_id as "tokenId",
+          a.token_contract as "tokenContract", 
+          a.approved,
+          a.amount,
+          a.amount_formatted as "amountFormatted",
+          a.duration,
+          a.first_bid_time as "firstBidTime",
+          a.reserve_price as "reservePrice",
+          a.curator_fee_percentage as "curatorFeePercentage",
+          a.token_owner as "tokenOwner",
+          a.bidder,
+          a.curator,
+          a.currency,
+          a.currency_symbol as "currencySymbol",
+          a.currency_decimals as "currencyDecimals",
+          a.is_settled as "isSettled",
+          CAST(a.id as text) as "auctionId",
           'token_owner' as role
         FROM auctions a
         JOIN auction_token_owners ato ON a.id = ato.auction_id
@@ -44,7 +60,23 @@ export async function GET(request: NextRequest) {
         -- Get auctions where address is curator
         SELECT 
           a.id,
-          a.data,
+          a.token_id as "tokenId",
+          a.token_contract as "tokenContract", 
+          a.approved,
+          a.amount,
+          a.amount_formatted as "amountFormatted",
+          a.duration,
+          a.first_bid_time as "firstBidTime",
+          a.reserve_price as "reservePrice",
+          a.curator_fee_percentage as "curatorFeePercentage",
+          a.token_owner as "tokenOwner",
+          a.bidder,
+          a.curator,
+          a.currency,
+          a.currency_symbol as "currencySymbol",
+          a.currency_decimals as "currencyDecimals",
+          a.is_settled as "isSettled",
+          CAST(a.id as text) as "auctionId",
           'curator' as role
         FROM auctions a
         JOIN auction_curators ac ON a.id = ac.auction_id
@@ -55,7 +87,23 @@ export async function GET(request: NextRequest) {
         -- Get auctions where address is bidder
         SELECT 
           a.id,
-          a.data,
+          a.token_id as "tokenId",
+          a.token_contract as "tokenContract", 
+          a.approved,
+          a.amount,
+          a.amount_formatted as "amountFormatted",
+          a.duration,
+          a.first_bid_time as "firstBidTime",
+          a.reserve_price as "reservePrice",
+          a.curator_fee_percentage as "curatorFeePercentage",
+          a.token_owner as "tokenOwner",
+          a.bidder,
+          a.curator,
+          a.currency,
+          a.currency_symbol as "currencySymbol",
+          a.currency_decimals as "currencyDecimals",
+          a.is_settled as "isSettled",
+          CAST(a.id as text) as "auctionId",
           'bidder' as role
         FROM auctions a
         JOIN auction_bidders ab ON a.id = ab.auction_id
@@ -69,13 +117,49 @@ export async function GET(request: NextRequest) {
         FROM address_auctions
       ),
       unique_auctions AS (
-        SELECT DISTINCT id, data
+        SELECT DISTINCT 
+          id,
+          "tokenId",
+          "tokenContract", 
+          approved,
+          amount,
+          "amountFormatted",
+          duration,
+          "firstBidTime",
+          "reservePrice",
+          "curatorFeePercentage",
+          "tokenOwner",
+          bidder,
+          curator,
+          currency,
+          "currencySymbol",
+          "currencyDecimals",
+          "isSettled",
+          "auctionId"
         FROM address_auctions
       )
       SELECT 
         COALESCE(
           JSON_AGG(
-            ua.data ORDER BY ua.id
+            JSON_BUILD_OBJECT(
+              'auctionId', ua."auctionId",
+              'tokenId', ua."tokenId",
+              'tokenContract', ua."tokenContract",
+              'approved', ua.approved,
+              'amount', ua.amount,
+              'amountFormatted', ua."amountFormatted",
+              'duration', ua.duration,
+              'firstBidTime', ua."firstBidTime",
+              'reservePrice', ua."reservePrice",
+              'curatorFeePercentage', ua."curatorFeePercentage",
+              'tokenOwner', ua."tokenOwner",
+              'bidder', ua.bidder,
+              'curator', ua.curator,
+              'currency', ua.currency,
+              'currencySymbol', ua."currencySymbol",
+              'currencyDecimals', ua."currencyDecimals",
+              'isSettled', ua."isSettled"
+            ) ORDER BY ua.id
           ) FILTER (WHERE ua.id IS NOT NULL), 
           '[]'::json
         ) as auctions,
