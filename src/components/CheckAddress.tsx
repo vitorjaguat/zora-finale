@@ -40,7 +40,10 @@ export default function CheckAddress() {
   }, [result?.originalInput, router, searchParams]);
 
   return (
-    <div className="z-10 mx-auto flex w-full max-w-7xl flex-col items-stretch gap-4">
+    <div
+      id="address-checker"
+      className="z-10 mx-auto flex w-full max-w-7xl flex-col items-stretch gap-4 pt-[32vh]"
+    >
       <AddressSearch
         onSubmit={handleSubmit}
         loading={loading}

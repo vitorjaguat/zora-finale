@@ -121,4 +121,5 @@ body {
   background-color: #000;
   scrollbar-width: 0;
   font-family: "Helvetica Neue";
+  scroll-behavior: smooth;
 }
