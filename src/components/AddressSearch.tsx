@@ -36,7 +36,9 @@ export function AddressSearch({
 
   return (
     <div className="z-10 flex flex-col items-center gap-8 rounded-lg border border-neutral-600 bg-neutral-800 p-6">
-      <div className="w-full text-2xl text-neutral-200">Check Address</div>
+      <div className="w-full text-center text-4xl text-neutral-200">
+        Address Checker
+      </div>
       <input
         ref={addressRef}
         className="w-2xl max-w-full rounded-lg bg-neutral-500 p-2 text-center text-white outline-0"

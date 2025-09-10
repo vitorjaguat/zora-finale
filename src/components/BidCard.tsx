@@ -207,11 +207,11 @@ export default function BidCard({
   };
 
   const getRelationshipToUser = () => {
-    if (!isConnected || !address) return "Observer";
+    if (!isConnected || !address) return "Just looking";
     if (bid.tokenOwner.toLowerCase() === address.toLowerCase())
       return "Token Owner";
     if (bid.bidder.toLowerCase() === address.toLowerCase()) return "Bidder";
-    return "Observer";
+    return "Just looking";
   };
 
   const formatDate = (timestamp: string) => {
@@ -223,7 +223,7 @@ export default function BidCard({
   };
 
   return (
-    <div className="flex justify-stretch gap-3 overflow-hidden rounded bg-neutral-700 opacity-80 transition-opacity duration-200 hover:opacity-100">
+    <div className="flex justify-stretch gap-3 overflow-hidden rounded bg-neutral-700/90 duration-200 hover:bg-neutral-700/100">
       <div className="flex w-full flex-col gap-3 p-3 pr-0">
         {/* NFT PREVIEW */}
         <NFTPreview
@@ -246,29 +246,13 @@ export default function BidCard({
                     getRelationshipToUser() === "Token Owner" &&
                       "text-green-400",
                     getRelationshipToUser() === "Bidder" && "text-purple-400",
-                    getRelationshipToUser() === "Observer" &&
+                    getRelationshipToUser() === "Just looking" &&
                       "text-neutral-400",
                   )}
                 >
                   {getRelationshipToUser()}
                 </span>
               </div>
-
-              {/* <div className="flex items-center gap-2">
-                <span>Status:</span>
-                <span
-                  className={cn(
-                    "font-semibold",
-                    bid.status === "active" && "text-green-400",
-                    bid.status === "withdrawn" && "text-red-400",
-                    bid.status === "accepted" && "text-blue-400",
-                  )}
-                >
-                  {bid.status === "active" && "Active Bid"}
-                  {bid.status === "withdrawn" && "Withdrawn Bid"}
-                  {bid.status === "accepted" && "Accepted Bid"}
-                </span>
-              </div> */}
 
               <div>
                 Bid Amount:{" "}
@@ -404,7 +388,7 @@ export default function BidCard({
                   isPending ||
                   isConfirming ||
                   isSuccess ||
-                  getRelationshipToUser() == "Observer"
+                  getRelationshipToUser() == "Just looking"
                 }
                 className={cn(
                   "w-full cursor-pointer rounded py-3 text-center text-white transition-colors duration-200 disabled:cursor-not-allowed",

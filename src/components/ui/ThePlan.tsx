@@ -11,7 +11,10 @@ export default function ThePlan() {
   const usdValueAuctionHouse = ethAmountAuctionHouse * ethPrice;
 
   return (
-    <div className="mt-32 flex max-w-1/2 flex-col gap-6 text-neutral-200">
+    <div
+      id="the-plan"
+      className="mt-0 flex max-w-1/2 flex-col gap-6 px-6 pt-32 text-neutral-200"
+    >
       {/* Intro text */}
       <div className="text-2xl">The Plan</div>
       <div className="font-light">
@@ -74,18 +77,18 @@ export default function ThePlan() {
         unearthed. Until now.{" "}
       </div>
       {/* Graphic */}
-      <div className="flex justify-around gap-4">
+      <div className="mt-11 flex justify-around gap-10">
         {/* Market contract */}
-        <div className="relative flex aspect-square w-fit flex-col items-center justify-center rounded-full border-2 border-neutral-700 bg-neutral-900/30 p-6">
+        <div className="relative flex aspect-square w-fit flex-1 flex-col items-center justify-center rounded-full border-2 border-neutral-700 bg-neutral-900/30 p-6">
           <Link
             href="https://etherscan.io/address/0xE5BFAB544ecA83849c53464F85B7164375Bdaac1"
             target="_blank"
             rel="noopener noreferrer"
-            className="absolute right-0 bottom-4 font-thin tracking-wider text-neutral-400"
+            className="absolute right-0 bottom-4 font-light tracking-wider text-neutral-400"
           >
             Zora: Market
           </Link>
-          <div className="space-y-2">
+          <div className="flex flex-col items-center justify-center space-y-2">
             <div className="text-xl font-bold">144.04976775 ETH</div>
             {loading ? (
               <div className="animate-pulse">
@@ -95,7 +98,7 @@ export default function ThePlan() {
             ) : error ? (
               <div className="text-sm">Unable to load USD value</div>
             ) : (
-              <div className="space-y-1">
+              <div className="flex flex-col items-center justify-center space-y-1">
                 <div className="">
                   ≈ $
                   {usdValueMarket.toLocaleString("en-US", {
@@ -118,16 +121,16 @@ export default function ThePlan() {
         </div>
 
         {/* Auction contract */}
-        <div className="relative flex aspect-square w-fit flex-col items-center justify-center rounded-full border-2 border-neutral-700 bg-neutral-900/30 p-6">
+        <div className="relative flex aspect-square w-fit flex-1 flex-col items-center justify-center rounded-full border-2 border-neutral-700 bg-neutral-900/30 p-6">
           <Link
             href="https://etherscan.io/address/0xe468ce99444174bd3bbbed09209577d25d1ad673"
             target="_blank"
             rel="noopener noreferrer"
-            className="absolute -right-4 bottom-4 font-thin tracking-wider text-neutral-400"
+            className="absolute -right-4 bottom-4 font-light tracking-wider text-neutral-400"
           >
             Zora: Auction House
           </Link>
-          <div className="space-y-2">
+          <div className="flex flex-col items-center justify-center space-y-2">
             <div className="text-xl font-bold">13.52559704 ETH</div>
             {loading ? (
               <div className="animate-pulse">
@@ -137,7 +140,7 @@ export default function ThePlan() {
             ) : error ? (
               <div className="text-sm">Unable to load USD value</div>
             ) : (
-              <div className="space-y-1">
+              <div className="flex flex-col items-center justify-center space-y-1">
                 <div className="">
                   ≈ $
                   {usdValueAuctionHouse.toLocaleString("en-US", {
@@ -161,7 +164,7 @@ export default function ThePlan() {
       </div>
 
       {/* 2 column text */}
-      <div className="mt-10 grid w-[110%] grid-cols-2 gap-4">
+      <div className="mt-12 grid w-[110%] grid-cols-2 gap-4">
         <div className="space-y-2">
           <div className="text-lg">FUNDS ARE SAFU 🙏</div>
           <div className="text-sm font-light">

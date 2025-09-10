@@ -58,22 +58,33 @@ export function AuctionCard({
     if (loading) return "Settling...";
 
     const role = getRelationshipToUser();
-    if (role === "Observer" || role === "Curator") {
-      if (auction.bidder === zeroAddress) {
-        return "Only owner can cancel the auction.";
-      } else {
-        return "Settle Auction";
-      }
-    }
+    const hasBid = auction.bidder !== zeroAddress;
+
     if (role === "Token Owner") {
-      if (auction.bidder === zeroAddress) {
-        return "Cancel Auction";
-      } else {
+      if (hasBid) {
         return "End Auction";
+      } else {
+        return "Cancel Auction";
       }
     }
+
     if (role === "Bidder") {
       return "End Auction";
+    }
+
+    if (role === "Curator") {
+      if (hasBid) {
+        return "Settle Auction";
+      } else {
+        return "Only owner can cancel the auction.";
+      }
+    }
+
+    // Just looking, former Observer
+    if (hasBid) {
+      return "Settle Auction";
+    } else {
+      return "Only owner can cancel the auction.";
     }
   };
 
@@ -95,14 +106,14 @@ export function AuctionCard({
   const getColorBarColor = () => {
     if (!isConnected || !address) return "bg-neutral-500";
     const role = getRelationshipToUser();
-    if (role === "Observer") return "bg-neutral-500";
+    if (role === "Just looking") return "bg-neutral-500";
     if (role === "Bidder") return "bg-purple-500";
     if (role === "Curator") return "bg-blue-500";
     if (role === "Token Owner") return "bg-green-500";
   };
 
   const getRelationshipToUser = () => {
-    if (!isConnected || !address) return "Observer";
+    if (!isConnected || !address) return "Just looking";
     if (auction.tokenOwner.toLowerCase() === address.toLowerCase())
       return "Token Owner";
     if (auction.bidder.toLowerCase() === address.toLowerCase()) return "Bidder";
@@ -111,7 +122,7 @@ export function AuctionCard({
       auction.curator.toLowerCase() === address.toLowerCase()
     )
       return "Curator";
-    return "Observer";
+    return "Just looking";
   };
 
   const formatDateTime = (timestamp: string) => {
@@ -134,8 +145,61 @@ export function AuctionCard({
     }
   };
 
+  const getStatusText = () => {
+    const role = getRelationshipToUser();
+    const hasBid = auction.bidder !== zeroAddress;
+    const isSettled = auction.isSettled;
+
+    // Settled auctions
+    if (isSettled) {
+      if (role === "Token Owner") {
+        return hasBid
+          ? "Auction completed. The NFT was transferred to the winning bidder and you received your payment."
+          : "Auction was cancelled and your NFT was returned.";
+      }
+      if (role === "Bidder") {
+        return "Congratulations! You won this auction and the NFT has been transferred to you.";
+      }
+      if (role === "Curator") {
+        return "This auction has been settled and curator fees have been distributed.";
+      }
+      return "This auction has been completed and settled.";
+    }
+
+    // Unsettled auctions
+    if (!isSettled) {
+      if (role === "Token Owner") {
+        if (hasBid) {
+          return "You can settle this auction and receive your payment.";
+        } else {
+          return "You can cancel this auction and reclaim your NFT.";
+        }
+      }
+
+      if (role === "Bidder") {
+        return "You can settle this auction and receive your NFT.";
+      }
+
+      if (role === "Curator") {
+        if (hasBid) {
+          return "This auction has an active bid and can be settled by anyone.";
+        } else {
+          return "This auction has no bids. The token owner can cancel it and reclaim their NFT.";
+        }
+      }
+
+      // Just looking (previously Observer)
+      if (hasBid) {
+        return "This auction has an active bid and you can help settle it. Token owner will receive their payment, bidder will receive their NFT.";
+      } else {
+        return "This auction has no bids. The token owner can cancel it and reclaim their NFT.";
+      }
+    }
+
+    return "";
+  };
   return (
-    <div className="flex justify-stretch gap-3 overflow-hidden rounded bg-neutral-700 duration-200 hover:bg-neutral-600">
+    <div className="flex justify-stretch gap-3 overflow-hidden rounded bg-neutral-700/90 duration-200 hover:bg-neutral-700/100">
       {/* COLOR BAR */}
       <div className={cn("h-full max-w-2 min-w-2", getColorBarColor())} />
 
@@ -158,7 +222,7 @@ export function AuctionCard({
                     getRelationshipToUser() === "Token Owner" &&
                       "text-green-400",
                     getRelationshipToUser() === "Bidder" && "text-purple-400",
-                    getRelationshipToUser() === "Observer" &&
+                    getRelationshipToUser() === "Just looking" &&
                       "text-neutral-400",
                   )}
                 >
@@ -281,6 +345,24 @@ export function AuctionCard({
           </div>
         </div>
 
+        {/* Status Bar */}
+        <div className="w-full rounded bg-neutral-600 p-3 text-center text-sm">
+          <div className="flex items-center justify-between">
+            <span className="text-neutral-300">Status:</span>
+            <span
+              className={cn(
+                "font-semibold",
+                !auction.isSettled && "text-yellow-400",
+                auction.isSettled && "text-green-400",
+              )}
+            >
+              {!auction.isSettled && "🟡 Unsettled Auction"}
+              {auction.isSettled && "🟢 Settled Auction"}
+            </span>
+          </div>
+          <div className="mt-2 text-xs text-neutral-400">{getStatusText()}</div>
+        </div>
+
         {/* Action buttons */}
         <div
           className={cn(
@@ -299,7 +381,12 @@ export function AuctionCard({
             <button
               onClick={handleSettleAuction}
               disabled={
-                loading || isSettled || getRelationshipToUser() === "Observer"
+                loading ||
+                isSettled ||
+                (getRelationshipToUser() === "Just looking" &&
+                  auction.bidder === zeroAddress) ||
+                (getRelationshipToUser() === "Curator" &&
+                  auction.bidder === zeroAddress)
               }
               className={cn(
                 "w-full cursor-pointer rounded py-3 text-center text-white transition-colors duration-200 disabled:cursor-not-allowed",
