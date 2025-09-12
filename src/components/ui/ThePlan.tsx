@@ -164,8 +164,8 @@ export default function ThePlan() {
       </div>
 
       {/* 2 column text */}
-      <div className="mt-12 grid w-[110%] grid-cols-2 gap-4">
-        <div className="space-y-2">
+      <div className="mt-12 grid w-[110%] flex-1 grid-cols-2 gap-16 pr-6">
+        <div className="flex-1 space-y-2">
           <div className="text-lg">FUNDS ARE SAFU 🙏</div>
           <div className="text-sm font-light">
             Was this a web2 startup, these funds would have been long gone. But
@@ -174,7 +174,7 @@ export default function ThePlan() {
             enabling you to recover your assets.
           </div>
         </div>
-        <div className="space-y-2">
+        <div className="flex-1 space-y-2">
           <div className="text-lg">GET YOUR ASSETS BACK!</div>
           <div className="text-sm font-light">
             As artists and developers ourselves, we think that it’s important

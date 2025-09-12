@@ -1,5 +1,5 @@
-// import CheckAddressWrapper from "@/components/CheckAddressWrapper";
-import CheckAddress from "@/components/CheckAddress";
+import CheckAddressWrapper from "@/components/CheckAddressWrapper";
+// import CheckAddress from "@/components/CheckAddress";
 import { ConnectButtonCustom } from "@/components/ConnectButton";
 import Donate from "@/components/Donate";
 import HowTo from "@/components/HowTo";
@@ -19,7 +19,7 @@ export default function HomePage() {
       {/* <div className="h-100"></div> */}
 
       <div className="z-1 mx-auto mt-32 flex w-full max-w-5xl flex-col items-center">
-        <CheckAddress />
+        <CheckAddressWrapper />
       </div>
       <Donate />
       {/* <Connect /> */}
@@ -30,7 +30,7 @@ export default function HomePage() {
           </h1>
           <ConnectButtonCustom
             text="Connect"
-            className="z-50! rounded-lg border-[2px] border-neutral-500 px-4 py-2 text-neutral-300 transition-colors duration-200 hover:bg-neutral-600"
+            className="z-50! rounded-lg border-[2px] border-neutral-600 px-4 py-2 text-neutral-300 transition-colors duration-200 hover:bg-neutral-600"
           />
         </div>
       </div>
