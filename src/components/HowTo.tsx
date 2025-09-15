@@ -1,8 +1,11 @@
+import { AddressDisplay } from "./AddressDisplay";
+import Link from "next/link";
+
 export default function HowTo() {
   return (
     <div
       id="how-to"
-      className="mt-32 flex max-w-1/2 flex-col gap-6 px-6 pt-32 pb-[500px] text-neutral-200"
+      className="mt-32 flex max-w-1/2 flex-col gap-6 px-6 pt-32 pb-[150px] text-neutral-200"
     >
       {/* Intro text */}
       <div className="text-2xl">How To</div>
@@ -12,8 +15,16 @@ export default function HowTo() {
           found, you&apos;ll see a list.
         </li>
         <li className="">
-          On the left side, you&apos;ll find active bids within the Zora Media
-          contract (prior to Auction House implementation).
+          On the left side, you&apos;ll find active bids within the{" "}
+          <Link
+            className="underline"
+            href="https://etherscan.io/address/0xabEFBc9fD2F806065b4f3C237d4b59D9A97Bcac7"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Zora Media contract
+          </Link>{" "}
+          (prior to Auction House implementation).
           <span className="block">
             There are two possible outcomes for these cases:
           </span>
@@ -34,8 +45,17 @@ export default function HowTo() {
           </ol>
         </li>
         <li>
-          On the right side you&apos;ll will find unsettled auctions made with
-          Zora Auction House, for which there are also two possible outcomes:
+          On the right side you&apos;ll will find unsettled auctions made within
+          the{" "}
+          <Link
+            className="underline"
+            href="https://etherscan.io/address/0xe468ce99444174bd3bbbed09209577d25d1ad673"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Zora Auction House smart contract
+          </Link>
+          , for which there are also two possible outcomes:
           <ol className="mt-2 ml-4 list-disc">
             <li>
               If an NFT was put for auction and didn&apos;t receive any bids,
@@ -44,16 +64,20 @@ export default function HowTo() {
             </li>
             <li>
               If the NFT received bids, and the last bid has not been settled,
-              anyone willing to pay for the gasfee can click “End Auction”. This
-              will send the NFT to the last bidder, and the original owner of
-              the NFT will receive the bidded amount in WETH (or other
-              ERC-20&apos;s).
+              anyone willing to pay for the gas fee can click “End Auction”.
+              This will send the NFT to the last bidder, and the original owner
+              of the NFT will receive the bidded amount in WETH (or other
+              ERC-20&apos;s). Bids on finalized auctions cannot be canceled.
             </li>
           </ol>
         </li>
         <li>
-          After receiving your assets back, you can be nice and donate some
-          funds to us at <span className="font-bold">zerazora.eth</span>.
+          After receiving your assets back, consider make a donation to{" "}
+          <AddressDisplay
+            className="text-base! font-bold"
+            address="zerazora.eth"
+            showENS
+          />
         </li>
       </ol>
     </div>

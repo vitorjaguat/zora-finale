@@ -10,7 +10,7 @@ import ThePlan from "@/components/ui/ThePlan";
 
 export default function HomePage() {
   return (
-    <main className="relative bg-gradient-to-b from-[#000000] to-[#333333]">
+    <main className="relative bg-gradient-to-b from-[#000000] to-[#555555] transition-all">
       <Hero />
       <Menu />
       <ThePlan />

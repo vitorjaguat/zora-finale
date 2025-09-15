@@ -2,6 +2,7 @@
 
 import { useEthPrice } from "@/hooks/useEthPrice";
 import Link from "next/link";
+import { AddressDisplay } from "../AddressDisplay";
 
 export default function ThePlan() {
   const { usd: ethPrice, loading, error } = useEthPrice();
@@ -44,6 +45,15 @@ export default function ThePlan() {
         >
           5-figure sales
         </Link>
+        ,{" "}
+        <Link
+          className="underline"
+          href="https://www.nbcnews.com/pop-culture/pop-culture-news/iconic-doge-meme-nft-breaks-records-selling-roughly-4-million-n1270161"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          memetic bid wars
+        </Link>
         . Some tokens from this (now clearly) mania phase even crossed the
         trad-art border into{" "}
         <Link
@@ -63,17 +73,17 @@ export default function ThePlan() {
         >
           Sotheby’s
         </Link>{" "}
-        sales.{" "}
+        auctions.{" "}
       </div>
       <div className="font-light">
         But evolution is relentless. As Zora shifted its orbit - now focused on
         <span className="ml-1 line-through decoration-2">shitcoins</span>
         <span className="ml-1 line-through decoration-2">memecoins</span>
         <span className="mx-1 line-through decoration-2">contentcoins</span>
-        creatorcoins - the contracts that once carried this golden age were
-        abandoned, their UI. Bags of WETH from past bids - and lots of NFTs -
-        are currently escrowed inside those contracts. A buried layer of WETH
-        and NFTs, sealed inside fossilized smart contracts — waiting to be
+        creatorcoins -, the contracts that once carried this golden age were
+        abandoned. Bags of WETH from past bids - and lots of NFTs - are
+        currently escrowed inside those contracts. A buried layer of WETH and
+        NFTs, sealed inside fossilized smart contracts, was waiting to be
         unearthed. Until now.{" "}
       </div>
       {/* Graphic */}
@@ -169,7 +179,7 @@ export default function ThePlan() {
           <div className="text-lg">FUNDS ARE SAFU 🙏</div>
           <div className="text-sm font-light">
             Was this a web2 startup, these funds would have been long gone. But
-            thanks to the beauty of decentralization, and a lot of sleuthing,
+            thanks to the beauty of decentralization, and some sleuthing,
             digging, and testing, we were able to create this alternative UI,
             enabling you to recover your assets.
           </div>
@@ -179,10 +189,15 @@ export default function ThePlan() {
           <div className="text-sm font-light">
             As artists and developers ourselves, we think that it’s important
             that people regain access over these assets. There’s no charge
-            (other than gasfees) to reclaim{" "}
+            (other than gas fees) to reclaim{" "}
             <span className="font-bold">WHAT’S ALREADY YOURS!</span> But we
             happily accept donations on{" "}
-            <span className="font-bold">zerazora.eth</span>
+            {/* <span className="font-bold">zerazora.eth</span> */}
+            <AddressDisplay
+              className="font-bold"
+              address="zerazora.eth"
+              showENS
+            />
           </div>
         </div>
       </div>

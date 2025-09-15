@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useEffect } from "react";
 import { resolveAddressOrENS } from "@/lib/ensUtils";
 
@@ -8,12 +10,14 @@ interface AddressDisplayProps {
   address: string;
   className?: string;
   showENS?: boolean; // Optional prop to enable ENS resolution
+  iconSize?: number;
 }
 
 export function AddressDisplay({
   address,
   className = "",
   showENS = false,
+  iconSize = 16,
 }: AddressDisplayProps) {
   const [copied, setCopied] = useState(false);
   const [ensName, setEnsName] = useState<string | null>(null);
@@ -90,7 +94,11 @@ export function AddressDisplay({
 
   return (
     <div className={`flex space-x-2 text-sm ${className}`}>
-      <span title={getDisplayTitle()} className="cursor-default">
+      <span
+        title={getDisplayTitle()}
+        className="cursor-pointer"
+        onClick={copyToClipboard}
+      >
         {showENS && ensLoading && (
           <span className="mr-1 inline-block h-2 w-2 animate-pulse rounded-full bg-neutral-500"></span>
         )}
@@ -103,7 +111,9 @@ export function AddressDisplay({
       >
         {copied ? (
           <svg
-            className="h-3.5 w-3.5 text-green-400"
+            className="text-green-400"
+            width={iconSize}
+            height={iconSize}
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -117,7 +127,9 @@ export function AddressDisplay({
           </svg>
         ) : (
           <svg
-            className="h-3.5 w-3.5 cursor-pointer"
+            className="cursor-pointer"
+            width={iconSize}
+            height={iconSize}
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
