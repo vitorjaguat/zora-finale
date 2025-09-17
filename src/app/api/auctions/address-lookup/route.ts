@@ -77,6 +77,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get auction details for all relevant auctions
+    const auctionIdsArray = Array.from(allAuctionIds);
     const auctionDetails = await db.execute(sql`
       SELECT 
         id,
@@ -97,7 +98,10 @@ export async function GET(request: NextRequest) {
         currency_decimals as "currencyDecimals",
         is_settled as "isSettled"
       FROM auctions 
-      WHERE id = ANY(${Array.from(allAuctionIds)})
+      WHERE id IN (${sql.join(
+        auctionIdsArray.map((id) => sql`${Number(id)}`),
+        sql`, `,
+      )})
       ORDER BY id
     `);
 

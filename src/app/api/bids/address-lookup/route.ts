@@ -60,177 +60,117 @@ export async function GET(request: NextRequest) {
 
     // Query the database for active bids where address is bidder or token owner
     try {
-      const results = await db.execute(sql`
-        WITH address_bids AS (
-          -- Get bids where address is bidder
-          SELECT 
-            b.id,
-            b.transaction_hash,
-            b.log_index,
-            b.token_id,
-            b.token_contract,
-            b.amount,
-            b.amount_formatted,
-            b.currency,
-            b.currency_symbol,
-            b.currency_decimals,
-            b.bidder,
-            b.recipient,
-            b.token_owner,
-            b.timestamp,
-            b.block_number,
-            b.is_active,
-            b.is_withdrawn,
-            b.is_accepted,
-            b.created_at,
-            'bidder' as role
-          FROM bids b
-          JOIN bid_bidders bb ON b.id = bb.bid_id
-          WHERE LOWER(bb.bidder_address) = LOWER(${address})
-          
-          UNION
-          
-          -- Get bids where address is token owner
-          SELECT 
-            b.id,
-            b.transaction_hash,
-            b.log_index,
-            b.token_id,
-            b.token_contract,
-            b.amount,
-            b.amount_formatted,
-            b.currency,
-            b.currency_symbol,
-            b.currency_decimals,
-            b.bidder,
-            b.recipient,
-            b.token_owner,
-            b.timestamp,
-            b.block_number,
-            b.is_active,
-            b.is_withdrawn,
-            b.is_accepted,
-            b.created_at,
-            'token_owner' as role
-          FROM bids b
-          JOIN bid_token_owners bto ON b.id = bto.bid_id
-          WHERE LOWER(bto.owner_address) = LOWER(${address})
-        ),
-        role_counts AS (
-          SELECT 
-            COUNT(CASE WHEN role = 'token_owner' THEN 1 END) as token_owner_count,
-            COUNT(CASE WHEN role = 'bidder' THEN 1 END) as bidder_count
-          FROM address_bids
-        ),
-        unique_bids AS (
-          SELECT DISTINCT 
-            id,
-            transaction_hash,
-            log_index,
-            token_id,
-            token_contract,
-            amount,
-            amount_formatted,
-            currency,
-            currency_symbol,
-            currency_decimals,
-            bidder,
-            recipient,
-            token_owner,
-            timestamp,
-            block_number,
-            is_active,
-            is_withdrawn,
-            is_accepted,
-            created_at
-          FROM address_bids
-        )
-        SELECT 
-          COALESCE(
-            JSON_AGG(
-              json_build_object(
-                'id', ub.id,
-                'transactionHash', ub.transaction_hash,
-                'logIndex', ub.log_index,
-                'tokenId', ub.token_id,
-                'tokenContract', ub.token_contract,
-                'amount', ub.amount,
-                'amountFormatted', ub.amount_formatted,
-                'currency', ub.currency,
-                'currencySymbol', ub.currency_symbol,
-                'currencyDecimals', ub.currency_decimals,
-                'bidder', ub.bidder,
-                'recipient', ub.recipient,
-                'tokenOwner', ub.token_owner,
-                'timestamp', ub.timestamp,
-                'blockNumber', ub.block_number,
-                'isActive', ub.is_active,
-                'isWithdrawn', ub.is_withdrawn,
-                'isAccepted', ub.is_accepted,
-                'processedAt', ub.created_at,
-                'status', 
-                CASE 
-                  WHEN ub.is_accepted = true THEN 'accepted'
-                  WHEN ub.is_withdrawn = true THEN 'withdrawn'
-                  WHEN ub.is_active = true THEN 'active'
-                  ELSE 'inactive'
-                END
-              ) ORDER BY ub.id
-            ) FILTER (WHERE ub.id IS NOT NULL), 
-            '[]'
-          ) as bids,
-          rc.token_owner_count::integer as token_owner_count,
-          rc.bidder_count::integer as bidder_count
-        FROM unique_bids ub
-        CROSS JOIN role_counts rc
-        GROUP BY rc.token_owner_count, rc.bidder_count
-      `);
+      // Get bid IDs for each role with simple queries
+      const [bidderResults, tokenOwnerResults] = await Promise.all([
+        // Bidder bids
+        db.execute(sql`
+          SELECT bid_id FROM bid_bidders 
+          WHERE LOWER(bidder_address) = LOWER(${address})
+        `),
+        // Token owner bids
+        db.execute(sql`
+          SELECT bid_id FROM bid_token_owners 
+          WHERE LOWER(owner_address) = LOWER(${address})
+        `),
+      ]);
 
-      const result = results[0] ?? {
-        bids: [],
-        token_owner_count: 0,
-        bidder_count: 0,
-      };
+      // Collect all unique bid IDs
+      const bidderIds = new Set(bidderResults.map((r) => r.bid_id as number));
+      const tokenOwnerIds = new Set(
+        tokenOwnerResults.map((r) => r.bid_id as number),
+      );
+      const allBidIds = new Set([...bidderIds, ...tokenOwnerIds]);
 
-      // Handle the bids data - now includes all bid fields directly
-      let bidsData: ActiveBid[] = [];
-      if ((result as { bids: string | unknown[] | null }).bids) {
-        if (
-          typeof (result as { bids: string | unknown[] | null }).bids ===
-          "string"
-        ) {
-          if (typeof result.bids === "string") {
-            bidsData = JSON.parse(result.bids) as ActiveBid[];
-          }
-        } else if (
-          Array.isArray((result as { bids: unknown[] | string | null }).bids)
-        ) {
-          bidsData = (result as { bids: ActiveBid[] }).bids;
-        }
+      if (allBidIds.size === 0) {
+        return NextResponse.json({
+          activeBids: {
+            hasActiveBids: false,
+            bidsCount: 0,
+            bids: [],
+            breakdown: {
+              asTokenOwner: 0,
+              asBidder: 0,
+            },
+          },
+        } satisfies ActiveBidsResult);
       }
 
-      const tokenOwnerCount =
-        "token_owner_count" in result &&
-        typeof result.token_owner_count === "number"
-          ? result.token_owner_count
-          : 0;
-      const bidderCount =
-        "bidder_count" in result && typeof result.bidder_count === "number"
-          ? result.bidder_count
-          : 0;
+      // Get bid details for all relevant bids
+      const bidIdsArray = Array.from(allBidIds);
+      const bidDetails = await db.execute(sql`
+        SELECT 
+          id,
+          transaction_hash,
+          log_index,
+          token_id,
+          token_contract,
+          amount,
+          amount_formatted,
+          currency,
+          currency_symbol,
+          currency_decimals,
+          bidder,
+          recipient,
+          token_owner,
+          timestamp,
+          block_number,
+          is_active,
+          is_withdrawn,
+          is_accepted,
+          created_at
+        FROM bids 
+        WHERE id = ANY(ARRAY[${sql.join(
+          bidIdsArray.map((id) => sql`${id}`),
+          sql`, `,
+        )}])
+        ORDER BY id
+      `);
 
-      // Calculate breakdown
-      const breakdown = {
-        asTokenOwner: tokenOwnerCount,
-        asBidder: bidderCount,
-      };
+      // Transform data and calculate status in JavaScript
+      const bidsData: ActiveBid[] = bidDetails.map((bid) => {
+        const isActive = bid.is_active as boolean;
+        const isWithdrawn = bid.is_withdrawn as boolean;
+        const isAccepted = bid.is_accepted as boolean;
+
+        let status: "active" | "withdrawn" | "accepted" | "inactive";
+        if (isAccepted) status = "accepted";
+        else if (isWithdrawn) status = "withdrawn";
+        else if (isActive) status = "active";
+        else status = "inactive";
+
+        return {
+          id: String(bid.id),
+          transactionHash: bid.transaction_hash as string,
+          logIndex: bid.log_index as number,
+          tokenId: bid.token_id as string,
+          tokenContract: bid.token_contract as string,
+          amount: bid.amount as string,
+          amountFormatted: bid.amount_formatted as string,
+          currency: bid.currency as string,
+          currencySymbol: bid.currency_symbol as string,
+          currencyDecimals: bid.currency_decimals as number,
+          bidder: bid.bidder as string,
+          recipient: bid.recipient as string,
+          tokenOwner: bid.token_owner as string,
+          timestamp: bid.timestamp as string,
+          blockNumber: bid.block_number as number,
+          isActive,
+          isWithdrawn,
+          isAccepted,
+          processedAt: bid.created_at as string,
+          status,
+        };
+      });
 
       const response: ActiveBidsResult = {
         activeBids: {
           hasActiveBids: bidsData.length > 0,
           bidsCount: bidsData.length,
           bids: bidsData,
-          breakdown,
+          breakdown: {
+            asTokenOwner: tokenOwnerIds.size,
+            asBidder: bidderIds.size,
+          },
         },
       };
 
