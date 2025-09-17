@@ -81,10 +81,10 @@ export default function ThePlan() {
         <span className="ml-1 line-through decoration-2">memecoins</span>
         <span className="mx-1 line-through decoration-2">contentcoins</span>
         creatorcoins -, the contracts that once carried this golden age were
-        abandoned. Bags of WETH from past bids - and lots of NFTs - are
-        currently escrowed inside those contracts. A buried layer of WETH and
-        NFTs, sealed inside fossilized smart contracts, was waiting to be
-        unearthed. Until now.{" "}
+        abandoned. Hundreds of WETH from past bids - and lots of NFTs - are
+        currently escrowed inside those contracts. A buried layer of fungies and
+        non-fungies sealed inside fossilized chests — waiting to be unearthed.
+        Until now.
       </div>
       {/* Graphic */}
       <div className="mt-11 flex justify-around gap-10">
