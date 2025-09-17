@@ -135,7 +135,7 @@ export function useAddressLookup() {
               `/api/auctions/address-lookup?address=${encodeURIComponent(address)}`,
             ),
             fetch(
-              `/api/active-bids/address-lookup?address=${encodeURIComponent(address)}`,
+              `/api/bids/address-lookup?address=${encodeURIComponent(address)}`,
             ),
           ],
         );

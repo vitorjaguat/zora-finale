@@ -67,8 +67,8 @@ WORKSPACE_CLEANUP_SUMMARY.md
 test-api.js
 
 # Backup files from development
-src/app/api/active-bids/address-lookup/route-json-backup.ts
-src/app/api/active-bids/address-lookup/route-db.ts
+src/app/api/bids/address-lookup/route-json-backup.ts
+src/app/api/bids/address-lookup/route-db.ts
 
 # Build/Development Files
 Makefile
