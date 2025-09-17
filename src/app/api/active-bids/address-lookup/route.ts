@@ -5,10 +5,11 @@ import { sql } from "drizzle-orm";
 
 // Define the structure of an active bid
 interface ActiveBid {
-  eventType: string;
-  implementation: string;
-  eventSignature: string;
+  id: string;
+  transactionHash: string;
+  logIndex: number;
   tokenId: string;
+  tokenContract: string;
   amount: string;
   amountFormatted: string;
   currency: string;
@@ -16,15 +17,21 @@ interface ActiveBid {
   currencyDecimals: number;
   bidder: string;
   recipient: string;
-  transactionHash: string;
-  blockNumber: number;
-  timestamp: string;
-  logIndex: number;
-  processedAt: string;
-  decodingMethod: string;
-  rawData: Record<string, unknown>;
-  contractVerification: Record<string, unknown>;
   tokenOwner: string;
+  timestamp: string;
+  blockNumber: number;
+  isActive: boolean;
+  isWithdrawn: boolean;
+  isAccepted: boolean;
+  processedAt: string;
+  status: "active" | "withdrawn" | "accepted" | "inactive";
+  // Legacy fields for backwards compatibility
+  eventType?: string;
+  implementation?: string;
+  eventSignature?: string;
+  decodingMethod?: string;
+  rawData?: Record<string, unknown>;
+  contractVerification?: Record<string, unknown>;
 }
 
 interface ActiveBidsResult {
@@ -58,10 +65,24 @@ export async function GET(request: NextRequest) {
           -- Get bids where address is bidder
           SELECT 
             b.id,
-            b.data,
+            b.transaction_hash,
+            b.log_index,
+            b.token_id,
+            b.token_contract,
+            b.amount,
+            b.amount_formatted,
+            b.currency,
+            b.currency_symbol,
+            b.currency_decimals,
+            b.bidder,
+            b.recipient,
+            b.token_owner,
+            b.timestamp,
+            b.block_number,
             b.is_active,
             b.is_withdrawn,
             b.is_accepted,
+            b.created_at,
             'bidder' as role
           FROM bids b
           JOIN bid_bidders bb ON b.id = bb.bid_id
@@ -72,10 +93,24 @@ export async function GET(request: NextRequest) {
           -- Get bids where address is token owner
           SELECT 
             b.id,
-            b.data,
+            b.transaction_hash,
+            b.log_index,
+            b.token_id,
+            b.token_contract,
+            b.amount,
+            b.amount_formatted,
+            b.currency,
+            b.currency_symbol,
+            b.currency_decimals,
+            b.bidder,
+            b.recipient,
+            b.token_owner,
+            b.timestamp,
+            b.block_number,
             b.is_active,
             b.is_withdrawn,
             b.is_accepted,
+            b.created_at,
             'token_owner' as role
           FROM bids b
           JOIN bid_token_owners bto ON b.id = bto.bid_id
@@ -89,27 +124,56 @@ export async function GET(request: NextRequest) {
         ),
         unique_bids AS (
           SELECT DISTINCT 
-            id, 
-            data,
+            id,
+            transaction_hash,
+            log_index,
+            token_id,
+            token_contract,
+            amount,
+            amount_formatted,
+            currency,
+            currency_symbol,
+            currency_decimals,
+            bidder,
+            recipient,
+            token_owner,
+            timestamp,
+            block_number,
             is_active,
             is_withdrawn,
-            is_accepted
+            is_accepted,
+            created_at
           FROM address_bids
         )
         SELECT 
           COALESCE(
             JSON_AGG(
               json_build_object(
-                'data', ub.data,
-                'isActive', ub.is_active = 'true',
-                'isWithdrawn', ub.is_withdrawn = 'true',
-                'isAccepted', ub.is_accepted = 'true',
+                'id', ub.id,
+                'transactionHash', ub.transaction_hash,
+                'logIndex', ub.log_index,
+                'tokenId', ub.token_id,
+                'tokenContract', ub.token_contract,
+                'amount', ub.amount,
+                'amountFormatted', ub.amount_formatted,
+                'currency', ub.currency,
+                'currencySymbol', ub.currency_symbol,
+                'currencyDecimals', ub.currency_decimals,
+                'bidder', ub.bidder,
+                'recipient', ub.recipient,
+                'tokenOwner', ub.token_owner,
+                'timestamp', ub.timestamp,
+                'blockNumber', ub.block_number,
+                'isActive', ub.is_active,
+                'isWithdrawn', ub.is_withdrawn,
+                'isAccepted', ub.is_accepted,
+                'processedAt', ub.created_at,
                 'status', 
                 CASE 
-                  WHEN ub.is_accepted = 'true' THEN 'accepted'
-                  WHEN ub.is_withdrawn = 'true' THEN 'withdrawn'
-                  WHEN ub.is_active = 'true' THEN 'active'
-                  ELSE 'active'
+                  WHEN ub.is_accepted = true THEN 'accepted'
+                  WHEN ub.is_withdrawn = true THEN 'withdrawn'
+                  WHEN ub.is_active = true THEN 'active'
+                  ELSE 'inactive'
                 END
               ) ORDER BY ub.id
             ) FILTER (WHERE ub.id IS NOT NULL), 
@@ -128,40 +192,21 @@ export async function GET(request: NextRequest) {
         bidder_count: 0,
       };
 
-      // Handle the bids data - now includes status information
-      interface BidWithStatus {
-        data: ActiveBid;
-        isActive: boolean;
-        isWithdrawn: boolean;
-        isAccepted: boolean;
-        status: "active" | "withdrawn" | "accepted";
-      }
-
+      // Handle the bids data - now includes all bid fields directly
       let bidsData: ActiveBid[] = [];
       if ((result as { bids: string | unknown[] | null }).bids) {
-        let parsedBids: BidWithStatus[] = [];
-
         if (
           typeof (result as { bids: string | unknown[] | null }).bids ===
           "string"
         ) {
           if (typeof result.bids === "string") {
-            parsedBids = JSON.parse(result.bids) as BidWithStatus[];
+            bidsData = JSON.parse(result.bids) as ActiveBid[];
           }
         } else if (
           Array.isArray((result as { bids: unknown[] | string | null }).bids)
         ) {
-          parsedBids = (result as { bids: BidWithStatus[] }).bids;
+          bidsData = (result as { bids: ActiveBid[] }).bids;
         }
-
-        // Transform the data to merge status fields with bid data
-        bidsData = parsedBids.map((bid: BidWithStatus) => ({
-          ...bid.data,
-          isActive: bid.isActive,
-          isWithdrawn: bid.isWithdrawn,
-          isAccepted: bid.isAccepted,
-          status: bid.status,
-        }));
       }
 
       const tokenOwnerCount =

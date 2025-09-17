@@ -8,6 +8,7 @@ import {
   jsonb,
   integer,
   boolean,
+  numeric,
 } from "drizzle-orm/pg-core";
 
 export const auctions = pgTable("auctions", {
@@ -89,37 +90,45 @@ export const auctionBidders = pgTable(
 
 // Bids table schema
 export const bids = pgTable("bids", {
-  id: text("id").primaryKey(), // Using transactionHash + logIndex as unique ID
+  // Core identification
+  id: text("id").primaryKey(),
   transactionHash: text("transaction_hash").notNull(),
-  logIndex: bigint("log_index", { mode: "bigint" }).notNull(),
+  logIndex: integer("log_index").notNull(),
+
+  // Token info
   tokenId: text("token_id").notNull(),
-  tokenContract: text("token_contract")
-    .notNull()
-    .default("0xabEFBc9fD2F806065b4f3C237d4b59D9A97Bcac7"),
-  amount: text("amount").notNull(), // Store as string to avoid precision loss
-  amountFormatted: text("amount_formatted").notNull(),
+  tokenContract: text("token_contract").notNull(),
+
+  // Amounts & Currency
+  amount: numeric("amount", { precision: 38, scale: 0 }).notNull(), // Raw wei amount
+  amountFormatted: numeric("amount_formatted", {
+    precision: 20,
+    scale: 8,
+  }).notNull(), // Formatted amount
   currency: text("currency").notNull(),
   currencySymbol: text("currency_symbol").notNull(),
-  currencyDecimals: bigint("currency_decimals", { mode: "number" }).notNull(),
+  currencyDecimals: integer("currency_decimals").notNull(),
+
+  // Addresses
   bidder: text("bidder").notNull(),
   recipient: text("recipient").notNull(),
   tokenOwner: text("token_owner").notNull(),
+
+  // Timing & Block
   timestamp: timestamp("timestamp").notNull(),
   blockNumber: bigint("block_number", { mode: "bigint" }).notNull(),
 
-  // Status tracking
-  isActive: text("is_active").notNull().default("true"), // "true", "false"
-  isWithdrawn: text("is_withdrawn").notNull().default("false"), // "true", "false"
-  isAccepted: text("is_accepted").notNull().default("false"), // "true", "false"
-
-  // Full JSON data for complete information
-  data: jsonb("data").notNull(),
+  // Status (converted from strings to booleans)
+  isActive: boolean("is_active").notNull().default(true),
+  isWithdrawn: boolean("is_withdrawn").notNull().default(false),
+  isAccepted: boolean("is_accepted").notNull().default(false),
 
   // Metadata
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
+  createdAt: timestamp("created_at").notNull(), // From JSON data, not defaultNow
+  updatedAt: timestamp("updated_at").defaultNow(), // Migration timestamp
 });
 
+// Simplified relationship tables
 export const bidBidders = pgTable(
   "bid_bidders",
   {
