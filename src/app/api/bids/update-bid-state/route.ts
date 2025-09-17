@@ -34,11 +34,9 @@ export async function POST(request: Request) {
 
     // Update the bid state based on the action
     const updateData = {
-      isActive: "false",
+      isActive: false,
       updatedAt: new Date(),
-      ...(action === "withdraw"
-        ? { isWithdrawn: "true" }
-        : { isAccepted: "true" }),
+      ...(action === "withdraw" ? { isWithdrawn: true } : { isAccepted: true }),
     };
 
     await db
