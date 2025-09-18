@@ -1,6 +1,6 @@
 export default function Hero() {
   return (
-    <div className="z-1 flex h-[calc(100dvh-72px)] w-full flex-col justify-between pt-6 pl-6 text-neutral-200">
+    <div className="z-1 flex h-[calc(100dvh-80px)] w-full flex-col justify-between pt-6 pl-6 text-neutral-200">
       <div className=""></div>
       <div className=""></div>
 

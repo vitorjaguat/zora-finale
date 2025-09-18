@@ -21,7 +21,7 @@ export default function HomePage() {
       <div className="z-1 mx-auto mt-32 flex w-full max-w-5xl flex-col items-center">
         <CheckAddressWrapper />
       </div>
-      <Donate />
+
       {/* <Connect /> */}
       <div className="fixed top-0 left-0 z-50 w-full mix-blend-difference">
         <div className="flex justify-between px-6 pt-6">
@@ -34,6 +34,7 @@ export default function HomePage() {
           />
         </div>
       </div>
+      <Donate />
     </main>
   );
 }
