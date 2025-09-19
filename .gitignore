@@ -120,3 +120,4 @@ src/scripts/generateJSON.ts
 src/lib/bidEvents.ts
 src/lib/bidFinalizedEvents.ts
 src/lib/contractHooks.ts
+/z_lists

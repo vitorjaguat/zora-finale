@@ -3,11 +3,11 @@
 
 @custom-variant dark (&:is(.dark *));
 
-@theme {
+/* @theme {
   --font-sans:
     var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif,
     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-}
+} */
 
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
@@ -120,6 +120,6 @@ html,
 body {
   background-color: #000;
   scrollbar-width: 0;
-  font-family: "Helvetica Neue";
+  font-family: "Helvetica Neue", Helvetica;
   scroll-behavior: smooth;
 }
