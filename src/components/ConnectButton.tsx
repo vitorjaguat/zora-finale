@@ -7,11 +7,13 @@ import Image from "next/image";
 interface ConnectButtonCustomProps {
   className?: string;
   text?: string;
+  isSearch?: boolean;
 }
 
 export const ConnectButtonCustom = ({
   className: _className,
   text = "Connect Wallet",
+  isSearch = false,
 }: ConnectButtonCustomProps) => {
   return (
     <ConnectButton.Custom>
@@ -60,47 +62,59 @@ export const ConnectButtonCustom = ({
                   </button>
                 );
               }
-              return (
-                <div style={{ display: "flex", gap: 12 }}>
+              if (!isSearch)
+                return (
+                  <div style={{ display: "flex", gap: 12 }}>
+                    <button
+                      onClick={openChainModal}
+                      className="flex items-center text-sm font-normal"
+                      type="button"
+                    >
+                      {chain.hasIcon && (
+                        <div
+                          style={{
+                            background: chain.iconBackground,
+                            width: 16,
+                            height: 16,
+                            borderRadius: 999,
+                            overflow: "hidden",
+                            marginRight: 4,
+                          }}
+                        >
+                          {chain.iconUrl && (
+                            <Image
+                              alt={chain.name ?? "Chain icon"}
+                              src={chain.iconUrl}
+                              width={16}
+                              height={16}
+                              style={{ width: 16, height: 16 }}
+                            />
+                          )}
+                        </div>
+                      )}
+                      {chain.name}
+                    </button>
+                    <button onClick={openAccountModal} type="button">
+                      {account.displayName}
+                      <span className="text-sm font-normal">
+                        {account.displayBalance
+                          ? ` (${account.displayBalance})`
+                          : ""}
+                      </span>
+                    </button>
+                  </div>
+                );
+              if (isSearch) {
+                return (
                   <button
-                    onClick={openChainModal}
-                    className="flex items-center text-sm font-normal"
+                    onClick={openAccountModal}
                     type="button"
+                    className="w-full cursor-pointer text-center"
                   >
-                    {chain.hasIcon && (
-                      <div
-                        style={{
-                          background: chain.iconBackground,
-                          width: 16,
-                          height: 16,
-                          borderRadius: 999,
-                          overflow: "hidden",
-                          marginRight: 4,
-                        }}
-                      >
-                        {chain.iconUrl && (
-                          <Image
-                            alt={chain.name ?? "Chain icon"}
-                            src={chain.iconUrl}
-                            width={16}
-                            height={16}
-                            style={{ width: 16, height: 16 }}
-                          />
-                        )}
-                      </div>
-                    )}
-                    {chain.name}
+                    DISCONNECT
                   </button>
-                  <button onClick={openAccountModal} type="button">
-                    {account.displayName}
-                    <span className="text-sm font-normal">
-                      {account.displayBalance
-                        ? ` (${account.displayBalance})`
-                        : ""}
-                    </span>
-                  </button>
-                </div>
-              );
+                );
+              }
             })()}
           </div>
         );
