@@ -123,3 +123,12 @@ body {
   font-family: "Helvetica Neue", Helvetica;
   scroll-behavior: smooth;
 }
+
+.custom-checkbox:checked {
+  background-color: #dedede !important;
+  border-color: #aaaaaa !important;
+  accent-color: #222222 !important;
+}
+.custom-checkbox:focus {
+  box-shadow: 0 0 0 1px #686868 !important;
+}

@@ -214,21 +214,23 @@ export function AuctionCard({
               Auction #{auction.auctionId}
             </div>
             <div className="space-y-1 space-x-3 pr-10 text-sm text-neutral-400">
-              <div className="flex items-center gap-2">
-                <span>Your Role:</span>
-                <span
-                  className={cn(
-                    "font-semibold",
-                    getRelationshipToUser() === "Token Owner" &&
-                      "text-green-400",
-                    getRelationshipToUser() === "Bidder" && "text-purple-400",
-                    getRelationshipToUser() === "Just looking" &&
-                      "text-neutral-400",
-                  )}
-                >
-                  {getRelationshipToUser()}
-                </span>
-              </div>
+              {isConnected && (
+                <div className="flex items-center gap-2">
+                  <span>Connected Wallet Role:</span>
+                  <span
+                    className={cn(
+                      "font-semibold",
+                      getRelationshipToUser() === "Token Owner" &&
+                        "text-green-400",
+                      getRelationshipToUser() === "Bidder" && "text-purple-400",
+                      getRelationshipToUser() === "Just looking" &&
+                        "text-neutral-400",
+                    )}
+                  >
+                    {getRelationshipToUser()}
+                  </span>
+                </div>
+              )}
 
               <div>Token ID: {auction.tokenId}</div>
               {(!isConnected ||
