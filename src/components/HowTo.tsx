@@ -8,7 +8,7 @@ export default function HowTo() {
       className="mt-32 flex max-w-1/2 flex-col gap-6 px-6 pt-32 pb-[150px] text-neutral-200"
     >
       {/* Intro text */}
-      <div className="text-2xl">How To</div>
+      <div className="text-4xl">How To</div>
       <ol className="ml-4 flex list-decimal flex-col gap-2 font-light">
         <li className="">
           Input a valid address or ENS below and submit. If escrowed assets are
@@ -74,7 +74,7 @@ export default function HowTo() {
         <li>
           After receiving your assets back, consider make a donation to{" "}
           <AddressDisplay
-            className="text-base! font-bold"
+            className="inline space-x-1! text-base! font-bold"
             address="zerazora.eth"
             showENS
           />

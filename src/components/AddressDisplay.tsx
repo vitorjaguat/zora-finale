@@ -106,7 +106,7 @@ export function AddressDisplay({
       </span>
       <button
         onClick={copyToClipboard}
-        className="flex-shrink-0 text-neutral-400 transition-colors hover:text-neutral-200"
+        className="h-fit flex-shrink-0 text-neutral-400 transition-colors hover:text-neutral-200"
         title={copied ? "Copied!" : "Copy address"}
       >
         {copied ? (

@@ -154,6 +154,11 @@ export default function BidCard({
           },
         };
 
+        console.log("MEDIA_CONTRACT.address: ", MEDIA_CONTRACT.address);
+        console.log("bid.tokenId", bid.tokenId);
+        console.log("bidStruct: ");
+        console.dir(bidStruct);
+
         writeContract({
           address: MEDIA_CONTRACT.address,
           abi: MEDIA_CONTRACT.abi,

@@ -10,7 +10,7 @@ export default function Donate() {
     >
       <div className="flex max-w-1/2 flex-col gap-6">
         {/* Intro text */}
-        <div className="text-2xl">Donate</div>
+        <div className="text-4xl">Donate</div>
         <div className="font-light">
           This alternate UI was made with love by{" "}
           <Link
