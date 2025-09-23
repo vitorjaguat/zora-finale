@@ -6,7 +6,7 @@ export default function Donate() {
   return (
     <div
       id="donate"
-      className="relative mt-[250px] h-screen w-full px-6 pt-40 text-neutral-200"
+      className="relative mt-20 h-screen w-full px-6 pt-32 text-neutral-200"
     >
       <div className="flex max-w-1/2 flex-col gap-6">
         {/* Intro text */}

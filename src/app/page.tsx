@@ -18,7 +18,7 @@ export default function HomePage() {
       <HowTo />
       <Sphere />
 
-      <div className="z-1 mx-auto mt-32 flex w-full max-w-5xl flex-col items-center">
+      <div className="z-1 mx-auto flex w-full max-w-5xl flex-col items-center">
         <CheckAddressWrapper />
       </div>
 

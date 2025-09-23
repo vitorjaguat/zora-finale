@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function Menu() {
   return (
-    <div className="pointer-events-none sticky top-0 left-0 z-[60] flex h-[100dvh] w-full flex-col justify-between pt-8 pl-6 text-neutral-200 mix-blend-difference">
+    <div className="pointer-events-none sticky top-0 left-0 z-[60] flex w-full flex-col justify-between pt-8 pl-6 text-neutral-200 mix-blend-difference">
       <nav className="pointer-events-none flex w-full justify-between pb-6">
         <div className="w-[104px]"></div> {/* distance for ZORA */}
         <Link href="#the-plan" className="pointer-events-auto">

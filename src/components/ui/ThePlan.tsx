@@ -14,7 +14,7 @@ export default function ThePlan() {
   return (
     <div
       id="the-plan"
-      className="mt-0 flex max-w-1/2 flex-col gap-6 px-6 pt-32 text-neutral-200"
+      className="mt-20 flex max-w-1/2 flex-col gap-6 px-6 pt-32 text-neutral-200"
     >
       {/* Intro text */}
       <div className="text-4xl">The Plan</div>

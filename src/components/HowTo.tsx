@@ -5,7 +5,7 @@ export default function HowTo() {
   return (
     <div
       id="how-to"
-      className="mt-32 flex max-w-1/2 flex-col gap-6 px-6 pt-32 pb-[150px] text-neutral-200"
+      className="mt-20 flex max-w-1/2 flex-col gap-6 px-6 pt-32 text-neutral-200"
     >
       {/* Intro text */}
       <div className="text-4xl">How To</div>

@@ -52,7 +52,7 @@ export function AddressSearch({
       <div className="flex flex-col gap-4">
         <input
           ref={addressRef}
-          className="w-2xl max-w-full rounded-lg bg-neutral-500 px-4 py-2.5 text-center text-white outline-0"
+          className="w-2xl max-w-full rounded-lg bg-neutral-700 px-4 py-2.5 text-center text-white outline-0"
           type="text"
           name="address"
           id="address"
