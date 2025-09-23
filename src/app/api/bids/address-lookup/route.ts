@@ -42,6 +42,7 @@ interface ActiveBidsResult {
     breakdown: {
       asTokenOwner: number;
       asBidder: number;
+      settled: number;
     };
   };
 }
@@ -90,6 +91,7 @@ export async function GET(request: NextRequest) {
             breakdown: {
               asTokenOwner: 0,
               asBidder: 0,
+              settled: 0,
             },
           },
         } satisfies ActiveBidsResult);
@@ -123,14 +125,18 @@ export async function GET(request: NextRequest) {
           bidIdsArray.map((id) => sql`${id}`),
           sql`, `,
         )}])
-        ORDER BY id
+        ORDER BY timestamp
       `);
+
+      // Prepare settled bids count
+      let settledBidsCount = 0;
 
       // Transform data and calculate status in JavaScript
       const bidsData: ActiveBid[] = bidDetails.map((bid) => {
         const isActive = bid.is_active as boolean;
         const isWithdrawn = bid.is_withdrawn as boolean;
         const isAccepted = bid.is_accepted as boolean;
+        if (!isActive) settledBidsCount++;
 
         let status: "active" | "withdrawn" | "accepted" | "inactive";
         if (isAccepted) status = "accepted";
@@ -170,6 +176,7 @@ export async function GET(request: NextRequest) {
           breakdown: {
             asTokenOwner: tokenOwnerIds.size,
             asBidder: bidderIds.size,
+            settled: settledBidsCount,
           },
         },
       };

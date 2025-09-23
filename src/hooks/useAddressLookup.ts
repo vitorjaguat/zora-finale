@@ -58,6 +58,7 @@ export interface ActiveBidsResult {
   breakdown: {
     asTokenOwner: number;
     asBidder: number;
+    settled: number;
   };
 }
 
@@ -71,6 +72,7 @@ export interface Result {
     asTokenOwner: number;
     asCurator: number;
     asBidder: number;
+    settled: number;
   };
   activeBids: ActiveBidsResult | null;
 }

@@ -39,9 +39,17 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
       <div className="flex w-full flex-col gap-6">
         {/* Breakdown Header */}
         <div className="flex w-full items-center justify-center gap-3">
-          <HiArrowTurnLeftDown color="white" className="translate-y-1.5" />
+          <HiArrowTurnLeftDown
+            color="white"
+            className="translate-y-1.5"
+            size={24}
+          />
           <div className="text-2xl text-white">Breakdown</div>
-          <HiArrowTurnRightDown color="white" className="translate-y-1.5" />
+          <HiArrowTurnRightDown
+            color="white"
+            className="translate-y-1.5"
+            size={24}
+          />
         </div>
         <div className="flex w-full gap-4">
           {/* ActiveBids breakdown */}
@@ -63,16 +71,20 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
                     : 0}
                 </div>
               </div>
-              {/* <div className="rounded bg-neutral-700 p-3">
-            <div className="font-semibold text-blue-400">As Curator</div>
-            <div className="text-lg text-neutral-200">
-              {result.activeBids ? result.activeBids.breakdown.asCurator : 0}
-            </div>
-          </div> */}
               <div className="rounded bg-neutral-700 p-3">
                 <div className="font-semibold text-purple-400">As Bidder</div>
                 <div className="text-lg text-neutral-200">
                   {result.activeBids ? result.activeBids.breakdown.asBidder : 0}
+                </div>
+              </div>
+            </div>
+            <div className="mt-4 grid grid-cols-1 gap-4 text-sm md:grid-cols-3">
+              <div className="rounded bg-neutral-700 p-3">
+                <div className="font-semibold text-neutral-300">
+                  Settled Bids
+                </div>
+                <div className="text-lg text-neutral-200">
+                  {result.activeBids ? result.activeBids.breakdown.settled : 0}
                 </div>
               </div>
             </div>
@@ -104,6 +116,16 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
                 <div className="font-semibold text-purple-400">As Bidder</div>
                 <div className="text-lg text-neutral-200">
                   {result.breakdown.asBidder}
+                </div>
+              </div>
+            </div>
+            <div className="mt-4 grid grid-cols-1 gap-4 text-sm md:grid-cols-3">
+              <div className="rounded bg-neutral-700 p-3">
+                <div className="font-semibold text-neutral-300">
+                  Settled Auctions
+                </div>
+                <div className="text-lg text-neutral-200">
+                  {result.breakdown.settled}
                 </div>
               </div>
             </div>

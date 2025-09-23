@@ -12,6 +12,7 @@ interface CheckResult {
     asTokenOwner: number;
     asCurator: number;
     asBidder: number;
+    settled: number;
   };
 }
 
@@ -72,6 +73,7 @@ export async function GET(request: NextRequest) {
           asTokenOwner: 0,
           asCurator: 0,
           asBidder: 0,
+          settled: 0,
         },
       } satisfies CheckResult);
     }
@@ -105,11 +107,17 @@ export async function GET(request: NextRequest) {
       ORDER BY id
     `);
 
+    // Prepare settledAuctionsCount
+    let settledAuctionsCount = 0;
+
     // Transform and add auctionId field
-    const auctions: AuctionData[] = auctionDetails.map((auction) => ({
-      ...auction,
-      auctionId: String(auction.id),
-    })) as AuctionData[];
+    const auctions: AuctionData[] = auctionDetails.map((auction) => {
+      if (auction.isSettled) settledAuctionsCount++;
+      return {
+        ...auction,
+        auctionId: String(auction.id),
+      };
+    }) as AuctionData[];
 
     const response: CheckResult = {
       address,
@@ -120,6 +128,7 @@ export async function GET(request: NextRequest) {
         asTokenOwner: tokenOwnerIds.size,
         asCurator: curatorIds.size,
         asBidder: bidderIds.size,
+        settled: settledAuctionsCount,
       },
     };
 
