@@ -32,8 +32,8 @@ export default function HomePage() {
             ZERA
           </Link>
           <ConnectButtonCustom
-            text="Connect"
-            className="z-50! rounded-lg border-[2px] border-neutral-600 px-4 py-2 text-neutral-300 transition-colors duration-200 hover:bg-neutral-600"
+            text="CONNECT"
+            className="z-50! translate-x-1 -translate-y-1 rounded-lg border-[2px] border-neutral-600 bg-neutral-700 px-4 py-2 text-neutral-300 transition-colors duration-200 hover:bg-neutral-600"
           />
         </div>
       </div>

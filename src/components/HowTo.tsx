@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export default function HowTo() {
   return (
-    <div
+    <section
       id="how-to"
       className="mt-20 flex max-w-1/2 flex-col gap-6 px-6 pt-32 text-neutral-200"
     >
@@ -80,6 +80,6 @@ export default function HowTo() {
           />
         </li>
       </ol>
-    </div>
+    </section>
   );
 }

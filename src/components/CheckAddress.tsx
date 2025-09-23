@@ -40,7 +40,7 @@ export default function CheckAddress() {
   }, [result?.originalInput, router, searchParams]);
 
   return (
-    <div
+    <section
       id="address-checker"
       className="z-10 mx-auto mt-0 flex w-full max-w-7xl flex-col items-stretch gap-12 pt-56"
     >
@@ -53,6 +53,6 @@ export default function CheckAddress() {
       {error && <ErrorDisplay error={error} />}
 
       {result && <ResultsDisplay result={result} />}
-    </div>
+    </section>
   );
 }

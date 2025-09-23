@@ -12,7 +12,7 @@ export default function ThePlan() {
   const usdValueAuctionHouse = ethAmountAuctionHouse * ethPrice;
 
   return (
-    <div
+    <section
       id="the-plan"
       className="mt-20 flex max-w-1/2 flex-col gap-6 px-6 pt-32 text-neutral-200"
     >
@@ -257,6 +257,6 @@ export default function ThePlan() {
           </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 }

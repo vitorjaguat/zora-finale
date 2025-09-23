@@ -4,7 +4,7 @@ import CheckAddress from "./CheckAddress";
 
 function CheckAddressLoading() {
   return (
-    <div className="flex flex-col items-center gap-2">
+    <section className="flex flex-col items-center gap-2">
       <div className="flex flex-col items-center gap-8 rounded-lg border border-neutral-600 bg-neutral-800 p-6">
         <div className="w-full text-2xl text-neutral-200">Check Address</div>
         <div className="animate-pulse">
@@ -12,7 +12,7 @@ function CheckAddressLoading() {
         </div>
         <div className="h-12 w-24 animate-pulse rounded-lg bg-neutral-300"></div>
       </div>
-    </div>
+    </section>
   );
 }
 

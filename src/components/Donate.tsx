@@ -4,7 +4,7 @@ import { FaGithub } from "react-icons/fa";
 
 export default function Donate() {
   return (
-    <div
+    <section
       id="donate"
       className="relative mt-20 h-screen w-full px-6 pt-32 text-neutral-200"
     >
@@ -66,6 +66,6 @@ export default function Donate() {
         </div>
         {/* <div className="h-2 w-[580px] bg-pink-300"></div> */}
       </div>
-    </div>
+    </section>
   );
 }
