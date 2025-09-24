@@ -55,7 +55,7 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
           {/* ActiveBids breakdown */}
           <div className="mb-4 flex-1 rounded-lg border border-neutral-600 bg-neutral-800 p-6">
             <h2 className="mb-4 text-xl font-semibold text-neutral-200">
-              Found {result.activeBids?.bidsCount} unsettled bid
+              Found {result.activeBids?.bidsCount} bid
               {result.activeBids?.bidsCount !== 1 ? "s" : ""} for{" "}
               <AddressDisplay address={result.address} />
             </h2>

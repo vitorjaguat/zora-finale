@@ -1,5 +1,5 @@
 "use client";
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 import { ConnectButtonCustom } from "./ConnectButton";
 
@@ -16,6 +16,7 @@ export function AddressSearch({
 }: AddressSearchProps) {
   const addressRef = useRef<HTMLInputElement>(null);
   const { address: connectedAddress, isConnected } = useAccount();
+  const [hasAutoSubmitted, setHasAutoSubmitted] = useState(false);
 
   // Set initial value when component mounts or initialValue changes
   useEffect(() => {
@@ -24,12 +25,13 @@ export function AddressSearch({
     }
   }, [initialValue]);
 
-  // Auto-submit when wallet connects
+  // Auto-submit only on first wallet connection, not on every render
   useEffect(() => {
-    if (isConnected && connectedAddress && !loading) {
+    if (isConnected && connectedAddress && !loading && !hasAutoSubmitted) {
       onSubmit(connectedAddress);
+      setHasAutoSubmitted(true);
     }
-  }, [isConnected, connectedAddress, onSubmit, loading]);
+  }, [isConnected, connectedAddress, onSubmit, loading, hasAutoSubmitted]);
 
   const handleKeyPress = (e: React.KeyboardEvent): void => {
     if (e.key === "Enter" && !loading) {
