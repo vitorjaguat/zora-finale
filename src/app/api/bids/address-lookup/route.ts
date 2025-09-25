@@ -3,8 +3,7 @@ import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { sql } from "drizzle-orm";
 
-// Define the structure of an active bid
-interface ActiveBid {
+export interface Bid {
   id: string;
   transactionHash: string;
   logIndex: number;
@@ -18,6 +17,7 @@ interface ActiveBid {
   bidder: string;
   recipient: string;
   tokenOwner: string;
+  sellOnShareValue: string;
   timestamp: string;
   blockNumber: number;
   isActive: boolean;
@@ -34,15 +34,18 @@ interface ActiveBid {
   contractVerification?: Record<string, unknown>;
 }
 
-interface ActiveBidsResult {
-  activeBids: {
-    hasActiveBids: boolean;
-    bidsCount: number;
-    bids: ActiveBid[];
-    breakdown: {
+export interface BidsResult {
+  hasBids: boolean;
+  bidsCount: number;
+  bids: Bid[];
+  breakdown: {
+    active: {
       asTokenOwner: number;
       asBidder: number;
-      settled: number;
+    };
+    settled: {
+      asTokenOwner: number;
+      asBidder: number;
     };
   };
 }
@@ -76,25 +79,28 @@ export async function GET(request: NextRequest) {
       ]);
 
       // Collect all unique bid IDs
-      const bidderIds = new Set(bidderResults.map((r) => r.bid_id as number));
+      const bidderIds = new Set(bidderResults.map((r) => r.bid_id as string));
       const tokenOwnerIds = new Set(
-        tokenOwnerResults.map((r) => r.bid_id as number),
+        tokenOwnerResults.map((r) => r.bid_id as string),
       );
       const allBidIds = new Set([...bidderIds, ...tokenOwnerIds]);
 
       if (allBidIds.size === 0) {
         return NextResponse.json({
-          activeBids: {
-            hasActiveBids: false,
-            bidsCount: 0,
-            bids: [],
-            breakdown: {
+          hasBids: false,
+          bidsCount: 0,
+          bids: [],
+          breakdown: {
+            active: {
               asTokenOwner: 0,
               asBidder: 0,
-              settled: 0,
+            },
+            settled: {
+              asTokenOwner: 0,
+              asBidder: 0,
             },
           },
-        } satisfies ActiveBidsResult);
+        } satisfies BidsResult);
       }
 
       // Get bid details for all relevant bids
@@ -114,6 +120,7 @@ export async function GET(request: NextRequest) {
           bidder,
           recipient,
           token_owner,
+          sell_on_share_value,
           timestamp,
           block_number,
           is_active,
@@ -128,21 +135,38 @@ export async function GET(request: NextRequest) {
         ORDER BY timestamp
       `);
 
-      // Prepare settled bids count
-      let settledBidsCount = 0;
+      // Calculate breakdown by role and active/settled status
+      let activeAsTokenOwner = 0;
+      let activeAsBidder = 0;
+      let settledAsTokenOwner = 0;
+      let settledAsBidder = 0;
 
       // Transform data and calculate status in JavaScript
-      const bidsData: ActiveBid[] = bidDetails.map((bid) => {
+      const bidsData: Bid[] = bidDetails.map((bid) => {
         const isActive = bid.is_active as boolean;
         const isWithdrawn = bid.is_withdrawn as boolean;
         const isAccepted = bid.is_accepted as boolean;
-        if (!isActive) settledBidsCount++;
 
         let status: "active" | "withdrawn" | "accepted" | "inactive";
         if (isAccepted) status = "accepted";
         else if (isWithdrawn) status = "withdrawn";
         else if (isActive) status = "active";
         else status = "inactive";
+
+        const bidId = bid.id as string;
+        if (isActive) {
+          if (bidderIds.has(bidId)) {
+            activeAsBidder++;
+          } else if (tokenOwnerIds.has(bidId)) {
+            activeAsTokenOwner++;
+          }
+        } else {
+          if (bidderIds.has(bidId)) {
+            settledAsBidder++;
+          } else if (tokenOwnerIds.has(bidId)) {
+            settledAsTokenOwner++;
+          }
+        }
 
         return {
           id: String(bid.id),
@@ -158,6 +182,7 @@ export async function GET(request: NextRequest) {
           bidder: bid.bidder as string,
           recipient: bid.recipient as string,
           tokenOwner: bid.token_owner as string,
+          sellOnShareValue: bid.sell_on_share_value as string,
           timestamp: bid.timestamp as string,
           blockNumber: bid.block_number as number,
           isActive,
@@ -168,15 +193,32 @@ export async function GET(request: NextRequest) {
         };
       });
 
-      const response: ActiveBidsResult = {
-        activeBids: {
-          hasActiveBids: bidsData.length > 0,
-          bidsCount: bidsData.length,
-          bids: bidsData,
-          breakdown: {
-            asTokenOwner: tokenOwnerIds.size,
-            asBidder: bidderIds.size,
-            settled: settledBidsCount,
+      // bidsData.forEach((bid) => {
+      //   const bidId = parseInt(bid.id);
+      //   const isBidder = bidderIds.has(bidId);
+      //   const isTokenOwner = tokenOwnerIds.has(bidId);
+
+      //   if (bid.isActive) {
+      //     if (isTokenOwner) activeAsTokenOwner++;
+      //     if (isBidder) activeAsBidder++;
+      //   } else {
+      //     if (isTokenOwner) settledAsTokenOwner++;
+      //     if (isBidder) settledAsBidder++;
+      //   }
+      // });
+
+      const response: BidsResult = {
+        hasBids: bidsData.length > 0,
+        bidsCount: bidsData.length,
+        bids: bidsData,
+        breakdown: {
+          active: {
+            asTokenOwner: activeAsTokenOwner,
+            asBidder: activeAsBidder,
+          },
+          settled: {
+            asTokenOwner: settledAsTokenOwner,
+            asBidder: settledAsBidder,
           },
         },
       };

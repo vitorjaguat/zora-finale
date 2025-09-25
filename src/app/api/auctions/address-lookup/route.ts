@@ -3,16 +3,22 @@ import { db } from "@/lib/db";
 import { sql } from "drizzle-orm";
 import type { AuctionData } from "@/hooks/useAddressLookup";
 
-interface CheckResult {
+interface AuctionsResult {
   address: string;
   hasAuctions: boolean;
   auctionCount: number;
   auctions: AuctionData[];
   breakdown: {
-    asTokenOwner: number;
-    asCurator: number;
-    asBidder: number;
-    settled: number;
+    active: {
+      asTokenOwner: number;
+      asCurator: number;
+      asBidder: number;
+    };
+    settled: {
+      asTokenOwner: number;
+      asCurator: number;
+      asBidder: number;
+    };
   };
 }
 
@@ -70,12 +76,18 @@ export async function GET(request: NextRequest) {
         auctionCount: 0,
         auctions: [],
         breakdown: {
-          asTokenOwner: 0,
-          asCurator: 0,
-          asBidder: 0,
-          settled: 0,
+          active: {
+            asTokenOwner: 0,
+            asCurator: 0,
+            asBidder: 0,
+          },
+          settled: {
+            asTokenOwner: 0,
+            asCurator: 0,
+            asBidder: 0,
+          },
         },
-      } satisfies CheckResult);
+      } satisfies AuctionsResult);
     }
 
     // Get auction details for all relevant auctions
@@ -107,28 +119,59 @@ export async function GET(request: NextRequest) {
       ORDER BY id
     `);
 
-    // Prepare settledAuctionsCount
-    let settledAuctionsCount = 0;
+    // Calculate breakdown by role and active/settled status
+    let activeAsTokenOwner = 0;
+    let activeAsCurator = 0;
+    let activeAsBidder = 0;
+    let settledAsTokenOwner = 0;
+    let settledAsCurator = 0;
+    let settledAsBidder = 0;
 
     // Transform and add auctionId field
     const auctions: AuctionData[] = auctionDetails.map((auction) => {
-      if (auction.isSettled) settledAuctionsCount++;
+      if (auction.isSettled) {
+        if (auction.tokenOwner === address) {
+          settledAsTokenOwner++;
+        }
+        if (auction.bidder === address) {
+          settledAsBidder++;
+        }
+        if (auction.curator === address && auction.tokenOwner !== address) {
+          settledAsCurator++;
+        }
+      } else {
+        if (auction.tokenOwner === address) {
+          activeAsTokenOwner++;
+        }
+        if (auction.bidder === address) {
+          activeAsBidder++;
+        }
+        if (auction.curator === address && auction.tokenOwner !== address) {
+          activeAsCurator++;
+        }
+      }
       return {
         ...auction,
         auctionId: String(auction.id),
       };
     }) as AuctionData[];
 
-    const response: CheckResult = {
+    const response: AuctionsResult = {
       address,
       hasAuctions: auctions.length > 0,
       auctionCount: auctions.length,
       auctions,
       breakdown: {
-        asTokenOwner: tokenOwnerIds.size,
-        asCurator: curatorIds.size,
-        asBidder: bidderIds.size,
-        settled: settledAuctionsCount,
+        active: {
+          asTokenOwner: activeAsTokenOwner,
+          asCurator: activeAsCurator,
+          asBidder: activeAsBidder,
+        },
+        settled: {
+          asTokenOwner: settledAsTokenOwner,
+          asCurator: settledAsCurator,
+          asBidder: settledAsBidder,
+        },
       },
     };
 

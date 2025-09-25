@@ -3,8 +3,9 @@ import { AddressDisplay } from "./AddressDisplay";
 import BidCard from "./BidCard";
 import { HiArrowTurnRightDown, HiArrowTurnLeftDown } from "react-icons/hi2";
 import { useState } from "react";
+import type { Bid, BidsResult } from "@/app/api/bids/address-lookup/route";
 
-import type { Result, ActiveBid } from "@/hooks/useAddressLookup";
+import type { Result } from "@/hooks/useAddressLookup";
 
 // interface CheckResult {
 //   address: string;
@@ -31,8 +32,8 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
     : result.auctions;
 
   const filteredBids = showOnlyActive
-    ? (result.activeBids?.bids.filter((bid) => bid.isActive) ?? [])
-    : (result.activeBids?.bids ?? []);
+    ? (result?.bids?.bids.filter((bid) => bid.isActive) ?? [])
+    : (result?.bids?.bids ?? []);
   return (
     <div className="flex w-full flex-col gap-12">
       {/* BREAKDOWN */}
@@ -55,36 +56,53 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
           {/* ActiveBids breakdown */}
           <div className="mb-4 flex-1 rounded-lg border border-neutral-600 bg-neutral-800 p-6">
             <h2 className="mb-4 text-xl font-semibold text-neutral-200">
-              Found {result.activeBids?.bidsCount} bid
-              {result.activeBids?.bidsCount !== 1 ? "s" : ""} for{" "}
+              Found {result.bids?.bidsCount} bid
+              {result.bids?.bidsCount !== 1 ? "s" : ""} for{" "}
               <AddressDisplay address={result.address} />
             </h2>
 
-            <div className="grid grid-cols-1 gap-4 text-sm md:grid-cols-3">
-              <div className="rounded bg-neutral-700 p-3">
-                <div className="font-semibold text-green-400">
-                  As Token Owner
+            {/* Active Bids */}
+            <div className="mb-4">
+              <h3 className="mb-2 text-lg font-medium text-green-400">
+                Active Bids
+              </h3>
+              <div className="grid grid-cols-1 gap-4 text-sm md:grid-cols-2">
+                <div className="rounded bg-neutral-700 p-3">
+                  <div className="font-semibold text-green-400">
+                    As Token Owner
+                  </div>
+                  <div className="text-lg text-neutral-200">
+                    {result.bids?.breakdown?.active?.asTokenOwner ?? 0}
+                  </div>
                 </div>
-                <div className="text-lg text-neutral-200">
-                  {result.activeBids
-                    ? result.activeBids.breakdown.asTokenOwner
-                    : 0}
-                </div>
-              </div>
-              <div className="rounded bg-neutral-700 p-3">
-                <div className="font-semibold text-purple-400">As Bidder</div>
-                <div className="text-lg text-neutral-200">
-                  {result.activeBids ? result.activeBids.breakdown.asBidder : 0}
+                <div className="rounded bg-neutral-700 p-3">
+                  <div className="font-semibold text-purple-400">As Bidder</div>
+                  <div className="text-lg text-neutral-200">
+                    {result.bids?.breakdown?.active?.asBidder ?? 0}
+                  </div>
                 </div>
               </div>
             </div>
-            <div className="mt-4 grid grid-cols-1 gap-4 text-sm md:grid-cols-3">
-              <div className="rounded bg-neutral-700 p-3">
-                <div className="font-semibold text-neutral-300">
-                  Settled Bids
+
+            {/* Settled Bids */}
+            <div>
+              <h3 className="mb-2 text-lg font-medium text-neutral-300">
+                Settled Bids
+              </h3>
+              <div className="grid grid-cols-1 gap-4 text-sm md:grid-cols-2">
+                <div className="rounded bg-neutral-700 p-3">
+                  <div className="font-semibold text-green-400">
+                    As Token Owner
+                  </div>
+                  <div className="text-lg text-neutral-200">
+                    {result.bids?.breakdown?.settled?.asTokenOwner ?? 0}
+                  </div>
                 </div>
-                <div className="text-lg text-neutral-200">
-                  {result.activeBids ? result.activeBids.breakdown.settled : 0}
+                <div className="rounded bg-neutral-700 p-3">
+                  <div className="font-semibold text-purple-400">As Bidder</div>
+                  <div className="text-lg text-neutral-200">
+                    {result.bids?.breakdown?.settled?.asBidder ?? 0}
+                  </div>
                 </div>
               </div>
             </div>
@@ -97,35 +115,60 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
               <AddressDisplay address={result.address} />
             </h2>
 
-            <div className="grid grid-cols-1 gap-4 text-sm md:grid-cols-3">
-              <div className="rounded bg-neutral-700 p-3">
-                <div className="font-semibold text-green-400">
-                  As Token Owner
+            {/* Active Auctions */}
+            <div className="mb-4">
+              <h3 className="mb-2 text-lg font-medium text-green-400">
+                Active Auctions
+              </h3>
+              <div className="grid grid-cols-1 gap-4 text-sm md:grid-cols-3">
+                <div className="rounded bg-neutral-700 p-3">
+                  <div className="font-semibold text-green-400">
+                    As Token Owner
+                  </div>
+                  <div className="text-lg text-neutral-200">
+                    {result.breakdown?.active?.asTokenOwner ?? 0}
+                  </div>
                 </div>
-                <div className="text-lg text-neutral-200">
-                  {result.breakdown.asTokenOwner}
+                <div className="rounded bg-neutral-700 p-3">
+                  <div className="font-semibold text-blue-400">As Curator</div>
+                  <div className="text-lg text-neutral-200">
+                    {result.breakdown?.active?.asCurator ?? 0}
+                  </div>
                 </div>
-              </div>
-              <div className="rounded bg-neutral-700 p-3">
-                <div className="font-semibold text-blue-400">As Curator</div>
-                <div className="text-lg text-neutral-200">
-                  {result.breakdown.asCurator}
-                </div>
-              </div>
-              <div className="rounded bg-neutral-700 p-3">
-                <div className="font-semibold text-purple-400">As Bidder</div>
-                <div className="text-lg text-neutral-200">
-                  {result.breakdown.asBidder}
+                <div className="rounded bg-neutral-700 p-3">
+                  <div className="font-semibold text-purple-400">As Bidder</div>
+                  <div className="text-lg text-neutral-200">
+                    {result.breakdown?.active?.asBidder ?? 0}
+                  </div>
                 </div>
               </div>
             </div>
-            <div className="mt-4 grid grid-cols-1 gap-4 text-sm md:grid-cols-3">
-              <div className="rounded bg-neutral-700 p-3">
-                <div className="font-semibold text-neutral-300">
-                  Settled Auctions
+
+            {/* Settled Auctions */}
+            <div>
+              <h3 className="mb-2 text-lg font-medium text-neutral-300">
+                Settled Auctions
+              </h3>
+              <div className="grid grid-cols-1 gap-4 text-sm md:grid-cols-3">
+                <div className="rounded bg-neutral-700 p-3">
+                  <div className="font-semibold text-green-400">
+                    As Token Owner
+                  </div>
+                  <div className="text-lg text-neutral-200">
+                    {result.breakdown?.settled?.asTokenOwner ?? 0}
+                  </div>
                 </div>
-                <div className="text-lg text-neutral-200">
-                  {result.breakdown.settled}
+                <div className="rounded bg-neutral-700 p-3">
+                  <div className="font-semibold text-blue-400">As Curator</div>
+                  <div className="text-lg text-neutral-200">
+                    {result.breakdown?.settled?.asCurator ?? 0}
+                  </div>
+                </div>
+                <div className="rounded bg-neutral-700 p-3">
+                  <div className="font-semibold text-purple-400">As Bidder</div>
+                  <div className="text-lg text-neutral-200">
+                    {result.breakdown?.settled?.asBidder ?? 0}
+                  </div>
                 </div>
               </div>
             </div>
@@ -173,7 +216,7 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
               </div>
             ) : (
               <div className="grid grid-cols-1 gap-6">
-                {filteredBids.map((bid: ActiveBid) => (
+                {filteredBids.map((bid: Bid) => (
                   <BidCard
                     key={bid.transactionHash}
                     bid={bid}

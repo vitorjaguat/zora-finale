@@ -1,4 +1,4 @@
-import type { ActiveBid } from "@/hooks/useAddressLookup";
+import type { Bid } from "@/app/api/bids/address-lookup/route";
 import { AddressDisplay } from "./AddressDisplay";
 import { cn } from "@/lib/utils";
 import { NFTPreview } from "./NFTPreview";
@@ -15,7 +15,7 @@ import {
 import { MEDIA_CONTRACT } from "@/config/contract";
 
 interface BidCardProps {
-  bid: ActiveBid;
+  bid: Bid;
   inputAddress: string; // Keep for potential future use, but unused in current logic
 }
 
@@ -23,6 +23,7 @@ export default function BidCard({
   bid,
   inputAddress: _inputAddress,
 }: BidCardProps) {
+  console.dir(bid);
   const { isConnected, address } = useAccount();
   const [error, setError] = useState<string | null>(null);
 
@@ -77,7 +78,7 @@ export default function BidCard({
             success: boolean;
             action: string;
           };
-          console.log("Bid state successfully updated:", result.message);
+          // console.log("Bid state successfully updated:", result.message);
         }
       } catch (error) {
         console.error("Error updating bid state in database:", error);
@@ -154,10 +155,10 @@ export default function BidCard({
           },
         };
 
-        console.log("MEDIA_CONTRACT.address: ", MEDIA_CONTRACT.address);
-        console.log("bid.tokenId", bid.tokenId);
-        console.log("bidStruct: ");
-        console.dir(bidStruct);
+        // console.log("MEDIA_CONTRACT.address: ", MEDIA_CONTRACT.address);
+        // console.log("bid.tokenId", bid.tokenId);
+        // console.log("bidStruct: ");
+        // console.dir(bidStruct);
 
         writeContract({
           address: MEDIA_CONTRACT.address,

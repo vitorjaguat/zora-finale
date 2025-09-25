@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react"; // Removed unused useEffect
 import { isAddress } from "viem";
 import { isLikelyENSName, resolveAddressOrENS } from "@/lib/ensUtils";
+import { type Bid, type BidsResult } from "@/app/api/bids/address-lookup/route";
 
 export interface AuctionData {
   auctionId: string;
@@ -22,45 +23,50 @@ export interface AuctionData {
   isSettled: boolean;
 }
 
-export interface ActiveBid {
-  eventType: string;
-  implementation: string;
-  eventSignature: string;
-  tokenId: string;
-  amount: string;
-  amountFormatted: string;
-  currency: string;
-  currencySymbol: string;
-  currencyDecimals: number;
-  bidder: string;
-  recipient: string;
-  sellOnShareValue?: string;
-  transactionHash: string;
-  blockNumber: number;
-  timestamp: string;
-  logIndex: number;
-  processedAt: string;
-  decodingMethod: string;
-  rawData: Record<string, unknown>;
-  contractVerification: Record<string, unknown>;
-  tokenOwner: string;
-  // Status fields
-  isActive: boolean;
-  isWithdrawn: boolean;
-  isAccepted: boolean;
-  status: "active" | "withdrawn" | "accepted";
-}
+// export interface ActiveBid {
+//   eventType: string;
+//   implementation: string;
+//   eventSignature: string;
+//   tokenId: string;
+//   amount: string;
+//   amountFormatted: string;
+//   currency: string;
+//   currencySymbol: string;
+//   currencyDecimals: number;
+//   bidder: string;
+//   recipient: string;
+//   sellOnShareValue?: string;
+//   transactionHash: string;
+//   blockNumber: number;
+//   timestamp: string;
+//   logIndex: number;
+//   processedAt: string;
+//   decodingMethod: string;
+//   rawData: Record<string, unknown>;
+//   contractVerification: Record<string, unknown>;
+//   tokenOwner: string;
+//   // Status fields
+//   isActive: boolean;
+//   isWithdrawn: boolean;
+//   isAccepted: boolean;
+//   status: "active" | "withdrawn" | "accepted";
+// }
 
-export interface ActiveBidsResult {
-  hasActiveBids: boolean;
-  bidsCount: number;
-  bids: ActiveBid[];
-  breakdown: {
-    asTokenOwner: number;
-    asBidder: number;
-    settled: number;
-  };
-}
+// export interface ActiveBidsResult {
+//   hasBids: boolean;
+//   bidsCount: number;
+//   bids: ActiveBid[];
+//   breakdown: {
+//     active: {
+//       asTokenOwner: number;
+//       asBidder: number;
+//     };
+//     settled: {
+//       asTokenOwner: number;
+//       asBidder: number;
+//     };
+//   };
+// }
 
 export interface Result {
   address: string;
@@ -69,12 +75,18 @@ export interface Result {
   auctionCount: number;
   auctions: AuctionData[];
   breakdown: {
-    asTokenOwner: number;
-    asCurator: number;
-    asBidder: number;
-    settled: number;
+    active: {
+      asTokenOwner: number;
+      asCurator: number;
+      asBidder: number;
+    };
+    settled: {
+      asTokenOwner: number;
+      asCurator: number;
+      asBidder: number;
+    };
   };
-  activeBids: ActiveBidsResult | null;
+  bids: BidsResult | null;
 }
 
 interface ErrorResponse {
@@ -131,19 +143,17 @@ export function useAddressLookup() {
 
       // Make parallel API calls to both endpoints
       try {
-        const [auctionsResponse, activeBidsResponse] = await Promise.allSettled(
-          [
-            fetch(
-              `/api/auctions/address-lookup?address=${encodeURIComponent(address)}`,
-            ),
-            fetch(
-              `/api/bids/address-lookup?address=${encodeURIComponent(address)}`,
-            ),
-          ],
-        );
+        const [auctionsResponse, bidsResponse] = await Promise.allSettled([
+          fetch(
+            `/api/auctions/address-lookup?address=${encodeURIComponent(address)}`,
+          ),
+          fetch(
+            `/api/bids/address-lookup?address=${encodeURIComponent(address)}`,
+          ),
+        ]);
 
         let auctionsData: Result | null = null;
-        let activeBidsData: ActiveBidsResult | null = null;
+        let bidsData: BidsResult | null = null;
 
         // Process auctions response
         if (auctionsResponse.status === "fulfilled") {
@@ -166,29 +176,23 @@ export function useAddressLookup() {
           console.warn("Auctions API call failed:", auctionsResponse.reason);
         }
 
-        // Process active bids response
-        if (activeBidsResponse.status === "fulfilled") {
-          const contentType =
-            activeBidsResponse.value.headers.get("content-type");
+        // Process bids response
+        if (bidsResponse.status === "fulfilled") {
+          const contentType = bidsResponse.value.headers.get("content-type");
           if (
             contentType?.includes("application/json") &&
-            activeBidsResponse.value.ok
+            bidsResponse.value.ok
           ) {
-            const activeBidsFullResponse =
-              (await activeBidsResponse.value.json()) as {
-                activeBids: ActiveBidsResult;
-              };
-            activeBidsData = activeBidsFullResponse.activeBids;
+            const bidsFullResponse =
+              (await bidsResponse.value.json()) as BidsResult;
+            bidsData = bidsFullResponse;
           } else {
             console.warn(
               "Active bids API call failed or returned invalid response",
             );
           }
         } else {
-          console.warn(
-            "Active bids API call failed:",
-            activeBidsResponse.reason,
-          );
+          console.warn("Active bids API call failed:", bidsResponse.reason);
         }
 
         // If auctions API failed completely, throw error
@@ -200,11 +204,10 @@ export function useAddressLookup() {
         const combinedResult: Result = {
           ...auctionsData,
           originalInput: originalInput, // Include the original input (ENS or 0x)
-          activeBids: activeBidsData,
+          bids: bidsData,
         };
 
         setResult(combinedResult);
-        console.dir(combinedResult, { depth: null });
       } catch (err) {
         if (err instanceof Error) {
           setError(err.message);
@@ -217,8 +220,6 @@ export function useAddressLookup() {
     },
     [lastSearchedAddress, result],
   );
-
-  console.dir(result);
 
   return {
     result,

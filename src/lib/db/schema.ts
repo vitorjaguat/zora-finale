@@ -123,6 +123,9 @@ export const bids = pgTable("bids", {
   isWithdrawn: boolean("is_withdrawn").notNull().default(false),
   isAccepted: boolean("is_accepted").notNull().default(false),
 
+  // Sell on share value (from original bid data)
+  sellOnShareValue: numeric("sell_on_share_value", { precision: 38, scale: 0 }), // Raw wei amount, nullable for migration
+
   // Metadata
   createdAt: timestamp("created_at").notNull(), // From JSON data, not defaultNow
   updatedAt: timestamp("updated_at").defaultNow(), // Migration timestamp
