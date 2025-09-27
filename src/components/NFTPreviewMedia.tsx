@@ -2,6 +2,7 @@ import type { AlchemyNFTResponse } from "../hooks/useNFTMetadata";
 import Image from "next/image";
 import { useEffect, useState, useRef, useCallback } from "react";
 import { PiPlayCircleBold, PiPauseCircleBold } from "react-icons/pi";
+import { TfiFaceSad } from "react-icons/tfi";
 
 interface NFTPreviewMediaProps {
   nftData: AlchemyNFTResponse | null;
@@ -216,7 +217,9 @@ export default function NFTPreviewMedia({
       return (
         <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-neutral-700 to-neutral-800">
           <div className="text-center text-xs text-neutral-400">
-            <div className="mb-1 text-lg">🖼️</div>
+            <div className="mb-1 text-lg">
+              <TfiFaceSad color={"#a1a1a1"} size={60} />
+            </div>
             <div>NFT</div>
             <div>#{id}</div>
           </div>
