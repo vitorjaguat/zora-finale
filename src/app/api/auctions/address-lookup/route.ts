@@ -129,24 +129,35 @@ export async function GET(request: NextRequest) {
 
     // Transform and add auctionId field
     const auctions: AuctionData[] = auctionDetails.map((auction) => {
-      if (auction.isSettled) {
-        if (auction.tokenOwner === address) {
+      const isSettled = auction.isSettled as boolean;
+      const tokenOwner = auction.tokenOwner as string;
+      const bidder = auction.bidder as string;
+      const curator = auction.curator as string;
+
+      if (isSettled) {
+        if (tokenOwner.toLowerCase() === address.toLowerCase()) {
           settledAsTokenOwner++;
         }
-        if (auction.bidder === address) {
+        if (bidder.toLowerCase() === address.toLowerCase()) {
           settledAsBidder++;
         }
-        if (auction.curator === address && auction.tokenOwner !== address) {
+        if (
+          curator.toLowerCase() === address.toLowerCase() &&
+          tokenOwner.toLowerCase() !== address.toLowerCase()
+        ) {
           settledAsCurator++;
         }
       } else {
-        if (auction.tokenOwner === address) {
+        if (tokenOwner.toLowerCase() === address.toLowerCase()) {
           activeAsTokenOwner++;
         }
-        if (auction.bidder === address) {
+        if (bidder.toLowerCase() === address.toLowerCase()) {
           activeAsBidder++;
         }
-        if (auction.curator === address && auction.tokenOwner !== address) {
+        if (
+          curator.toLowerCase() === address.toLowerCase() &&
+          tokenOwner.toLowerCase() !== address.toLowerCase()
+        ) {
           activeAsCurator++;
         }
       }

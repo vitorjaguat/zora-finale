@@ -34,6 +34,9 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
   const filteredBids = showOnlyActive
     ? (result?.bids?.bids.filter((bid) => bid.isActive) ?? [])
     : (result?.bids?.bids ?? []);
+
+  console.log("Result:");
+  console.dir(result);
   return (
     <div className="flex w-full flex-col gap-12">
       {/* BREAKDOWN */}
