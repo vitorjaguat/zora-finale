@@ -2,10 +2,10 @@ import { AuctionCard } from "./AuctionCard";
 import { AddressDisplay } from "./AddressDisplay";
 import BidCard from "./BidCard";
 import { HiArrowTurnRightDown, HiArrowTurnLeftDown } from "react-icons/hi2";
-import { useState } from "react";
-import type { Bid, BidsResult } from "@/app/api/bids/address-lookup/route";
-
+import { useState, useEffect } from "react";
+import type { Bid } from "@/app/api/bids/address-lookup/route";
 import type { Result } from "@/hooks/useAddressLookup";
+import type { ResultWithFirstMetadata } from "@/app/api/nft/firstMetadataBatch/route";
 
 // interface CheckResult {
 //   address: string;
@@ -25,20 +25,110 @@ interface ResultsDisplayProps {
 
 export function ResultsDisplay({ result }: ResultsDisplayProps) {
   const [showOnlyActive, setShowOnlyActive] = useState(false);
+  const [resultWithMetadata, setResultWithMetadata] =
+    useState<ResultWithFirstMetadata | null>(null);
+  const [metadataLoading, setMetadataLoading] = useState(false);
+  const [metadataError, setMetadataError] = useState<string | null>(null);
+
+  // Fetch metadata whenever result changes
+  useEffect(() => {
+    const fetchMetadata = async () => {
+      if (!result) return;
+
+      setMetadataLoading(true);
+      setMetadataError(null);
+
+      try {
+        const response = await fetch("/api/nft/firstMetadataBatch", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(result),
+        });
+
+        if (!response.ok) {
+          throw new Error(
+            `Failed to fetch metadata: ${response.status} ${response.statusText}`,
+          );
+        }
+
+        const enhancedResult: ResultWithFirstMetadata =
+          (await response.json()) as ResultWithFirstMetadata;
+        setResultWithMetadata(enhancedResult);
+      } catch (error) {
+        console.error("Error fetching metadata:", error);
+        setMetadataError(
+          error instanceof Error ? error.message : "Failed to fetch metadata",
+        );
+        // Fallback to original result structure
+        setResultWithMetadata({
+          ...result,
+          hasAuctions: result.hasAuctions,
+          auctionCount: result.auctionCount,
+          breakdown: result.breakdown,
+          auctions: result.auctions.map((auction) => ({
+            ...auction,
+            metadata: undefined,
+          })),
+          bids: {
+            hasBids: result.bids?.hasBids ?? false,
+            bidsCount: result.bids?.bidsCount ?? 0,
+            bids: (result.bids?.bids ?? []).map((bid) => ({
+              ...bid,
+              metadata: undefined,
+            })),
+          },
+        });
+      } finally {
+        setMetadataLoading(false);
+      }
+    };
+
+    void fetchMetadata();
+  }, [result]);
+
+  // Use enhanced result if available, otherwise fall back to original
+  const displayResult = resultWithMetadata ?? result;
 
   // Filter auctions and bids based on checkbox state
   const filteredAuctions = showOnlyActive
-    ? result.auctions.filter((auction) => !auction.isSettled)
-    : result.auctions;
+    ? (resultWithMetadata?.auctions.filter((auction) => !auction.isSettled) ??
+      result.auctions.filter((auction) => !auction.isSettled))
+    : (resultWithMetadata?.auctions ?? result.auctions);
 
   const filteredBids = showOnlyActive
-    ? (result?.bids?.bids.filter((bid) => bid.isActive) ?? [])
-    : (result?.bids?.bids ?? []);
+    ? (resultWithMetadata?.bids.bids.filter((bid) => bid.isActive) ??
+      result?.bids?.bids.filter((bid) => bid.isActive) ??
+      [])
+    : (resultWithMetadata?.bids.bids ?? result?.bids?.bids ?? []);
 
-  console.log("Result:");
-  console.dir(result);
+  // console.log("Result:");
+  // console.dir(result);
   return (
     <div className="flex w-full flex-col gap-12">
+      {/* Metadata Loading Indicator */}
+      {metadataLoading && (
+        <div className="rounded-lg border border-blue-600 bg-blue-900/20 p-4">
+          <div className="flex items-center gap-2 text-blue-400">
+            <div className="h-4 w-4 animate-spin rounded-full border-2 border-blue-400 border-t-transparent"></div>
+            <span>Loading NFT metadata...</span>
+          </div>
+        </div>
+      )}
+
+      {/* Metadata Error Indicator */}
+      {metadataError && (
+        <div className="rounded-lg border border-red-600 bg-red-900/20 p-4">
+          <div className="text-red-400">
+            <strong>Metadata Error:</strong> {metadataError}
+          </div>
+          <div className="mt-1 text-sm text-red-300">
+            Displaying results without enhanced metadata.
+          </div>
+        </div>
+      )}
+
       {/* BREAKDOWN */}
       <div className="flex w-full flex-col gap-6">
         {/* Breakdown Header */}
@@ -59,9 +149,14 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
           {/* ActiveBids breakdown */}
           <div className="mb-4 flex-1 rounded-lg border border-neutral-600 bg-neutral-800 p-6">
             <h2 className="mb-4 text-xl font-semibold text-neutral-200">
-              Found {result.bids?.bidsCount} bid
-              {result.bids?.bidsCount !== 1 ? "s" : ""} for{" "}
-              <AddressDisplay address={result.address} />
+              Found{" "}
+              {displayResult.bids?.bidsCount ?? result.bids?.bidsCount ?? 0} bid
+              {(displayResult.bids?.bidsCount ??
+                result.bids?.bidsCount ??
+                0) !== 1
+                ? "s"
+                : ""}{" "}
+              for <AddressDisplay address={result.address} />
             </h2>
 
             {/* Active Bids */}
@@ -75,13 +170,17 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
                     As Token Owner
                   </div>
                   <div className="text-lg text-neutral-200">
-                    {result.bids?.breakdown?.active?.asTokenOwner ?? 0}
+                    {displayResult.bids?.breakdown?.active?.asTokenOwner ??
+                      result.bids?.breakdown?.active?.asTokenOwner ??
+                      0}
                   </div>
                 </div>
                 <div className="rounded bg-neutral-700 p-3">
                   <div className="font-semibold text-purple-400">As Bidder</div>
                   <div className="text-lg text-neutral-200">
-                    {result.bids?.breakdown?.active?.asBidder ?? 0}
+                    {displayResult.bids?.breakdown?.active?.asBidder ??
+                      result.bids?.breakdown?.active?.asBidder ??
+                      0}
                   </div>
                 </div>
               </div>
@@ -98,13 +197,17 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
                     As Token Owner
                   </div>
                   <div className="text-lg text-neutral-200">
-                    {result.bids?.breakdown?.settled?.asTokenOwner ?? 0}
+                    {displayResult.bids?.breakdown?.settled?.asTokenOwner ??
+                      result.bids?.breakdown?.settled?.asTokenOwner ??
+                      0}
                   </div>
                 </div>
                 <div className="rounded bg-neutral-700 p-3">
                   <div className="font-semibold text-purple-400">As Bidder</div>
                   <div className="text-lg text-neutral-200">
-                    {result.bids?.breakdown?.settled?.asBidder ?? 0}
+                    {displayResult.bids?.breakdown?.settled?.asBidder ??
+                      result.bids?.breakdown?.settled?.asBidder ??
+                      0}
                   </div>
                 </div>
               </div>
@@ -113,9 +216,11 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
           {/* Auctions breakdown */}
           <div className="mb-4 flex-1 rounded-lg border border-neutral-600 bg-neutral-800 p-6">
             <h2 className="mb-4 text-xl font-semibold text-neutral-200">
-              Found {result.auctionCount} auction
-              {result.auctionCount !== 1 ? "s" : ""} for{" "}
-              <AddressDisplay address={result.address} />
+              Found {displayResult.auctionCount ?? result.auctionCount} auction
+              {(displayResult.auctionCount ?? result.auctionCount) !== 1
+                ? "s"
+                : ""}{" "}
+              for <AddressDisplay address={result.address} />
             </h2>
 
             {/* Active Auctions */}
@@ -129,19 +234,25 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
                     As Token Owner
                   </div>
                   <div className="text-lg text-neutral-200">
-                    {result.breakdown?.active?.asTokenOwner ?? 0}
+                    {displayResult.breakdown?.active?.asTokenOwner ??
+                      result.breakdown?.active?.asTokenOwner ??
+                      0}
                   </div>
                 </div>
                 <div className="rounded bg-neutral-700 p-3">
                   <div className="font-semibold text-blue-400">As Curator</div>
                   <div className="text-lg text-neutral-200">
-                    {result.breakdown?.active?.asCurator ?? 0}
+                    {displayResult.breakdown?.active?.asCurator ??
+                      result.breakdown?.active?.asCurator ??
+                      0}
                   </div>
                 </div>
                 <div className="rounded bg-neutral-700 p-3">
                   <div className="font-semibold text-purple-400">As Bidder</div>
                   <div className="text-lg text-neutral-200">
-                    {result.breakdown?.active?.asBidder ?? 0}
+                    {displayResult.breakdown?.active?.asBidder ??
+                      result.breakdown?.active?.asBidder ??
+                      0}
                   </div>
                 </div>
               </div>
@@ -158,19 +269,25 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
                     As Token Owner
                   </div>
                   <div className="text-lg text-neutral-200">
-                    {result.breakdown?.settled?.asTokenOwner ?? 0}
+                    {displayResult.breakdown?.settled?.asTokenOwner ??
+                      result.breakdown?.settled?.asTokenOwner ??
+                      0}
                   </div>
                 </div>
                 <div className="rounded bg-neutral-700 p-3">
                   <div className="font-semibold text-blue-400">As Curator</div>
                   <div className="text-lg text-neutral-200">
-                    {result.breakdown?.settled?.asCurator ?? 0}
+                    {displayResult.breakdown?.settled?.asCurator ??
+                      result.breakdown?.settled?.asCurator ??
+                      0}
                   </div>
                 </div>
                 <div className="rounded bg-neutral-700 p-3">
                   <div className="font-semibold text-purple-400">As Bidder</div>
                   <div className="text-lg text-neutral-200">
-                    {result.breakdown?.settled?.asBidder ?? 0}
+                    {displayResult.breakdown?.settled?.asBidder ??
+                      result.breakdown?.settled?.asBidder ??
+                      0}
                   </div>
                 </div>
               </div>
@@ -219,9 +336,9 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
               </div>
             ) : (
               <div className="grid grid-cols-1 gap-6">
-                {filteredBids.map((bid: Bid) => (
+                {filteredBids.map((bid) => (
                   <BidCard
-                    key={bid.transactionHash}
+                    key={bid.transactionHash || bid.id}
                     bid={bid}
                     inputAddress={result.address}
                   />

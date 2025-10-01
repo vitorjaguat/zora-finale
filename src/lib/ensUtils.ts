@@ -5,9 +5,7 @@ import { mainnet } from "viem/chains";
 // Create a public client for ENS resolution
 const publicClient = createPublicClient({
   chain: mainnet,
-  transport: http(
-    process.env.NEXT_PUBLIC_ALCHEMY_RPC_URL ?? "https://eth.llamarpc.com",
-  ),
+  transport: http(process.env.ALCHEMY_RPC_URL),
 });
 
 export interface ENSResolution {

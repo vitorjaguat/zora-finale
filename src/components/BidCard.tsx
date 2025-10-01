@@ -23,7 +23,7 @@ export default function BidCard({
   bid,
   inputAddress: _inputAddress,
 }: BidCardProps) {
-  console.dir(bid);
+  // console.dir(bid);
   const { isConnected, address } = useAccount();
   const [error, setError] = useState<string | null>(null);
 
@@ -110,8 +110,6 @@ export default function BidCard({
       return bid.amountFormatted || "0";
     }
   };
-
-  if (bid.tokenId == "7") console.dir(bid);
 
   const handleSettleBid = async () => {
     if (isPending || isConfirming) return;
@@ -232,10 +230,7 @@ export default function BidCard({
     <div className="flex justify-stretch gap-3 overflow-hidden rounded bg-neutral-700/90 duration-200 hover:bg-neutral-700/100">
       <div className="flex w-full flex-col gap-3 p-3 pr-0">
         {/* NFT PREVIEW */}
-        <NFTPreview
-          id={bid.tokenId}
-          contract={"0xabEFBc9fD2F806065b4f3C237d4b59D9A97Bcac7"}
-        />{" "}
+        <NFTPreview id={bid.tokenId} contract={bid.tokenContract} />{" "}
         {/* Contract address not available in bid data */}
         <div className="flex h-full min-h-[100px] items-stretch">
           {/* COL 1 - Bid Content */}

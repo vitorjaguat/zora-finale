@@ -14,9 +14,9 @@ export function NFTPreview({ id, contract, className = "" }: NFTPreviewProps) {
     tokenId: id,
   });
 
-  if (nftData?.tokenId == "315" || nftData?.tokenId == "32")
-    console.dir(nftData);
-  // console.dir(nftData);
+  // if (nftData?.tokenId == "315" || nftData?.tokenId == "32")
+  //   console.dir(nftData);
+  // // console.dir(nftData);
 
   return (
     <div className="flex gap-3 bg-white/5">
@@ -37,13 +37,15 @@ export function NFTPreview({ id, contract, className = "" }: NFTPreviewProps) {
         </div>
       ) : (
         <div className="flex flex-col justify-end gap-2 pr-3 pb-3 text-xs">
-          {nftData?.name && (
+          {(nftData?.metadataUri?.title ?? nftData?.name) && (
             <div className="font-semibold text-neutral-200">
-              {nftData?.name}
+              {nftData?.metadataUri?.title ?? nftData?.name}
             </div>
           )}
-          {nftData?.description && (
-            <div className="text-neutral-400">{nftData?.description}</div>
+          {(nftData?.metadataUri?.description ?? nftData?.description) && (
+            <div className="text-neutral-400">
+              {nftData?.metadataUri?.description ?? nftData?.description}
+            </div>
           )}
           <div className="text-neutral-400">Token ID: {nftData?.tokenId}</div>
           <div className="text-neutral-400">

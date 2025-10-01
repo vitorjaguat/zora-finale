@@ -1,40 +1,52 @@
 import { useState, useEffect } from "react";
 // import type { AlchemyNFTResponse } from "@/components/NFTPreview";
+import type { Nft } from "alchemy-sdk";
+import { MEDIA_CONTRACT } from "@/config/contract";
 
-export interface AlchemyNFTResponse {
-  contract: {
-    address: string;
+export interface AlchemyNFTResponse extends Nft {
+  metadataUri?: {
+    title?: string;
+    description?: string;
+    mimeType?: string;
+    version?: string;
+    uri?: string;
   };
-  tokenId: string;
-  tokenType: string;
-  name?: string;
-  description?: string;
-  image?: {
-    cachedUrl?: string;
-    thumbnailUrl?: string;
-    pngUrl?: string;
-    contentType?: string;
-    size?: number;
-    originalUrl?: string;
-  };
-  raw?: {
-    metadata?: {
-      image?: string;
-      animation_url?: string;
-    };
-  };
-  tokenUri?: {
-    gateway?: string;
-    raw?: string;
-  };
-  media?: Array<{
-    gateway?: string;
-    thumbnail?: string;
-    raw?: string;
-    format?: string;
-    bytes?: number;
-  }>;
 }
+
+// export interface AlchemyNFTResponse {
+//   contract: {
+//     address: string;
+//   };
+//   tokenId: string;
+//   tokenType: string;
+//   name?: string;
+//   description?: string;
+//   image?: {
+//     cachedUrl?: string;
+//     thumbnailUrl?: string;
+//     pngUrl?: string;
+//     contentType?: string;
+//     size?: number;
+//     originalUrl?: string;
+//   };
+//   raw?: {
+//     metadata?: {
+//       image?: string;
+//       animation_url?: string;
+//     };
+//   };
+//   tokenUri?: {
+//     gateway?: string;
+//     raw?: string;
+//   };
+//   media?: Array<{
+//     gateway?: string;
+//     thumbnail?: string;
+//     raw?: string;
+//     format?: string;
+//     bytes?: number;
+//   }>;
+// }
 
 interface UseNFTMetadataProps {
   contractAddress: string;
@@ -83,7 +95,7 @@ export function useNFTMetadata({
       }
     };
 
-    void fetchNFTMetadata();
+    if (contractAddress === MEDIA_CONTRACT.address) void fetchNFTMetadata();
   }, [contractAddress, tokenId]);
 
   return { nftData, loading, error };

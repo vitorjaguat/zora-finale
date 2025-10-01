@@ -27,14 +27,15 @@ export default function NFTPreviewMedia({
   const [progress, setProgress] = useState(0);
   const audioRef = useRef<HTMLAudioElement>(null);
 
+  // console.dir(nftData);
   const resolveIPFSUrl = useCallback((url: string): string => {
     if (!url) return "";
 
     if (url.startsWith("ipfs://")) {
-      return `https://ipfs.io/ipfs/${url.slice(7)}`;
+      return `https://alchemy.mypinata.cloud/ipfs/${url.slice(7)}`;
     }
     if (url.startsWith("ipfs/")) {
-      return `https://ipfs.io/ipfs/${url.slice(5)}`;
+      return `https://alchemy.mypinata.cloud/ipfs/${url.slice(5)}`;
     }
     return url;
   }, []);
@@ -47,11 +48,11 @@ export default function NFTPreviewMedia({
       nftData.image?.thumbnailUrl ??
       nftData.image?.pngUrl ??
       nftData.image?.originalUrl ??
-      nftData.media?.[0]?.gateway ??
-      nftData.media?.[0]?.thumbnail ??
-      nftData.raw?.metadata?.image ??
-      nftData.raw?.metadata?.animation_url ??
-      nftData.tokenUri?.gateway ??
+      nftData.animation?.cachedUrl ??
+      nftData.animation?.originalUrl ??
+      (nftData.raw?.metadata as { image?: string })?.image ??
+      (nftData.raw?.metadata as { animation_url?: string })?.animation_url ??
+      (nftData.tokenUri as { gateway?: string })?.gateway ??
       "";
 
     return resolveIPFSUrl(mediaUrl);
@@ -63,7 +64,7 @@ export default function NFTPreviewMedia({
 
       try {
         const apiContentType =
-          nftData?.image?.contentType ?? nftData?.media?.[0]?.format ?? "";
+          nftData?.image?.contentType ?? nftData?.animation?.contentType ?? "";
         if (apiContentType) {
           if (apiContentType.startsWith("audio/")) return "audio";
           if (apiContentType.startsWith("video/")) return "video";
@@ -335,7 +336,9 @@ export default function NFTPreviewMedia({
         ) : (
           <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-neutral-700 to-neutral-800">
             <div className="text-center text-xs text-neutral-400">
-              <div className="mb-1 text-lg">🖼️</div>
+              <div className="mb-1 text-lg">
+                <TfiFaceSad color={"#a1a1a1"} size={60} />
+              </div>
               <div>NFT</div>
               <div>#{id}</div>
             </div>

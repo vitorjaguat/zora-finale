@@ -21,7 +21,6 @@ export function AuctionCard({
   onAuctionSettled,
   inputAddress: _inputAddress, // Keep for potential future use, but unused in current logic
 }: AuctionCardProps) {
-  console.dir(auction);
   const { isConnected, address } = useAccount();
   const { settleAuction, loading, error, success, transactionHash, reset } =
     useSettleAuction();

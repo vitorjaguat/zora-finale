@@ -416,7 +416,7 @@ export const AUCTION_HOUSE_CONTRACT = {
   ] as const,
 } as const;
 
-// Media contract configuration
+// Media contract ABI
 export const MEDIA_CONTRACT = {
   address: "0xabEFBc9fD2F806065b4f3C237d4b59D9A97Bcac7" as const,
   abi: [
@@ -729,6 +729,13 @@ export const MEDIA_CONTRACT = {
     {
       inputs: [{ internalType: "uint256", name: "tokenId", type: "uint256" }],
       name: "tokenURI",
+      outputs: [{ internalType: "string", name: "", type: "string" }],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [{ internalType: "uint256", name: "tokenId", type: "uint256" }],
+      name: "tokenMetadataURI",
       outputs: [{ internalType: "string", name: "", type: "string" }],
       stateMutability: "view",
       type: "function",
