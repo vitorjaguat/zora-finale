@@ -33,7 +33,7 @@ export function NFTPreview({
     nftData?.metadataUri?.title ||
     nftData?.metadataUri?.name ||
     nftData?.name ||
-    "";
+    false;
   /* eslint-enable @typescript-eslint/prefer-nullish-coalescing */
 
   return (
@@ -56,7 +56,9 @@ export function NFTPreview({
       ) : (
         <div className="flex flex-col justify-end gap-2 pr-3 pb-3 text-xs">
           {nftTitle && (
-            <div className="font-semibold text-neutral-200">{nftTitle}</div>
+            <div className="font-semibold text-neutral-200">
+              {nftTitle as React.ReactNode}
+            </div>
           )}
           {(nftData?.metadataUri?.description ?? nftData?.description) && (
             <div className="text-neutral-400">
