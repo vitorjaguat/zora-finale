@@ -69,9 +69,8 @@ export default function NFTPreviewMedia({
       nftData?.tokenUri ??
       (nftData.tokenUri as { gateway?: string })?.gateway ??
       "";
-    console.dir(nftData);
-    if (!mediaUrl) console.log("no mediaUrl for token ", id);
-    console.log("mediaUrl for token ", id);
+    // if (!mediaUrl) console.log("no mediaUrl for token ", id);
+    // console.log("mediaUrl for token ", id);
 
     return resolveIPFSUrl(mediaUrl);
   }, [nftData, resolveIPFSUrl]);

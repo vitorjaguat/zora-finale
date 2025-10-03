@@ -199,6 +199,8 @@ export function AuctionCard({
     return "";
   };
 
+  // if (auction.tokenId === "5628") console.dir(auction);
+
   return (
     <div className="flex justify-stretch gap-3 overflow-hidden rounded bg-neutral-700/90 duration-200 hover:bg-neutral-700/100">
       {/* COLOR BAR */}
@@ -307,20 +309,34 @@ export function AuctionCard({
                   </div>
                 )}
 
-              {auction?.curator.toLowerCase() !==
-                auction?.tokenOwner.toLowerCase() &&
-                auction?.curator !== zeroAddress && (
-                  <div className="mt-2 space-y-1 space-x-3 border-t border-neutral-600 pt-2">
-                    <div className="flex items-center">
-                      <span className="mr-2">Curator:</span>
-                      <AddressDisplay
-                        address={auction.curator}
-                        showENS={true}
-                      />
+              {/* FEES distribution */}
+              {(auction.bidder !== zeroAddress ||
+                (auction?.curator.toLowerCase() !==
+                  auction?.tokenOwner.toLowerCase() &&
+                  auction?.curator !== zeroAddress)) && (
+                <div className="mt-2 space-y-1 space-x-3 border-t border-neutral-600 pt-2">
+                  {auction?.curator.toLowerCase() !==
+                    auction?.tokenOwner.toLowerCase() &&
+                    auction?.curator !== zeroAddress && (
+                      <>
+                        <div className="flex items-center">
+                          <span className="mr-2">Curator:</span>
+                          <AddressDisplay
+                            address={auction.curator}
+                            showENS={true}
+                          />
+                        </div>
+                        <div>Curator Fee: {auction.curatorFeePercentage}%</div>
+                      </>
+                    )}
+                  {auction.bidder !== zeroAddress && (
+                    <div className="">
+                      Secondary sales royalties may apply when settling a closed
+                      auction.
                     </div>
-                    <div>Curator Fee: {auction.curatorFeePercentage}%</div>
-                  </div>
-                )}
+                  )}
+                </div>
+              )}
             </div>
           </div>
 
