@@ -3,6 +3,8 @@ import Image from "next/image";
 import { useEffect, useState, useRef, useCallback } from "react";
 import { PiPlayCircleBold, PiPauseCircleBold } from "react-icons/pi";
 import { TfiFaceSad } from "react-icons/tfi";
+import { FaLink } from "react-icons/fa6";
+import Link from "next/link";
 
 interface NFTPreviewMediaProps {
   nftData: AlchemyNFTResponse | null;
@@ -27,7 +29,8 @@ export default function NFTPreviewMedia({
   const [progress, setProgress] = useState(0);
   const audioRef = useRef<HTMLAudioElement>(null);
 
-  // console.dir(nftData);
+  // console.dir(nftData?.image.cachedUrl);
+
   const resolveIPFSUrl = useCallback((url: string): string => {
     if (!url) return "";
 
@@ -36,6 +39,16 @@ export default function NFTPreviewMedia({
     }
     if (url.startsWith("ipfs/")) {
       return `https://alchemy.mypinata.cloud/ipfs/${url.slice(5)}`;
+    }
+
+    const ipfsHashPattern =
+      /\/([Qm][1-9A-HJ-NP-Za-km-z]{44}|b[A-Za-z2-7]{58}|[a-f0-9]{64})(?:\?.*)?$/;
+    // eslint-disable-next-line @typescript-eslint/prefer-regexp-exec
+    const ipfsMatch = url.match(ipfsHashPattern);
+
+    if (ipfsMatch) {
+      const hash = ipfsMatch[1];
+      return `https://alchemy.mypinata.cloud/ipfs/${hash}`;
     }
     return url;
   }, []);
@@ -46,14 +59,19 @@ export default function NFTPreviewMedia({
     const mediaUrl =
       nftData.image?.cachedUrl ??
       nftData.image?.thumbnailUrl ??
+      nftData.metadataUri?.image ??
       nftData.image?.pngUrl ??
       nftData.image?.originalUrl ??
       nftData.animation?.cachedUrl ??
       nftData.animation?.originalUrl ??
       (nftData.raw?.metadata as { image?: string })?.image ??
       (nftData.raw?.metadata as { animation_url?: string })?.animation_url ??
+      nftData?.tokenUri ??
       (nftData.tokenUri as { gateway?: string })?.gateway ??
       "";
+    console.dir(nftData);
+    if (!mediaUrl) console.log("no mediaUrl for token ", id);
+    console.log("mediaUrl for token ", id);
 
     return resolveIPFSUrl(mediaUrl);
   }, [nftData, resolveIPFSUrl]);
@@ -217,12 +235,15 @@ export default function NFTPreviewMedia({
     if (!mediaUrl) {
       return (
         <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-neutral-700 to-neutral-800">
-          <div className="text-center text-xs text-neutral-400">
+          <div className="flex flex-col items-center justify-center text-center text-xs text-neutral-400">
             <div className="mb-1 text-lg">
               <TfiFaceSad color={"#a1a1a1"} size={60} />
             </div>
             <div>NFT</div>
             <div>#{id}</div>
+            {/* <Link href={getMediaUrl()} className="" target="_blank">
+              View token media
+            </Link> */}
           </div>
         </div>
       );
@@ -230,15 +251,18 @@ export default function NFTPreviewMedia({
 
     if (mediaType === "unknown") {
       return (
-        <Image
-          src={mediaUrl}
-          alt={nftName}
-          width={80}
-          height={80}
-          className="h-full w-full object-contain"
-          onError={() => setImageError(true)}
-          unoptimized
-        />
+        <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-neutral-700 to-neutral-800">
+          <div className="flex flex-col items-center justify-center text-center text-xs text-neutral-400">
+            <div className="mb-1 text-lg">
+              <FaLink color={"#a1a1a1"} size={60} />
+            </div>
+            <div>NFT</div>
+            <div>#{id}</div>
+            <Link href={getMediaUrl()} className="" target="_blank">
+              View token media
+            </Link>
+          </div>
+        </div>
       );
     }
 
@@ -335,12 +359,15 @@ export default function NFTPreviewMedia({
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-neutral-700 to-neutral-800">
-            <div className="text-center text-xs text-neutral-400">
+            <div className="flex flex-col items-center justify-center text-center text-xs text-neutral-400">
               <div className="mb-1 text-lg">
-                <TfiFaceSad color={"#a1a1a1"} size={60} />
+                <FaLink color={"#a1a1a1"} size={60} />
               </div>
               <div>NFT</div>
               <div>#{id}</div>
+              <Link href={getMediaUrl()} className="" target="_blank">
+                View token media
+              </Link>
             </div>
           </div>
         );

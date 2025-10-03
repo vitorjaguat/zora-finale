@@ -22,7 +22,7 @@ const publicClient = createPublicClient({
   transport: http(ALCHEMY_RPC_URL),
 });
 
-interface TokenMetadata {
+export interface TokenMetadataUri {
   title?: string;
   description?: string;
   image?: string;
@@ -30,112 +30,64 @@ interface TokenMetadata {
 }
 
 export async function GET(request: NextRequest) {
+  const { searchParams } = new URL(request.url);
+  const contractAddress = searchParams.get("contractAddress");
+  const tokenId = searchParams.get("tokenId");
+
+  if (!contractAddress || !tokenId) {
+    return NextResponse.json(
+      { error: "Missing contractAddress or tokenId" },
+      { status: 400 },
+    );
+  }
+
+  // TODO: remove getNFTMetadata, as the basic metadata is already being batch fetched with alchemy SDK in api/nft/firstMetadataBatch; return only the metadataUri property object and use it on BidCard and AuctionCard
+
+  // Enhanced metadata fetching from Media contract
   try {
-    const { searchParams } = new URL(request.url);
-    const contractAddress = searchParams.get("contractAddress");
-    const tokenId = searchParams.get("tokenId");
+    // Only fetch from Media contract if it's the Zora Media contract
+    if (
+      contractAddress.toLowerCase() === MEDIA_CONTRACT.address.toLowerCase()
+    ) {
+      console.log(`Fetching tokenMetadataURI for token ${tokenId}...`);
 
-    if (!contractAddress || !tokenId) {
-      return NextResponse.json(
-        { error: "Missing contractAddress or tokenId" },
-        { status: 400 },
-      );
-    }
+      const metadataURI = await publicClient.readContract({
+        address: MEDIA_CONTRACT.address,
+        abi: MEDIA_CONTRACT.abi,
+        functionName: "tokenMetadataURI",
+        args: [BigInt(tokenId)],
+      });
 
-    const url = `https://eth-mainnet.g.alchemy.com/nft/v3/${ALCHEMY_API_KEY}/getNFTMetadata`;
-    const params = new URLSearchParams({
-      contractAddress,
-      tokenId,
-      refreshCache: "true",
-    });
+      console.log(`TokenMetadataURI: ${metadataURI}`);
 
-    const response = await fetch(`${url}?${params}`, {
-      method: "GET",
-      headers: {
-        accept: "application/json",
-      },
-    });
+      if (metadataURI && metadataURI.trim() !== "") {
+        // Resolve IPFS URLs to gateway URLs
+        const resolvedURI = metadataURI.startsWith("ipfs://")
+          ? metadataURI.replace("ipfs://", "https://ipfs.io/ipfs/")
+          : metadataURI;
 
-    if (!response.ok) {
-      throw new Error(
-        `Alchemy API error: ${response.status} ${response.statusText}`,
-      );
-    }
+        console.log(`Fetching metadata from: ${resolvedURI}`);
 
-    const rawData: unknown = await response.json();
-    if (rawData && typeof rawData === "object" && rawData !== null) {
-      const data = rawData as AlchemyNFTResponse;
+        // Fetch the metadata JSON
+        const metadataResponse = await fetch(resolvedURI, {
+          headers: {
+            Accept: "application/json",
+          },
+        });
 
-      // Enhanced metadata fetching from Media contract
-      try {
-        // Only fetch from Media contract if it's the Zora Media contract
-        if (
-          contractAddress.toLowerCase() === MEDIA_CONTRACT.address.toLowerCase()
-        ) {
-          console.log(`Fetching tokenMetadataURI for token ${tokenId}...`);
+        if (metadataResponse.ok) {
+          const metadata = (await metadataResponse.json()) as TokenMetadataUri;
+          console.log("Successfully fetched metadata:", metadata);
 
-          const metadataURI = await publicClient.readContract({
-            address: MEDIA_CONTRACT.address,
-            abi: MEDIA_CONTRACT.abi,
-            functionName: "tokenMetadataURI",
-            args: [BigInt(tokenId)],
-          });
-
-          console.log(`TokenMetadataURI: ${metadataURI}`);
-
-          if (metadataURI && metadataURI.trim() !== "") {
-            // Resolve IPFS URLs to gateway URLs
-            const resolvedURI = metadataURI.startsWith("ipfs://")
-              ? metadataURI.replace("ipfs://", "https://ipfs.io/ipfs/")
-              : metadataURI;
-
-            console.log(`Fetching metadata from: ${resolvedURI}`);
-
-            // Fetch the metadata JSON
-            const metadataResponse = await fetch(resolvedURI, {
-              headers: {
-                Accept: "application/json",
-              },
-            });
-
-            if (metadataResponse.ok) {
-              const metadata = (await metadataResponse.json()) as TokenMetadata;
-              console.log("Successfully fetched metadata:", metadata);
-
-              // Enhance the Alchemy response with the contract metadata
-              const enhancedData = {
-                ...data,
-                // Override with contract metadata if available
-                name: metadata.title ?? data.name,
-                description: metadata.description ?? data.description,
-                // Add metadataUri object with all properties
-                metadataUri: {
-                  uri: metadataURI,
-                  resolvedUri: resolvedURI,
-                  title: metadata.name,
-                  description: metadata.description,
-                  ...metadata,
-                },
-              };
-
-              return NextResponse.json(enhancedData);
-            } else {
-              console.warn(
-                `Failed to fetch metadata from URI: ${metadataResponse.status} ${metadataResponse.statusText}`,
-              );
-            }
-          } else {
-            console.log("No metadata URI found for this token");
-          }
+          return NextResponse.json(metadata);
+        } else {
+          console.warn(
+            `Failed to fetch metadata from URI: ${metadataResponse.status} ${metadataResponse.statusText}`,
+          );
         }
-      } catch (contractError) {
-        console.error("Error fetching from Media contract:", contractError);
-        // Continue with original Alchemy data if contract call fails
+      } else {
+        console.log("No metadata URI found for this token");
       }
-
-      return NextResponse.json(data);
-    } else {
-      throw new Error("Invalid response format from Alchemy API");
     }
   } catch (error) {
     console.error("Error fetching NFT metadata:", error);

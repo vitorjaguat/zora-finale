@@ -13,6 +13,7 @@ import {
   useWaitForTransactionReceipt,
 } from "wagmi";
 import { MEDIA_CONTRACT } from "@/config/contract";
+// import type { BidDataWithMetadata } from "@/app/api/nft/firstMetadataBatch/route";
 
 interface BidCardProps {
   bid: Bid;
@@ -226,11 +227,17 @@ export default function BidCard({
     }
   };
 
+  // console.dir(bid.metadata);
+
   return (
     <div className="flex justify-stretch gap-3 overflow-hidden rounded bg-neutral-700/90 duration-200 hover:bg-neutral-700/100">
       <div className="flex w-full flex-col gap-3 p-3 pr-0">
         {/* NFT PREVIEW */}
-        <NFTPreview id={bid.tokenId} contract={bid.tokenContract} />{" "}
+        <NFTPreview
+          id={bid.tokenId}
+          contract={bid.tokenContract}
+          tokenData={bid.metadata}
+        />{" "}
         {/* Contract address not available in bid data */}
         <div className="flex h-full min-h-[100px] items-stretch">
           {/* COL 1 - Bid Content */}

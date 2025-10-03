@@ -2,6 +2,8 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { sql } from "drizzle-orm";
+// import type { BidDataWithMetadata } from "../../nft/firstMetadataBatch/route";
+import type { AlchemyNFTResponse } from "@/hooks/useNFTMetadata";
 
 export interface Bid {
   id: string;
@@ -32,11 +34,12 @@ export interface Bid {
   decodingMethod?: string;
   rawData?: Record<string, unknown>;
   contractVerification?: Record<string, unknown>;
+  metadata: AlchemyNFTResponse;
 }
 
 export interface BidsResult {
-  hasBids: boolean;
-  bidsCount: number;
+  hasBids?: boolean;
+  bidsCount?: number;
   bids: Bid[];
   breakdown: {
     active: {
@@ -190,6 +193,7 @@ export async function GET(request: NextRequest) {
           isAccepted,
           processedAt: bid.created_at as string,
           status,
+          metadata: {} as AlchemyNFTResponse,
         };
       });
 

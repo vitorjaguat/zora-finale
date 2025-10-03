@@ -9,6 +9,7 @@ import { useSettleAuction } from "@/hooks/useSettleAuction";
 import { useState, useEffect } from "react";
 import { ConnectButtonCustom } from "@/components/ConnectButton";
 import { useAccount } from "wagmi";
+// import type { AuctionDataWithMetadata } from "@/app/api/nft/firstMetadataBatch/route";
 
 interface AuctionCardProps {
   auction: AuctionData;
@@ -197,6 +198,7 @@ export function AuctionCard({
 
     return "";
   };
+
   return (
     <div className="flex justify-stretch gap-3 overflow-hidden rounded bg-neutral-700/90 duration-200 hover:bg-neutral-700/100">
       {/* COLOR BAR */}
@@ -204,7 +206,11 @@ export function AuctionCard({
 
       <div className="flex w-full flex-col gap-3 p-3 pl-0">
         {/* NFT PREVIEW */}
-        <NFTPreview id={auction.tokenId} contract={auction.tokenContract} />
+        <NFTPreview
+          id={auction.tokenId}
+          contract={auction.tokenContract}
+          tokenData={auction.metadata}
+        />
 
         <div className="flex h-full min-h-[100px] items-stretch">
           {/* COL 1 - Auction Content */}

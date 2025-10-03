@@ -11,6 +11,8 @@ export default function CheckAddress() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
+  // console.dir(result);
+
   // 1. Check for address in URL params on mount and search automatically
   useEffect(() => {
     const addressFromUrl = searchParams.get("address");
@@ -52,6 +54,7 @@ export default function CheckAddress() {
 
       {error && <ErrorDisplay error={error} />}
 
+      {/* OBS: result goes as a prop still without metadata */}
       {result && <ResultsDisplay result={result} />}
     </section>
   );

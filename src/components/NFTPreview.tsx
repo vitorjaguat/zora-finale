@@ -1,22 +1,40 @@
 import NFTPreviewMedia from "./NFTPreviewMedia";
 import { AddressDisplay } from "./AddressDisplay";
-import { useNFTMetadata } from "@/hooks/useNFTMetadata";
+import {
+  useNFTMetadata,
+  type AlchemyNFTResponse,
+} from "@/hooks/useNFTMetadata";
 
 interface NFTPreviewProps {
   id: string;
   contract: string;
   className?: string;
+  tokenData: AlchemyNFTResponse;
 }
 
-export function NFTPreview({ id, contract, className = "" }: NFTPreviewProps) {
+export function NFTPreview({
+  id,
+  contract,
+  tokenData,
+  className = "",
+}: NFTPreviewProps) {
   const { nftData, loading, error } = useNFTMetadata({
     contractAddress: contract,
     tokenId: id,
+    tokenData,
   });
 
   // if (nftData?.tokenId == "315" || nftData?.tokenId == "32")
   //   console.dir(nftData);
-  // // console.dir(nftData);
+  // console.dir(nftData);
+
+  /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
+  const nftTitle =
+    nftData?.metadataUri?.title ||
+    nftData?.metadataUri?.name ||
+    nftData?.name ||
+    "";
+  /* eslint-enable @typescript-eslint/prefer-nullish-coalescing */
 
   return (
     <div className="flex gap-3 bg-white/5">
@@ -37,10 +55,8 @@ export function NFTPreview({ id, contract, className = "" }: NFTPreviewProps) {
         </div>
       ) : (
         <div className="flex flex-col justify-end gap-2 pr-3 pb-3 text-xs">
-          {(nftData?.metadataUri?.title ?? nftData?.name) && (
-            <div className="font-semibold text-neutral-200">
-              {nftData?.metadataUri?.title ?? nftData?.name}
-            </div>
+          {nftTitle && (
+            <div className="font-semibold text-neutral-200">{nftTitle}</div>
           )}
           {(nftData?.metadataUri?.description ?? nftData?.description) && (
             <div className="text-neutral-400">
@@ -52,7 +68,7 @@ export function NFTPreview({ id, contract, className = "" }: NFTPreviewProps) {
             Token Contract:{" "}
             <AddressDisplay
               className="inline items-end! text-xs"
-              address={nftData?.contract.address ?? ""}
+              address={nftData?.contract?.address ?? ""}
             />
           </div>
         </div>

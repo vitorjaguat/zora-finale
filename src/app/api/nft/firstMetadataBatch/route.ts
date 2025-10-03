@@ -16,34 +16,35 @@ const alchemy = new Alchemy({
   network: Network.ETH_MAINNET,
 });
 
-// Enhanced types with metadata
-export interface AuctionDataWithMetadata extends AuctionData {
-  metadata?: AlchemyNFTResponse;
-}
+// Enhanced types with metadata // UPDATE: original Bid and AuctionData types already come with the metadata optional property.
 
-export interface BidDataWithMetadata extends Bid {
-  metadata?: AlchemyNFTResponse;
-}
+// export interface AuctionDataWithMetadata extends AuctionData {
+//   metadata?: AlchemyNFTResponse;
+// }
 
-export interface ResultWithFirstMetadata
-  extends Omit<Result, "auctions" | "bids"> {
-  auctions: AuctionDataWithMetadata[];
-  bids: {
-    hasBids?: boolean;
-    bidsCount?: number;
-    breakdown?: {
-      active: {
-        asTokenOwner: number;
-        asBidder: number;
-      };
-      settled: {
-        asTokenOwner: number;
-        asBidder: number;
-      };
-    };
-    bids: BidDataWithMetadata[];
-  };
-}
+// export interface BidDataWithMetadata extends Bid {
+//   metadata?: AlchemyNFTResponse;
+// }
+
+// export interface ResultWithFirstMetadata
+//   extends Omit<Result, "auctions" | "bids"> {
+//   auctions: AuctionData[];
+//   bids: {
+//     hasBids?: boolean;
+//     bidsCount?: number;
+//     breakdown?: {
+//       active: {
+//         asTokenOwner: number;
+//         asBidder: number;
+//       };
+//       settled: {
+//         asTokenOwner: number;
+//         asBidder: number;
+//       };
+//     };
+//     bids: Bid[];
+//   };
+// }
 
 interface TokenReference {
   contractAddress: string;
@@ -131,37 +132,48 @@ export async function POST(request: NextRequest) {
     const getMetadata = (
       tokenContract: string,
       tokenId: string,
-    ): AlchemyNFTResponse | undefined => {
+    ): AlchemyNFTResponse => {
       const key = `${tokenContract}-${tokenId}`;
-      return metadataMap.get(key);
+      return metadataMap.get(key)!;
     };
 
     // Enhance auctions with metadata
-    const enhancedAuctions: AuctionDataWithMetadata[] =
+    const enhancedAuctions: AuctionData[] =
       body.auctions?.map((auction) => ({
         ...auction,
         metadata: getMetadata(auction.tokenContract, auction.tokenId),
       })) || [];
 
     // Enhance bids with metadata
-    const enhancedBids: BidDataWithMetadata[] =
-      body.bids?.bids?.map((bid) => ({
+    const enhancedBids: Bid[] =
+      body.bids!.bids?.map((bid) => ({
         ...bid,
         metadata: getMetadata(bid.tokenContract, bid.tokenId),
       })) ?? [];
 
     // Create the enhanced result
-    const resultWithMetadata: ResultWithFirstMetadata = {
+    const resultWithMetadata: Result = {
       ...body,
+      fetchMetadata1: true,
       auctions: enhancedAuctions,
       bids: {
         ...body.bids,
         bids: enhancedBids,
+        breakdown: body.bids?.breakdown ?? {
+          active: {
+            asTokenOwner: 0,
+            asBidder: 0,
+          },
+          settled: {
+            asTokenOwner: 0,
+            asBidder: 0,
+          },
+        },
       },
     };
 
-    console.log("Results with metadata:");
-    console.dir(resultWithMetadata);
+    // console.log("Results with metadata:");
+    // console.dir(resultWithMetadata, { depth: null }); // OK!
 
     return NextResponse.json(resultWithMetadata);
   } catch (error) {

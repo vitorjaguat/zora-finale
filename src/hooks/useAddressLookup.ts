@@ -2,6 +2,8 @@ import { useState, useCallback } from "react"; // Removed unused useEffect
 import { isAddress } from "viem";
 import { isLikelyENSName, resolveAddressOrENS } from "@/lib/ensUtils";
 import { type Bid, type BidsResult } from "@/app/api/bids/address-lookup/route";
+// import type { AuctionDataWithMetadata } from "@/app/api/nft/firstMetadataBatch/route";
+import type { AlchemyNFTResponse } from "./useNFTMetadata";
 
 export interface AuctionData {
   auctionId: string;
@@ -21,6 +23,7 @@ export interface AuctionData {
   currencySymbol: string;
   currencyDecimals: number;
   isSettled: boolean;
+  metadata: AlchemyNFTResponse;
 }
 
 // export interface ActiveBid {
@@ -71,10 +74,10 @@ export interface AuctionData {
 export interface Result {
   address: string;
   originalInput: string; // Keep track of original input (ENS or 0x)
-  hasAuctions: boolean;
-  auctionCount: number;
+  hasAuctions?: boolean;
+  auctionCount?: number;
   auctions: AuctionData[];
-  breakdown: {
+  breakdown?: {
     active: {
       asTokenOwner: number;
       asCurator: number;
@@ -87,6 +90,8 @@ export interface Result {
     };
   };
   bids: BidsResult | null;
+  fetchMetadata1?: boolean;
+  // fetchMetadata2?: boolean; //only on individual bids and auctions
 }
 
 interface ErrorResponse {

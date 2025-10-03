@@ -4,8 +4,8 @@ import BidCard from "./BidCard";
 import { HiArrowTurnRightDown, HiArrowTurnLeftDown } from "react-icons/hi2";
 import { useState, useEffect } from "react";
 import type { Bid } from "@/app/api/bids/address-lookup/route";
-import type { Result } from "@/hooks/useAddressLookup";
-import type { ResultWithFirstMetadata } from "@/app/api/nft/firstMetadataBatch/route";
+import type { AuctionData, Result } from "@/hooks/useAddressLookup";
+// import type { ResultWithFirstMetadata } from "@/app/api/nft/firstMetadataBatch/route";
 
 // interface CheckResult {
 //   address: string;
@@ -25,10 +25,15 @@ interface ResultsDisplayProps {
 
 export function ResultsDisplay({ result }: ResultsDisplayProps) {
   const [showOnlyActive, setShowOnlyActive] = useState(false);
-  const [resultWithMetadata, setResultWithMetadata] =
-    useState<ResultWithFirstMetadata | null>(null);
+  const [resultWithMetadata, setResultWithMetadata] = useState<Result | null>(
+    null,
+  );
   const [metadataLoading, setMetadataLoading] = useState(false);
   const [metadataError, setMetadataError] = useState<string | null>(null);
+  const [filteredAuctions, setFilteredAuctions] = useState<AuctionData[]>(
+    result.auctions,
+  );
+  const [filteredBids, setFilteredBids] = useState<Bid[]>(result.bids!.bids);
 
   // Fetch metadata whenever result changes
   useEffect(() => {
@@ -53,33 +58,44 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
           );
         }
 
-        const enhancedResult: ResultWithFirstMetadata =
-          (await response.json()) as ResultWithFirstMetadata;
+        const enhancedResult: Result = (await response.json()) as Result;
         setResultWithMetadata(enhancedResult);
+        // console.dir(enhancedResult);
       } catch (error) {
         console.error("Error fetching metadata:", error);
+        setResultWithMetadata(result);
         setMetadataError(
           error instanceof Error ? error.message : "Failed to fetch metadata",
         );
-        // Fallback to original result structure
-        setResultWithMetadata({
-          ...result,
-          hasAuctions: result.hasAuctions,
-          auctionCount: result.auctionCount,
-          breakdown: result.breakdown,
-          auctions: result.auctions.map((auction) => ({
-            ...auction,
-            metadata: undefined,
-          })),
-          bids: {
-            hasBids: result.bids?.hasBids ?? false,
-            bidsCount: result.bids?.bidsCount ?? 0,
-            bids: (result.bids?.bids ?? []).map((bid) => ({
-              ...bid,
-              metadata: undefined,
-            })),
-          },
-        });
+        // // Fallback to original result structure
+        // setResultWithMetadata({
+        //   ...result,
+        //   hasAuctions: result.hasAuctions,
+        //   auctionCount: result.auctionCount,
+        //   breakdown: result.breakdown,
+        //   auctions: result.auctions.map((auction) => ({
+        //     ...auction,
+        //     metadata: undefined,
+        //   })),
+        //   bids: {
+        //     hasBids: result.bids?.hasBids ?? false,
+        //     bidsCount: result.bids?.bidsCount ?? 0,
+        //     bids: (result.bids?.bids ?? []).map((bid) => ({
+        //       ...bid,
+        //       metadata: undefined,
+        //     })),
+        //     breakdown: result.bids?.breakdown ?? {
+        //       active: {
+        //         asTokenOwner: 0,
+        //         asBidder: 0,
+        //       },
+        //       settled: {
+        //         asTokenOwner: 0,
+        //         asBidder: 0,
+        //       },
+        //     },
+        //   },
+        // });
       } finally {
         setMetadataLoading(false);
       }
@@ -88,23 +104,25 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
     void fetchMetadata();
   }, [result]);
 
-  // Use enhanced result if available, otherwise fall back to original
-  const displayResult = resultWithMetadata ?? result;
+  useEffect(() => {
+    if (resultWithMetadata) {
+      setFilteredAuctions(
+        showOnlyActive
+          ? resultWithMetadata?.auctions.filter((auction) => !auction.isSettled)
+          : (resultWithMetadata?.auctions ?? result.auctions),
+      );
+      setFilteredBids(
+        showOnlyActive
+          ? resultWithMetadata?.bids!.bids.filter((bid) => bid.isActive)
+          : (resultWithMetadata?.bids!.bids ?? result?.bids?.bids ?? []),
+      );
+    }
+  }, [showOnlyActive, resultWithMetadata]);
 
-  // Filter auctions and bids based on checkbox state
-  const filteredAuctions = showOnlyActive
-    ? (resultWithMetadata?.auctions.filter((auction) => !auction.isSettled) ??
-      result.auctions.filter((auction) => !auction.isSettled))
-    : (resultWithMetadata?.auctions ?? result.auctions);
+  useEffect(() => {
+    // console.dir(resultWithMetadata);
+  }, [resultWithMetadata?.fetchMetadata1]);
 
-  const filteredBids = showOnlyActive
-    ? (resultWithMetadata?.bids.bids.filter((bid) => bid.isActive) ??
-      result?.bids?.bids.filter((bid) => bid.isActive) ??
-      [])
-    : (resultWithMetadata?.bids.bids ?? result?.bids?.bids ?? []);
-
-  // console.log("Result:");
-  // console.dir(result);
   return (
     <div className="flex w-full flex-col gap-12">
       {/* Metadata Loading Indicator */}
@@ -149,14 +167,9 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
           {/* ActiveBids breakdown */}
           <div className="mb-4 flex-1 rounded-lg border border-neutral-600 bg-neutral-800 p-6">
             <h2 className="mb-4 text-xl font-semibold text-neutral-200">
-              Found{" "}
-              {displayResult.bids?.bidsCount ?? result.bids?.bidsCount ?? 0} bid
-              {(displayResult.bids?.bidsCount ??
-                result.bids?.bidsCount ??
-                0) !== 1
-                ? "s"
-                : ""}{" "}
-              for <AddressDisplay address={result.address} />
+              Found {result.bids?.bidsCount ?? 0} bid
+              {(result.bids?.bidsCount ?? 0) !== 1 ? "s" : ""} for{" "}
+              <AddressDisplay address={result.address} />
             </h2>
 
             {/* Active Bids */}
@@ -170,17 +183,13 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
                     As Token Owner
                   </div>
                   <div className="text-lg text-neutral-200">
-                    {displayResult.bids?.breakdown?.active?.asTokenOwner ??
-                      result.bids?.breakdown?.active?.asTokenOwner ??
-                      0}
+                    {result.bids?.breakdown?.active?.asTokenOwner ?? 0}
                   </div>
                 </div>
                 <div className="rounded bg-neutral-700 p-3">
                   <div className="font-semibold text-purple-400">As Bidder</div>
                   <div className="text-lg text-neutral-200">
-                    {displayResult.bids?.breakdown?.active?.asBidder ??
-                      result.bids?.breakdown?.active?.asBidder ??
-                      0}
+                    {result.bids?.breakdown?.active?.asBidder ?? 0}
                   </div>
                 </div>
               </div>
@@ -197,17 +206,13 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
                     As Token Owner
                   </div>
                   <div className="text-lg text-neutral-200">
-                    {displayResult.bids?.breakdown?.settled?.asTokenOwner ??
-                      result.bids?.breakdown?.settled?.asTokenOwner ??
-                      0}
+                    {result.bids?.breakdown?.settled?.asTokenOwner ?? 0}
                   </div>
                 </div>
                 <div className="rounded bg-neutral-700 p-3">
                   <div className="font-semibold text-purple-400">As Bidder</div>
                   <div className="text-lg text-neutral-200">
-                    {displayResult.bids?.breakdown?.settled?.asBidder ??
-                      result.bids?.breakdown?.settled?.asBidder ??
-                      0}
+                    {result.bids?.breakdown?.settled?.asBidder ?? 0}
                   </div>
                 </div>
               </div>
@@ -216,11 +221,9 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
           {/* Auctions breakdown */}
           <div className="mb-4 flex-1 rounded-lg border border-neutral-600 bg-neutral-800 p-6">
             <h2 className="mb-4 text-xl font-semibold text-neutral-200">
-              Found {displayResult.auctionCount ?? result.auctionCount} auction
-              {(displayResult.auctionCount ?? result.auctionCount) !== 1
-                ? "s"
-                : ""}{" "}
-              for <AddressDisplay address={result.address} />
+              Found {result.auctionCount} auction
+              {result.auctionCount !== 1 ? "s" : ""} for{" "}
+              <AddressDisplay address={result.address} />
             </h2>
 
             {/* Active Auctions */}
@@ -234,25 +237,19 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
                     As Token Owner
                   </div>
                   <div className="text-lg text-neutral-200">
-                    {displayResult.breakdown?.active?.asTokenOwner ??
-                      result.breakdown?.active?.asTokenOwner ??
-                      0}
+                    {result.breakdown?.active?.asTokenOwner ?? 0}
                   </div>
                 </div>
                 <div className="rounded bg-neutral-700 p-3">
                   <div className="font-semibold text-blue-400">As Curator</div>
                   <div className="text-lg text-neutral-200">
-                    {displayResult.breakdown?.active?.asCurator ??
-                      result.breakdown?.active?.asCurator ??
-                      0}
+                    {result.breakdown?.active?.asCurator ?? 0}
                   </div>
                 </div>
                 <div className="rounded bg-neutral-700 p-3">
                   <div className="font-semibold text-purple-400">As Bidder</div>
                   <div className="text-lg text-neutral-200">
-                    {displayResult.breakdown?.active?.asBidder ??
-                      result.breakdown?.active?.asBidder ??
-                      0}
+                    {result.breakdown?.active?.asBidder ?? 0}
                   </div>
                 </div>
               </div>
@@ -269,25 +266,19 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
                     As Token Owner
                   </div>
                   <div className="text-lg text-neutral-200">
-                    {displayResult.breakdown?.settled?.asTokenOwner ??
-                      result.breakdown?.settled?.asTokenOwner ??
-                      0}
+                    {result.breakdown?.settled?.asTokenOwner ?? 0}
                   </div>
                 </div>
                 <div className="rounded bg-neutral-700 p-3">
                   <div className="font-semibold text-blue-400">As Curator</div>
                   <div className="text-lg text-neutral-200">
-                    {displayResult.breakdown?.settled?.asCurator ??
-                      result.breakdown?.settled?.asCurator ??
-                      0}
+                    {result.breakdown?.settled?.asCurator ?? 0}
                   </div>
                 </div>
                 <div className="rounded bg-neutral-700 p-3">
                   <div className="font-semibold text-purple-400">As Bidder</div>
                   <div className="text-lg text-neutral-200">
-                    {displayResult.breakdown?.settled?.asBidder ??
-                      result.breakdown?.settled?.asBidder ??
-                      0}
+                    {result.breakdown?.settled?.asBidder ?? 0}
                   </div>
                 </div>
               </div>
@@ -322,7 +313,7 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
         <div className="grid min-h-0 grid-cols-2 gap-6">
           {/* Left Column - Active Bids */}
           <div className="w-full">
-            {filteredBids.length === 0 ? (
+            {filteredBids && filteredBids.length === 0 ? (
               <div className="rounded-lg border border-neutral-600 bg-neutral-800 p-6">
                 <h2 className="mb-4 text-xl font-semibold text-neutral-200">
                   {showOnlyActive ? "No active bids found" : "No bids found"}{" "}
@@ -336,13 +327,15 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
               </div>
             ) : (
               <div className="grid grid-cols-1 gap-6">
-                {filteredBids.map((bid) => (
-                  <BidCard
-                    key={bid.transactionHash || bid.id}
-                    bid={bid}
-                    inputAddress={result.address}
-                  />
-                ))}
+                {resultWithMetadata
+                  ? filteredBids?.map((bid) => (
+                      <BidCard
+                        key={bid.transactionHash || bid.id}
+                        bid={bid}
+                        inputAddress={result.address}
+                      />
+                    ))
+                  : "Fetching metadata..."}
               </div>
             )}
           </div>
@@ -365,13 +358,15 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
               </div>
             ) : (
               <div className="grid grid-cols-1 gap-6">
-                {filteredAuctions.map((auction) => (
-                  <AuctionCard
-                    key={auction.auctionId}
-                    auction={auction}
-                    inputAddress={result.address}
-                  />
-                ))}
+                {resultWithMetadata
+                  ? filteredAuctions.map((auction) => (
+                      <AuctionCard
+                        key={auction.auctionId}
+                        auction={auction}
+                        inputAddress={result.address}
+                      />
+                    ))
+                  : "Fetching metadata..."}
               </div>
             )}
           </div>
