@@ -13,6 +13,7 @@ import {
   useWaitForTransactionReceipt,
 } from "wagmi";
 import { MEDIA_CONTRACT } from "@/config/contract";
+import { useBidShares } from "@/hooks/useBidShares";
 // import type { BidDataWithMetadata } from "@/app/api/nft/firstMetadataBatch/route";
 
 interface BidCardProps {
@@ -227,6 +228,8 @@ export default function BidCard({
     }
   };
 
+  const bidSharesData = useBidShares(bid.amountFormatted, bid.bidShares);
+
   // console.dir(bid.metadata);
 
   return (
@@ -307,6 +310,37 @@ export default function BidCard({
                 Implementation: {bid.implementation || "Unknown"}
               </div> */}
 
+              {/* Bid Shares */}
+              {bid.isActive && (
+                <div className="mt-2 space-y-1 space-x-3 border-t border-neutral-600 pt-2">
+                  <div className="font-semibold">Bid Shares</div>
+                  <div className="flex items-center gap-2">
+                    <span>Previous Owner:</span>
+                    <span className="space-x-1">
+                      <span>{bidSharesData?.prevOwnerAmount}</span>
+                      <span>{bid.currencySymbol}</span>
+                    </span>
+                    <span>({bidSharesData?.prevOwnerPercent}%)</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span>Creator Royalties:</span>
+                    <span className="space-x-1">
+                      <span>{bidSharesData?.creatorAmount}</span>
+                      <span>{bid.currencySymbol}</span>
+                    </span>
+                    <span>({bidSharesData?.creatorPercent}%)</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span>Current Owner:</span>
+                    <span className="space-x-1">
+                      <span>{bidSharesData?.ownerAmount}</span>
+                      <span>{bid.currencySymbol}</span>
+                    </span>
+                    <span>({bidSharesData?.ownerPercent}%)</span>
+                  </div>
+                </div>
+              )}
+
               {bid.transactionHash && (
                 <div className="mt-2 text-xs">
                   <a
@@ -315,7 +349,7 @@ export default function BidCard({
                     rel="noopener noreferrer"
                     className="text-blue-400 underline hover:no-underline"
                   >
-                    View Transaction
+                    View Bid Transaction
                   </a>
                 </div>
               )}

@@ -35,6 +35,7 @@ export interface Bid {
   rawData?: Record<string, unknown>;
   contractVerification?: Record<string, unknown>;
   metadata: AlchemyNFTResponse;
+  bidShares: string;
 }
 
 export interface BidsResult {
@@ -129,7 +130,8 @@ export async function GET(request: NextRequest) {
           is_active,
           is_withdrawn,
           is_accepted,
-          created_at
+          created_at,
+          bid_shares
         FROM bids 
         WHERE id = ANY(ARRAY[${sql.join(
           bidIdsArray.map((id) => sql`${id}`),
@@ -194,6 +196,7 @@ export async function GET(request: NextRequest) {
           processedAt: bid.created_at as string,
           status,
           metadata: {} as AlchemyNFTResponse,
+          bidShares: bid.bid_shares as string,
         };
       });
 

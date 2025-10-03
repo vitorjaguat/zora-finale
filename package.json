@@ -17,6 +17,8 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "npx dotenv-cli -e .env.local -- drizzle-kit migrate",
     "db:migrate-sell-on-share": "npx dotenv-cli -e .env.local -- npx tsx scripts/migrate-sell-on-share-values.ts",
+    "db:populate-bid-shares": "npx dotenv-cli -e .env.local -- npx tsx scripts/populate-bid-shares.ts",
+    "test:bid-shares": "npx tsx scripts/test-bid-shares.ts",
     "db:studio": "drizzle-kit studio",
     "db:seed": "npx dotenv-cli -e .env.local -- npx tsx src/scripts/migrate-to-db.ts",
     "db:seed-bids": "npx dotenv-cli -e .env.local -- npx tsx src/scripts/migrate-bids-to-db.ts",

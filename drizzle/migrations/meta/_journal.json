@@ -15,6 +15,13 @@
       "when": 1758751530692,
       "tag": "0001_outgoing_tomas",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1759523130055,
+      "tag": "0002_shiny_korg",
+      "breakpoints": true
     }
   ]
 }
