@@ -483,10 +483,11 @@ export default function ThePlanGraphic() {
       </div>
 
       {/* CAPTION */}
-      <div className="flex items-center gap-4">
+      <div className="mt-6 flex items-center gap-4">
         <div className="h-4 w-8 bg-green-400"> </div>
         <div className="text-sm text-neutral-300">
-          Assets already reclaimed on ZERA (since 10.22.2025)
+          <div className="">Assets already reclaimed on ZERA</div>
+          <div>(since 10.22.2025)</div>
         </div>
       </div>
     </div>
