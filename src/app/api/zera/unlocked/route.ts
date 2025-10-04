@@ -4,42 +4,109 @@ import { bids, auctions } from "@/lib/db/schema";
 import { eq, sum, count, sql } from "drizzle-orm";
 
 export interface ZeraUnlockedData {
-  unlockedEthMarket: number;
-  unlockedEthAuctionHouse: number;
-  unlockedNFTs: number;
+  market: {
+    reclaimedBids: number;
+    reclaimedWETH: number;
+    reclaimedDAI: number;
+    reclaimedUSDC: number;
+  };
+  auctionHouse: {
+    settledAuctions: number;
+    reclaimedWETH: number;
+  };
+  nfts: {
+    reclaimed: number;
+    uniqueOwners: number;
+  };
 }
 
 export async function GET() {
   try {
-    // Query 1: Sum of ETH from inactive bids (Market contract)
-    // bids.amountFormatted is numeric type
-    const marketResult = await db
-      .select({ total: sum(bids.amountFormatted) })
+    // Market contract queries
+
+    // Query 1: Count of reclaimed bids (inactive bids)
+    const reclaimedBidsResult = await db
+      .select({ count: count() })
       .from(bids)
       .where(eq(bids.isActive, false));
-    const unlockedEthMarket = Number(marketResult[0]?.total ?? 0);
+    const reclaimedBids = Number(reclaimedBidsResult[0]?.count ?? 0);
 
-    // Query 2: Sum of ETH from settled auctions (Auction House contract)
-    // auctions.amountFormatted is text type, so we need to cast it
-    const auctionEthResult = await db
+    // Query 2: Sum of reclaimed WETH from inactive bids
+    const reclaimedWETHResult = await db
+      .select({ total: sum(bids.amountFormatted) })
+      .from(bids)
+      .where(sql`${bids.isActive} = false AND ${bids.currencySymbol} = 'ETH'`);
+    const reclaimedWETH = Number(reclaimedWETHResult[0]?.total ?? 0);
+
+    // Query 3: Sum of reclaimed DAI from inactive bids
+    const reclaimedDAIResult = await db
+      .select({ total: sum(bids.amountFormatted) })
+      .from(bids)
+      .where(sql`${bids.isActive} = false AND ${bids.currencySymbol} = 'DAI'`);
+    const reclaimedDAI = Number(reclaimedDAIResult[0]?.total ?? 0);
+
+    // Query 4: Sum of reclaimed USDC from inactive bids
+    const reclaimedUSDCResult = await db
+      .select({ total: sum(bids.amountFormatted) })
+      .from(bids)
+      .where(sql`${bids.isActive} = false AND ${bids.currencySymbol} = 'USDC'`);
+    const reclaimedUSDC = Number(reclaimedUSDCResult[0]?.total ?? 0);
+
+    // Auction House contract queries
+
+    // Query 5: Count of settled auctions (bidder != zero address)
+    const settledAuctionsResult = await db
+      .select({ count: count() })
+      .from(auctions)
+      .where(
+        sql`${auctions.isSettled} = true AND ${auctions.bidder} != '0x0000000000000000000000000000000000000000'`,
+      );
+    const settledAuctions = Number(settledAuctionsResult[0]?.count ?? 0);
+
+    // Query 6: Sum of reclaimed WETH from settled auctions
+    const auctionReclaimedWETHResult = await db
       .select({
-        total: sql<string>`COALESCE(SUM(CAST(${auctions.amountFormatted} AS NUMERIC(20,8))), 0)`,
+        total: sql<string>`COALESCE(SUM(CAST(${auctions.amountFormatted} AS DECIMAL)), 0)`,
       })
       .from(auctions)
       .where(eq(auctions.isSettled, true));
-    const unlockedEthAuctionHouse = Number(auctionEthResult[0]?.total ?? 0);
+    const auctionReclaimedWETH = Number(
+      auctionReclaimedWETHResult[0]?.total ?? 0,
+    );
 
-    // Query 3: Count of settled auctions (unlocked NFTs)
-    const nftResult = await db
+    // NFTs queries
+
+    // Query 7: Count of reclaimed NFTs (settled auctions)
+    const reclaimedNFTsResult = await db
       .select({ count: count() })
       .from(auctions)
       .where(eq(auctions.isSettled, true));
-    const unlockedNFTs = Number(nftResult[0]?.count ?? 0);
+    const reclaimedNFTs = Number(reclaimedNFTsResult[0]?.count ?? 0);
+
+    // Query 8: Count of unique owners from settled auctions
+    const uniqueOwnersResult = await db
+      .select({
+        count: sql<string>`COUNT(DISTINCT ${auctions.tokenOwner})`,
+      })
+      .from(auctions)
+      .where(eq(auctions.isSettled, true));
+    const uniqueOwners = Number(uniqueOwnersResult[0]?.count ?? 0);
 
     const data: ZeraUnlockedData = {
-      unlockedEthMarket,
-      unlockedEthAuctionHouse,
-      unlockedNFTs,
+      market: {
+        reclaimedBids,
+        reclaimedWETH,
+        reclaimedDAI,
+        reclaimedUSDC,
+      },
+      auctionHouse: {
+        settledAuctions,
+        reclaimedWETH: auctionReclaimedWETH,
+      },
+      nfts: {
+        reclaimed: reclaimedNFTs,
+        uniqueOwners,
+      },
     };
 
     console.log("🔓 Zera unlocked data:", data);

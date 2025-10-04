@@ -2,9 +2,7 @@ import { useState, useEffect } from "react";
 import type { ZeraUnlockedData } from "@/app/api/zera/unlocked/route";
 
 interface UseZeraUnlockedReturn {
-  unlockedEthMarket: number;
-  unlockedEthAuctionHouse: number;
-  unlockedNFTs: number;
+  data: ZeraUnlockedData;
   loading: boolean;
   error: string | null;
   refetch: () => void;
@@ -12,9 +10,20 @@ interface UseZeraUnlockedReturn {
 
 export function useZeraUnlocked(): UseZeraUnlockedReturn {
   const [data, setData] = useState<ZeraUnlockedData>({
-    unlockedEthMarket: 0,
-    unlockedEthAuctionHouse: 0,
-    unlockedNFTs: 0,
+    market: {
+      reclaimedBids: 0,
+      reclaimedWETH: 0,
+      reclaimedDAI: 0,
+      reclaimedUSDC: 0,
+    },
+    auctionHouse: {
+      settledAuctions: 0,
+      reclaimedWETH: 0,
+    },
+    nfts: {
+      reclaimed: 0,
+      uniqueOwners: 0,
+    },
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -49,9 +58,7 @@ export function useZeraUnlocked(): UseZeraUnlockedReturn {
   }, []);
 
   return {
-    unlockedEthMarket: data.unlockedEthMarket,
-    unlockedEthAuctionHouse: data.unlockedEthAuctionHouse,
-    unlockedNFTs: data.unlockedNFTs,
+    data,
     loading,
     error,
     refetch: () => void fetchData(),

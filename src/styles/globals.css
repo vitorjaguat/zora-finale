@@ -132,3 +132,12 @@ body {
 .custom-checkbox:focus {
   box-shadow: 0 0 0 1px #686868 !important;
 }
+
+/* 3D flip effect classes */
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.rotate-y-180 {
+  transform: rotateY(180deg);
+}
