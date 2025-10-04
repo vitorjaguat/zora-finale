@@ -1,16 +1,10 @@
 "use client";
 
-import { useEthPrice } from "@/hooks/useEthPrice";
 import Link from "next/link";
 import { AddressDisplay } from "../AddressDisplay";
+import ThePlanGraphic from "./ThePlanGraphic";
 
 export default function ThePlan() {
-  const { usd: ethPrice, loading, error } = useEthPrice();
-  const ethAmountMarket = 144.04976775;
-  const usdValueMarket = ethPrice * ethAmountMarket;
-  const ethAmountAuctionHouse = 13.52559704;
-  const usdValueAuctionHouse = ethAmountAuctionHouse * ethPrice;
-
   return (
     <section
       id="the-plan"
@@ -86,149 +80,9 @@ export default function ThePlan() {
         non-fungies sealed inside fossilized chests — waiting to be unearthed.
         Until now.
       </div>
+
       {/* Graphic */}
-      <div className="mt-11 flex flex-col items-center gap-0">
-        {/* First row - 2 items */}
-        <div className="flex w-full justify-center gap-6">
-          {/* Market contract */}
-          <div className="relative flex h-72 w-72 flex-col items-center justify-center rounded-full border-2 border-neutral-700 bg-neutral-900/30 p-6">
-            <Link
-              href="https://etherscan.io/address/0xE5BFAB544ecA83849c53464F85B7164375Bdaac1"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="absolute right-0 bottom-4 font-light tracking-wider text-neutral-400"
-            >
-              Zora: Market
-            </Link>
-            <div className="flex flex-col items-center justify-center space-y-2">
-              <div className="text-xl font-bold">144.04976775 ETH</div>
-              <div className="-translate-y-1 font-light">
-                758 UNSETTLED BIDS
-              </div>
-              {loading ? (
-                <div className="animate-pulse">
-                  <div className="mb-1 h-6 w-48 rounded bg-neutral-700"></div>
-                  <div className="h-4 w-32 rounded bg-neutral-700"></div>
-                </div>
-              ) : error ? (
-                <div className="text-sm">Unable to load USD value</div>
-              ) : (
-                <div className="flex flex-col items-center justify-center space-y-1">
-                  <div className="text-red-500">
-                    ≈ $
-                    {usdValueMarket.toLocaleString("en-US", {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}{" "}
-                    USD
-                  </div>
-                  <div className="text-xs text-neutral-500">
-                    ETH: $
-                    {ethPrice.toLocaleString("en-US", {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}{" "}
-                    USD
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Auction contract */}
-          <div className="relative flex h-72 w-72 flex-col items-center justify-center rounded-full border-2 border-neutral-700 bg-neutral-900/30 p-6">
-            <Link
-              href="https://etherscan.io/address/0xe468ce99444174bd3bbbed09209577d25d1ad673"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="absolute -right-4 bottom-4 font-light tracking-wider text-neutral-400"
-            >
-              Zora: Auction House
-            </Link>
-            <div className="flex flex-col items-center justify-center space-y-2">
-              <div className="text-xl font-bold">13.52559704 ETH</div>
-              <div className="-translate-y-1 font-light">
-                158 UNSETTLED AUCTIONS
-              </div>
-              {loading ? (
-                <div className="animate-pulse">
-                  <div className="mb-1 h-6 w-48 rounded bg-neutral-700"></div>
-                  <div className="h-4 w-32 rounded bg-neutral-700"></div>
-                </div>
-              ) : error ? (
-                <div className="text-sm">Unable to load USD value</div>
-              ) : (
-                <div className="flex flex-col items-center justify-center space-y-1">
-                  <div className="text-red-500">
-                    ≈ $
-                    {usdValueAuctionHouse.toLocaleString("en-US", {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}{" "}
-                    USD
-                  </div>
-                  <div className="text-xs text-neutral-500">
-                    ETH: $
-                    {ethPrice.toLocaleString("en-US", {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}{" "}
-                    USD
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Second row - 1 item centered */}
-        <div className="flex justify-center">
-          {/* NFTs locked */}
-          <div className="relative flex h-72 w-72 flex-col items-center justify-center rounded-full border-2 border-neutral-700 bg-neutral-900/30 p-6">
-            <Link
-              href="https://etherscan.io/address/0xe468ce99444174bd3bbbed09209577d25d1ad673"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="absolute -right-4 bottom-4 font-light tracking-wider text-neutral-400"
-            >
-              Zora: Auction House
-            </Link>
-            <div className="flex flex-col items-center justify-center space-y-2">
-              <div className="text-xl font-bold">3061 ESCROWED NFTs</div>
-              <div className="-translate-y-1 font-light">
-                FROM 2165 CREATORS
-              </div>
-              {/* {loading ? (
-                <div className="animate-pulse">
-                  <div className="mb-1 h-6 w-48 rounded bg-neutral-700"></div>
-                  <div className="h-4 w-32 rounded bg-neutral-700"></div>
-                </div>
-              ) : error ? (
-                <div className="text-sm">Unable to load USD value</div>
-              ) : (
-                <div className="flex flex-col items-center justify-center space-y-1">
-                  <div className="text-red-500">
-                    ≈ $
-                    {usdValueAuctionHouse.toLocaleString("en-US", {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}{" "}
-                    USD
-                  </div>
-                  <div className="text-xs text-neutral-500">
-                    ETH: $
-                    {ethPrice.toLocaleString("en-US", {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}{" "}
-                    USD
-                  </div>
-                </div>
-              )} */}
-            </div>
-          </div>
-        </div>
-      </div>
+      <ThePlanGraphic />
 
       {/* 2 column text */}
       <div className="mt-12 grid w-[110%] flex-1 grid-cols-2 gap-16 pr-6">
