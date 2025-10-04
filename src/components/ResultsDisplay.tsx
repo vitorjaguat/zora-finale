@@ -5,6 +5,7 @@ import { HiArrowTurnRightDown, HiArrowTurnLeftDown } from "react-icons/hi2";
 import { useState, useEffect } from "react";
 import type { Bid } from "@/app/api/bids/address-lookup/route";
 import type { AuctionData, Result } from "@/hooks/useAddressLookup";
+import motion from "motion";
 // import type { ResultWithFirstMetadata } from "@/app/api/nft/firstMetadataBatch/route";
 
 // interface CheckResult {
@@ -125,28 +126,6 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
 
   return (
     <div className="flex w-full flex-col gap-12">
-      {/* Metadata Loading Indicator */}
-      {metadataLoading && (
-        <div className="rounded-lg border border-blue-600 bg-blue-900/20 p-4">
-          <div className="flex items-center gap-2 text-blue-400">
-            <div className="h-4 w-4 animate-spin rounded-full border-2 border-blue-400 border-t-transparent"></div>
-            <span>Loading NFT metadata...</span>
-          </div>
-        </div>
-      )}
-
-      {/* Metadata Error Indicator */}
-      {metadataError && (
-        <div className="rounded-lg border border-red-600 bg-red-900/20 p-4">
-          <div className="text-red-400">
-            <strong>Metadata Error:</strong> {metadataError}
-          </div>
-          <div className="mt-1 text-sm text-red-300">
-            Displaying results without enhanced metadata.
-          </div>
-        </div>
-      )}
-
       {/* BREAKDOWN */}
       <div className="flex w-full flex-col gap-6">
         {/* Breakdown Header */}
@@ -286,6 +265,28 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
           </div>
         </div>
       </div>
+
+      {/* Metadata Loading Indicator */}
+      {metadataLoading && (
+        <div className="rounded-lg border border-blue-600 bg-blue-900/20 p-4">
+          <div className="flex items-center gap-2 text-blue-400">
+            <div className="h-4 w-4 animate-spin rounded-full border-2 border-blue-400 border-t-transparent"></div>
+            <span>Loading NFT metadata...</span>
+          </div>
+        </div>
+      )}
+
+      {/* Metadata Error Indicator */}
+      {metadataError && (
+        <div className="rounded-lg border border-red-600 bg-red-900/20 p-4">
+          <div className="text-red-400">
+            <strong>Metadata Error:</strong> {metadataError}
+          </div>
+          <div className="mt-1 text-sm text-red-300">
+            Displaying results without enhanced metadata.
+          </div>
+        </div>
+      )}
 
       {/* Results */}
       <div className="">

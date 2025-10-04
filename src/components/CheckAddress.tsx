@@ -54,8 +54,16 @@ export default function CheckAddress() {
 
       {error && <ErrorDisplay error={error} />}
 
-      {/* OBS: result goes as a prop still without metadata */}
-      {result && <ResultsDisplay result={result} />}
+      <div
+        className={`transition-all duration-700 ease-in-out ${
+          result
+            ? "translate-y-0 opacity-100"
+            : "pointer-events-none translate-y-4 opacity-0"
+        }`}
+      >
+        {/* OBS: result goes as a prop still without metadata */}
+        {result && <ResultsDisplay result={result} />}
+      </div>
     </section>
   );
 }
