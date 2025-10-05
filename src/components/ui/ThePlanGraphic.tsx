@@ -67,16 +67,26 @@ export default function ThePlanGraphic() {
   return (
     <div className="mt-11 flex flex-col items-center gap-0">
       {/* First row - 2 items */}
-      <div className="flex w-full justify-center gap-6">
+      <div className="flex justify-evenly gap-6">
         {/* Market contract */}
         <div
-          className="perspective-1000 relative h-72 w-72"
+          className="perspective-1000 relative h-72 w-72 flex-shrink-0"
           onMouseEnter={() => setHoveredCircle("market")}
           onMouseLeave={() => setHoveredCircle(null)}
           style={{ perspective: "1000px" }}
         >
+          {/* Fixed contract link */}
+          <Link
+            href="https://etherscan.io/address/0xE5BFAB544ecA83849c53464F85B7164375Bdaac1"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="absolute right-0 bottom-4 z-10 font-light tracking-wider text-neutral-400"
+          >
+            Zora: Market
+          </Link>
+
           <div
-            className={`relative h-full w-full transition-transform duration-700 ease-in-out ${hoveredCircle === "market" ? "rotate-y-180" : ""} `}
+            className={`relative h-full w-full transition-transform duration-700 ease-in-out ${hoveredCircle === "market" || hoveredCircle === "all" ? "rotate-y-180" : ""} `}
             style={{ transformStyle: "preserve-3d" }}
           >
             {/* Front side (original content) */}
@@ -113,14 +123,6 @@ export default function ThePlanGraphic() {
 
               {/* Inner circle content */}
               <div className="relative flex h-72 w-72 flex-col items-center justify-center rounded-full border-2 border-neutral-700 bg-neutral-900/30 p-6">
-                <Link
-                  href="https://etherscan.io/address/0xE5BFAB544ecA83849c53464F85B7164375Bdaac1"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="absolute right-0 bottom-4 font-light tracking-wider text-neutral-400"
-                >
-                  Zora: Market
-                </Link>
                 <div className="flex flex-col items-center justify-center space-y-2">
                   <div className="text-center text-xl font-bold">
                     758 UNSETTLED BIDS
@@ -216,13 +218,23 @@ export default function ThePlanGraphic() {
 
         {/* Auction contract */}
         <div
-          className="perspective-1000 relative h-72 w-72"
+          className="perspective-1000 relative h-72 w-72 flex-shrink-0"
           onMouseEnter={() => setHoveredCircle("auction")}
           onMouseLeave={() => setHoveredCircle(null)}
           style={{ perspective: "1000px" }}
         >
+          {/* Fixed contract link */}
+          <Link
+            href="https://etherscan.io/address/0xe468ce99444174bd3bbbed09209577d25d1ad673"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="absolute -right-4 bottom-4 z-10 font-light tracking-wider text-neutral-400"
+          >
+            Zora: Auction House
+          </Link>
+
           <div
-            className={`relative h-full w-full transition-transform duration-700 ease-in-out ${hoveredCircle === "auction" ? "rotate-y-180" : ""} `}
+            className={`relative h-full w-full transition-transform duration-700 ease-in-out ${hoveredCircle === "auction" || hoveredCircle === "all" ? "rotate-y-180" : ""} `}
             style={{ transformStyle: "preserve-3d" }}
           >
             {/* Front side (original content) */}
@@ -261,14 +273,6 @@ export default function ThePlanGraphic() {
 
               {/* Inner circle content */}
               <div className="relative flex h-72 w-72 flex-col items-center justify-center rounded-full border-2 border-neutral-700 bg-neutral-900/30 p-6">
-                <Link
-                  href="https://etherscan.io/address/0xe468ce99444174bd3bbbed09209577d25d1ad673"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="absolute -right-4 bottom-4 font-light tracking-wider text-neutral-400"
-                >
-                  Zora: Auction House
-                </Link>
                 <div className="flex flex-col items-center justify-center space-y-2">
                   <div className="text-center text-xl font-bold">
                     158 UNSETTLED AUCTIONS
@@ -367,13 +371,23 @@ export default function ThePlanGraphic() {
       <div className="flex flex-col items-center justify-center gap-6">
         {/* NFTs locked */}
         <div
-          className="perspective-1000 relative h-72 w-72"
+          className="perspective-1000 relative h-72 w-72 flex-shrink-0"
           onMouseEnter={() => setHoveredCircle("nfts")}
           onMouseLeave={() => setHoveredCircle(null)}
           style={{ perspective: "1000px" }}
         >
+          {/* Fixed contract link */}
+          <Link
+            href="https://etherscan.io/address/0xe468ce99444174bd3bbbed09209577d25d1ad673"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="absolute -right-4 bottom-4 z-10 font-light tracking-wider text-neutral-400"
+          >
+            Escrowed NFTs
+          </Link>
+
           <div
-            className={`relative h-full w-full transition-transform duration-700 ease-in-out ${hoveredCircle === "nfts" ? "rotate-y-180" : ""} `}
+            className={`relative h-full w-full transition-transform duration-700 ease-in-out ${hoveredCircle === "nfts" || hoveredCircle === "all" ? "rotate-y-180" : ""} `}
             style={{ transformStyle: "preserve-3d" }}
           >
             {/* Front side (original content) */}
@@ -410,14 +424,6 @@ export default function ThePlanGraphic() {
 
               {/* Inner circle content */}
               <div className="relative flex h-72 w-72 flex-col items-center justify-center rounded-full border-2 border-neutral-700 bg-neutral-900/30 p-6">
-                <Link
-                  href="https://etherscan.io/address/0xe468ce99444174bd3bbbed09209577d25d1ad673"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="absolute -right-4 bottom-4 font-light tracking-wider text-neutral-400"
-                >
-                  Zora: Auction House
-                </Link>
                 <div className="flex flex-col items-center justify-center space-y-2">
                   <div className="text-xl font-bold">
                     {totalNFTs} ESCROWED NFTs
@@ -483,7 +489,11 @@ export default function ThePlanGraphic() {
       </div>
 
       {/* CAPTION */}
-      <div className="mt-6 flex items-center gap-4">
+      <div
+        onMouseEnter={() => setHoveredCircle("all")}
+        onMouseLeave={() => setHoveredCircle(null)}
+        className="mt-6 flex cursor-help items-center gap-4"
+      >
         <div className="h-4 w-8 bg-green-400"> </div>
         <div className="text-sm text-neutral-300">
           <div className="">Assets already reclaimed on ZERA</div>
