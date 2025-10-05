@@ -185,30 +185,35 @@ export default function ThePlanGraphic() {
                       <span className="text-green-400">
                         {zeraData.data.market.reclaimedBids}
                       </span>
-                      <span>/758 bids settled</span>
+                      <span className="ml-1.5">/ 758 bids settled</span>
                     </div>
                     <div className="flex justify-center text-center">
                       <span className="text-green-400">
                         {zeraData.data.market.reclaimedWETH}
                       </span>
-                      <span>/144.0497 WETH reclaimed</span>
+                      <span className="ml-1.5">/ 144.0497 WETH reclaimed</span>
                     </div>
                     <div className="flex justify-center">
                       <span className="text-green-400">
                         {zeraData.data.market.reclaimedDAI}
                       </span>
-                      <span>/{daiAmountMarket} DAI reclaimed</span>
+                      <span className="ml-1.5">
+                        / {daiAmountMarket} DAI reclaimed
+                      </span>
                     </div>
                     <div className="flex justify-center">
                       <span className="text-green-400">
                         {zeraData.data.market.reclaimedUSDC}
                       </span>
-                      <span>/{usdcAmountMarket} USDC reclaimed</span>
+                      <span className="ml-1.5">
+                        / {usdcAmountMarket} USDC reclaimed
+                      </span>
                     </div>
                     {/* <div className="flex justify-between">
                       <span className="text-neutral-400">Last Activity:</span>
                       <span>{zeraData.data.market.lastActivity}</span>
                     </div> */}
+                    <div className="mt-6">since 10.22.2025</div>
                   </div>
                 </div>
               </div>
@@ -334,13 +339,15 @@ export default function ThePlanGraphic() {
                       <span className="text-green-400">
                         {zeraData.data.auctionHouse.settledAuctions}
                       </span>
-                      <span>/158 auctions settled</span>
+                      <span className="ml-1.5">/ 158 auctions settled</span>
                     </div>
                     <div className="flex justify-center">
                       <span className="text-green-400">
                         {zeraData.data.auctionHouse.reclaimedWETH}
                       </span>
-                      <span>/{ethAmountAuctionHouse} WETH reclaimed</span>
+                      <span className="ml-1.5">
+                        / {ethAmountAuctionHouse} WETH reclaimed
+                      </span>
                     </div>
                     {/* <div className="flex justify-between">
                       <span className="text-neutral-400">Avg Time:</span>
@@ -358,7 +365,7 @@ export default function ThePlanGraphic() {
                         {zeraData.data.auction.successRate}
                       </span>
                     </div> */}
-                    <div className="mt-6">since 10/22/2025</div>
+                    <div className="mt-6">since 10.22.2025</div>
                   </div>
                 </div>
               </div>
@@ -458,28 +465,29 @@ export default function ThePlanGraphic() {
                       <span className="text-green-400">
                         {zeraData.data.nfts.reclaimed}
                       </span>
-                      <span>/3061 NFTs reclaimed</span>
+                      <span className="ml-1.5">/ 3061 NFTs reclaimed</span>
                     </div>
                     <div className="flex justify-center">
                       <span className="text-green-400">
                         {zeraData.data.nfts.uniqueOwners}
                       </span>
-                      <span>/2165 unique creators</span>
+                      <span className="ml-1.5">/ 2165 unique creators</span>
                     </div>
-                    <div className="flex justify-between">
+                    {/* <div className="flex justify-between">
                       <span className="text-neutral-400">Rare Items:</span>
                       <span>5</span>
                     </div>
-                    {/* <div className="flex justify-between">
+                    <div className="flex justify-between">
                       <span className="text-neutral-400">Collections:</span>
                       <span className="text-green-400">
                         {zeraData.data.nfts.collections}
                       </span>
-                    </div> */}
+                    </div>
                     <div className="flex justify-between">
                       <span className="text-neutral-400">Avg Value:</span>
                       <span>0.5 WETH</span>
-                    </div>
+                    </div> */}
+                    <div className="mt-6">since 10.22.2025</div>
                   </div>
                 </div>
               </div>
