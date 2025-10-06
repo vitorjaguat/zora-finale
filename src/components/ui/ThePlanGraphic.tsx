@@ -160,7 +160,7 @@ export default function ThePlanGraphic() {
                   )}
                   {!zeraData.loading && (
                     <div className="mt-1 text-xs text-green-400">
-                      {marketUnlockedPercentage.toFixed(1)}% unlocked
+                      {marketUnlockedPercentage.toFixed(1)}% reclaimed
                     </div>
                   )}
                 </div>
@@ -502,7 +502,7 @@ export default function ThePlanGraphic() {
         onMouseLeave={() => setHoveredCircle(null)}
         className="mt-6 flex cursor-help items-center gap-4"
       >
-        <div className="h-4 w-8 bg-green-400"> </div>
+        <div className="h-[2px] w-8 bg-green-400"> </div>
         <div className="text-sm text-neutral-300">
           <div className="">Assets already reclaimed on ZERA</div>
           <div>(since 10.22.2025)</div>
