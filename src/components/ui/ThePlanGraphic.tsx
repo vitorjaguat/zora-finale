@@ -385,7 +385,7 @@ export default function ThePlanGraphic() {
         >
           {/* Fixed contract link */}
           <Link
-            href="https://etherscan.io/address/0xe468ce99444174bd3bbbed09209577d25d1ad673"
+            href="https://etherscan.io/address/0xe468ce99444174bd3bbbed09209577d25d1ad673#asset-nfts"
             target="_blank"
             rel="noopener noreferrer"
             className="absolute -right-4 bottom-4 z-10 font-light tracking-wider text-neutral-400"
