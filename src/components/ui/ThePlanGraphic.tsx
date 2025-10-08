@@ -213,7 +213,9 @@ export default function ThePlanGraphic() {
                       <span className="text-neutral-400">Last Activity:</span>
                       <span>{zeraData.data.market.lastActivity}</span>
                     </div> */}
-                    <div className="mt-6">since 10.22.2025</div>
+                    <div className="mt-6 text-neutral-500">
+                      since 10.22.2025
+                    </div>
                   </div>
                 </div>
               </div>
@@ -346,7 +348,7 @@ export default function ThePlanGraphic() {
                         {zeraData.data.auctionHouse.reclaimedWETH}
                       </span>
                       <span className="ml-1.5">
-                        / {ethAmountAuctionHouse} WETH reclaimed
+                        / {ethAmountAuctionHouse.toFixed(4)} WETH reclaimed
                       </span>
                     </div>
                     {/* <div className="flex justify-between">
@@ -365,7 +367,9 @@ export default function ThePlanGraphic() {
                         {zeraData.data.auction.successRate}
                       </span>
                     </div> */}
-                    <div className="mt-6">since 10.22.2025</div>
+                    <div className="mt-6 text-neutral-500">
+                      since 10.22.2025
+                    </div>
                   </div>
                 </div>
               </div>
@@ -487,7 +491,9 @@ export default function ThePlanGraphic() {
                       <span className="text-neutral-400">Avg Value:</span>
                       <span>0.5 WETH</span>
                     </div> */}
-                    <div className="mt-6">since 10.22.2025</div>
+                    <div className="mt-6 text-neutral-500">
+                      since 10.22.2025
+                    </div>
                   </div>
                 </div>
               </div>
