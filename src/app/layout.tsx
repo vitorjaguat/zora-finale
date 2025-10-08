@@ -7,13 +7,11 @@ import Providers from "../components/provider/rainbow-provider";
 
 export const metadata: Metadata = {
   title: "ZERA",
-  description:
-    "Check if your Ethereum address owns any tokens (or WETH) on the Zora protocol",
+  description: "Reclaim your assets trapped inside old Zora smart contracts",
   icons: [{ rel: "icon", url: "/assets/zorb-monochrome.svg" }],
   openGraph: {
     title: "ZERA",
-    description:
-      "Check if your Ethereum address owns any tokens (or WETH) on the Zora protocol",
+    description: "Reclaim your assets trapped inside old Zora smart contracts",
     url: "https://zera.uint.studio",
     images: [
       {
@@ -29,8 +27,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "ZERA",
-    description:
-      "Check if your Ethereum address owns any tokens (or WETH) on the Zora protocol",
+    description: "Reclaim your assets trapped inside old Zora smart contracts",
     images: ["/assets/og-image.png"],
   },
 };

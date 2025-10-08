@@ -70,14 +70,14 @@ export default function ThePlan() {
         auctions.{" "}
       </div>
       <div className="font-light">
-        But evolution is relentless. As Zora shifted its orbit - now focused on
+        But evolution is relentless. As Zora shifted its orbit (now focused on
         <span className="ml-1 line-through decoration-2">shitcoins</span>
         <span className="ml-1 line-through decoration-2">memecoins</span>
         <span className="mx-1 line-through decoration-2">contentcoins</span>
-        creatorcoins -, the contracts that once carried this golden age were
+        creatorcoins) the contracts that once carried this golden age were
         abandoned. Hundreds of WETH from past bids - and lots of NFTs - are
         currently escrowed inside those contracts. A buried layer of fungies and
-        non-fungies sealed inside fossilized chests — waiting to be unearthed.
+        non-fungies sealed inside fossilized chests - waiting to be unearthed.
         Until now.
       </div>
 

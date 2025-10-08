@@ -8,10 +8,15 @@ export default function Hero() {
       <div className=""></div>
 
       <div className="">
-        <div className="mb-16 text-8xl">Yours truly,</div>
+        {/* <div className="mb-0 text-base text-neutral-300">Reclaim what’s</div> */}
+        <div className="mb-16 text-6xl">
+          <div className="">Reclaim what’s</div>
+          <div className="">yours, truly.</div>
+        </div>
         <p className="w-1/2 text-xl font-light">
-          Zora deprecated its UI for NFT auctioning and trading, leaving users’
-          assets locked into two smart contracts. Here you can get them back.
+          Zora deprecated its user interface for NFT auctioning and trading on
+          Ethereum mainnet, leaving users’ assets trapped.{" "}
+          <span className="font-bold">Get them back now.</span>
         </p>
         {/* <p className="w-1/2 text-xl font-light tracking-wider">
           Here you can get them back.

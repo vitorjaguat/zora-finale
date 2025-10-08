@@ -28,10 +28,13 @@ export default function Menu() {
   };
 
   return (
-    <div className="pointer-events-none sticky top-0 left-0 z-[60] flex w-full flex-col justify-between pt-8 pl-6 text-neutral-200 mix-blend-difference">
-      <nav className="pointer-events-none flex w-full justify-between pb-6">
-        <div className="w-[104px]"></div> {/* distance for ZERA */}
-        <Link href="#the-plan" className={getLinkClassName("the-plan")}>
+    <div className="pointer-events-none sticky top-0 left-0 z-[60] w-full pt-8 pl-6 text-neutral-200 mix-blend-difference">
+      <nav className="pointer-events-none flex w-full gap-12 pb-6">
+        <div className="w-[80px]"></div> {/* distance for ZERA */}
+        <Link
+          href="#the-plan"
+          className={getLinkClassName("the-plan") + " ml-0"}
+        >
           The Plan
         </Link>
         {/* <Link href="#how-to" className={getLinkClassName("how-to")}>
