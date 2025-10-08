@@ -34,9 +34,9 @@ export default function Menu() {
         <Link href="#the-plan" className={getLinkClassName("the-plan")}>
           The Plan
         </Link>
-        <Link href="#how-to" className={getLinkClassName("how-to")}>
+        {/* <Link href="#how-to" className={getLinkClassName("how-to")}>
           How To
-        </Link>
+        </Link> */}
         <Link
           href="#address-checker"
           className={getLinkClassName("address-checker")}

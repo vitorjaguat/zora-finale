@@ -9,10 +9,7 @@ export default function HowTo() {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <section
-      id="how-to"
-      className="mt-20 flex max-w-1/2 flex-col gap-6 px-6 pt-32 text-neutral-200"
-    >
+    <section className="mt-20 flex max-w-1/2 flex-col gap-6 px-6 pt-32 text-neutral-200">
       {/* Accordion Header */}
       <button
         onClick={() => setIsOpen(!isOpen)}

@@ -15,7 +15,7 @@ export default function HomePage() {
       <Hero />
       <Menu />
       <ThePlan />
-      <HowTo />
+      {/* <HowTo /> */}
       <Sphere />
 
       <div className="z-1 mx-auto flex w-full max-w-5xl flex-col items-center">

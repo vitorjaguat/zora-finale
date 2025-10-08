@@ -7,14 +7,8 @@ export function useActiveSection() {
 
   useEffect(() => {
     // Include hero section but it won't correspond to any menu item
-    const sections = [
-      "hero",
-      "the-plan",
-      "how-to",
-      "address-checker",
-      "donate",
-    ];
-    const menuSections = ["the-plan", "how-to", "address-checker", "donate"]; // Only these have menu items
+    const sections = ["hero", "the-plan", "address-checker", "donate"];
+    const menuSections = ["the-plan", "address-checker", "donate"]; // Only these have menu items
     const observers: IntersectionObserver[] = [];
     let currentActiveSection = "";
 

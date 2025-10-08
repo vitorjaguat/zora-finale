@@ -2,6 +2,9 @@
 import { useRef, useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 import { ConnectButtonCustom } from "./ConnectButton";
+import { BsQuestionCircle } from "react-icons/bs";
+import HowToModal from "./ui/HowToModal";
+import { IoClose } from "react-icons/io5";
 
 interface AddressSearchProps {
   onSubmit: (address: string) => void;
@@ -17,6 +20,7 @@ export function AddressSearch({
   const addressRef = useRef<HTMLInputElement>(null);
   const { address: connectedAddress, isConnected } = useAccount();
   const [hasAutoSubmitted, setHasAutoSubmitted] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Set initial value when component mounts or initialValue changes
   useEffect(() => {
@@ -47,7 +51,16 @@ export function AddressSearch({
   };
 
   return (
-    <div className="z-10 flex flex-col items-center gap-8 rounded-lg border border-neutral-600 bg-neutral-800 p-6">
+    <div className="relative z-10 flex flex-col items-center gap-8 rounded-lg border border-neutral-600 bg-neutral-800 p-6">
+      {/* HowTo link */}
+      <button
+        onClick={() => setIsModalOpen(true)}
+        className="absolute top-3 left-3 flex cursor-pointer items-center gap-3 text-sm text-neutral-200 transition-colors hover:text-white"
+      >
+        <BsQuestionCircle color="#e5e5e5" size={20} />
+      </button>
+
+      {/* Address search */}
       <div className="w-full text-center text-4xl text-neutral-200">
         Address Checker
       </div>
@@ -82,6 +95,37 @@ export function AddressSearch({
           </button>
         </div>
       </div>
+
+      {/* Modal Overlay */}
+      {isModalOpen && (
+        <div
+          className="bg-opacity-50 fixed inset-0 z-[999999999999] flex items-center justify-center bg-black"
+          onClick={() => setIsModalOpen(false)}
+          onScroll={(e) => e.stopPropagation()}
+          onScrollCapture={(e) => e.stopPropagation()}
+        >
+          <div
+            className="relative mx-4 max-h-[80vh] w-full max-w-4xl overflow-y-auto rounded-lg border border-neutral-600 bg-neutral-800 p-8"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close Button */}
+            <button
+              onClick={() => setIsModalOpen(false)}
+              className="absolute top-4 right-4 cursor-pointer text-neutral-400 transition-colors hover:text-white"
+            >
+              <IoClose size={24} />
+            </button>
+
+            {/* Modal Title */}
+            <div className="mb-6 text-2xl text-neutral-200">How To</div>
+
+            {/* Modal Content */}
+            <div className="text-neutral-200">
+              <HowToModal />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
