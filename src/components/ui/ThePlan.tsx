@@ -85,7 +85,7 @@ export default function ThePlan() {
       <ThePlanGraphic />
 
       {/* 2 column text */}
-      <div className="mt-12 grid w-[110%] max-sm:w-full flex-1 grid-cols-2 gap-16 pr-6 max-sm:px-2 max-sm:flex max-sm:flex-col">
+      <div className="mt-12 grid w-[110%] max-sm:w-full flex-1 grid-cols-2 gap-16 max-sm:gap-6 pr-6 max-sm:px-2 max-sm:flex max-sm:flex-col">
         <div className="flex-1 space-y-2">
           <div className="text-lg">FUNDS ARE SAFU 🙏</div>
           <div className="text-sm font-light">

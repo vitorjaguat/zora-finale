@@ -1,9 +1,11 @@
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useEthPrice } from "@/hooks/useEthPrice";
 import { useZeraUnlocked } from "@/hooks/useZeraUnlocked";
+import { useIsMobile } from "@/hooks/useIsMobile";
 
 export default function ThePlanGraphic() {
+  const isMobile = useIsMobile();
   const { usd: ethPrice, loading, error } = useEthPrice();
   const zeraData = useZeraUnlocked();
   const [hoveredCircle, setHoveredCircle] = useState<string | null>(null);
@@ -16,6 +18,15 @@ export default function ThePlanGraphic() {
   const ethAmountAuctionHouse = 13.52559704;
   const usdValueAuctionHouse = ethAmountAuctionHouse * ethPrice;
   const totalNFTs = 3061;
+
+  // Mobile flipping logic
+  useEffect(() => {
+    if (!isMobile) return;
+    const interval = setInterval(() => {
+      setHoveredCircle((prev) => (prev !== "all" ? "all" : null));
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [isMobile]);
 
   // Detailed data for flip sides (using real data from the API)
   //   const detailedData = {
@@ -71,8 +82,8 @@ export default function ThePlanGraphic() {
         {/* Market contract */}
         <div
           className="perspective-1000 relative h-72 w-72 flex-shrink-0  max-sm:mb-4 "
-          onMouseEnter={() => setHoveredCircle("market")}
-          onMouseLeave={() => setHoveredCircle(null)}
+          onMouseEnter={isMobile ? undefined : () => setHoveredCircle("market")}
+          onMouseLeave={isMobile ? undefined : () => setHoveredCircle(null)}
           style={{ perspective: "1000px" }}
         >
           {/* Fixed contract link */}
@@ -226,8 +237,10 @@ export default function ThePlanGraphic() {
         {/* Auction contract */}
         <div
           className="perspective-1000 relative h-72 w-72 flex-shrink-0 max-sm:mb-4"
-          onMouseEnter={() => setHoveredCircle("auction")}
-          onMouseLeave={() => setHoveredCircle(null)}
+          onMouseEnter={
+            isMobile ? undefined : () => setHoveredCircle("auction")
+          }
+          onMouseLeave={isMobile ? undefined : () => setHoveredCircle(null)}
           style={{ perspective: "1000px" }}
         >
           {/* Fixed contract link */}
@@ -383,8 +396,8 @@ export default function ThePlanGraphic() {
         {/* NFTs locked */}
         <div
           className="perspective-1000 relative h-72 w-72 flex-shrink-0 "
-          onMouseEnter={() => setHoveredCircle("nfts")}
-          onMouseLeave={() => setHoveredCircle(null)}
+          onMouseEnter={isMobile ? undefined : () => setHoveredCircle("nfts")}
+          onMouseLeave={isMobile ? undefined : () => setHoveredCircle(null)}
           style={{ perspective: "1000px" }}
         >
           {/* Fixed contract link */}
@@ -504,9 +517,9 @@ export default function ThePlanGraphic() {
 
       {/* CAPTION */}
       <div
-        onMouseEnter={() => setHoveredCircle("all")}
-        onMouseLeave={() => setHoveredCircle(null)}
-        className="mt-6 flex cursor-help items-center max-sm:px-2 gap-4  max-sm:gap-4 max-sm:mt-16"
+        onMouseEnter={isMobile ? undefined : () => setHoveredCircle("all")}
+        onMouseLeave={isMobile ? undefined : () => setHoveredCircle(null)}
+        className="mt-6 flex cursor-help items-center max-sm:px-2 gap-4  max-sm:gap-4 max-sm:mt-8"
       >
         <div className="h-[2px] w-8 bg-green-400 max-sm:w-8"> </div>
         <div className="text-sm text-neutral-300 max-sm:text-xs">
