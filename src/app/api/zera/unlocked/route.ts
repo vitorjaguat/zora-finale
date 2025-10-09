@@ -35,7 +35,7 @@ export async function GET() {
     const reclaimedWETHResult = await db
       .select({ total: sum(bids.amountFormatted) })
       .from(bids)
-      .where(sql`${bids.isActive} = false AND ${bids.currencySymbol} = 'ETH'`);
+      .where(sql`${bids.isActive} = false AND ${bids.currencySymbol} = 'WETH'`);
     const reclaimedWETH = Number(reclaimedWETHResult[0]?.total ?? 0);
 
     // Query 3: Sum of reclaimed DAI from inactive bids

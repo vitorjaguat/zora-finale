@@ -200,7 +200,7 @@ export default function ThePlanGraphic() {
                     </div>
                     <div className="flex justify-center text-center">
                       <span className="text-green-400">
-                        {zeraData.data.market.reclaimedWETH}
+                        {zeraData.data.market.reclaimedWETH.toFixed(4)}
                       </span>
                       <span className="ml-1.5">/ 144.0497 WETH reclaimed</span>
                     </div>
