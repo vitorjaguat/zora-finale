@@ -44,7 +44,7 @@ export default function CheckAddress() {
   return (
     <section
       id="address-checker"
-      className="z-10 mx-auto mt-0 flex w-full max-w-7xl flex-col items-stretch gap-12 pt-56"
+      className="z-10 mx-auto mt-0 flex w-full max-w-7xl flex-col items-stretch gap-12 pt-56 max-sm:pt-28"
     >
       <AddressSearch
         onSubmit={handleSubmit}

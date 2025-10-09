@@ -1,4 +1,16 @@
 @import "tailwindcss";
+
+@theme {
+  /* --breakpoint-*: initial;
+  --breakpoint-tablet: 40rem;
+  --breakpoint-laptop: 64rem;
+  --breakpoint-desktop: 80rem; */
+
+  /* Desktop-first (max-width) breakpoints */
+  /* --breakpoint-tab: max-width: 63.9375rem; 
+  --breakpoint-mob: max-width: 47.9375rem;  */
+}
+
 /* @import "tw-animate-css"; */
 
 /* @custom-variant dark (&:is(.dark *));

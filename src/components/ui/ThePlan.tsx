@@ -8,16 +8,16 @@ export default function ThePlan() {
   return (
     <section
       id="the-plan"
-      className="mt-20 flex max-w-1/2 flex-col gap-6 px-6 pt-32 text-neutral-200"
+      className="mt-20 flex max-w-1/2 flex-col gap-6 px-6 pt-32 max-sm:pt-8 text-neutral-200 max-sm:max-w-[100vw] max-sm:px-0"
     >
       {/* Intro text */}
-      <div className="text-4xl">The Plan</div>
-      <div className="font-light">
+      <div className="text-4xl  max-sm:px-2">The Plan</div>
+      <div className="font-light max-sm:px-2">
         Web3 doesn’t stand still: it evolves, it mutates, it leaves fossils
         behind. Nonetheless, blockchains are immutable record-stating memory
         machines.{" "}
       </div>
-      <div className="font-light">
+      <div className="font-light max-sm:px-2">
         Zora emerged on the New Year’s Eve of 2020 as a new place for collective
         value capture on the Internet. Beyond just another media platform, it
         became one of the great places for NFT creation and circulation. The
@@ -69,7 +69,7 @@ export default function ThePlan() {
         </Link>{" "}
         auctions.{" "}
       </div>
-      <div className="font-light">
+      <div className="font-light max-sm:px-2">
         But evolution is relentless. As Zora shifted its orbit (now focused on
         <span className="ml-1 line-through decoration-2">shitcoins</span>
         <span className="ml-1 line-through decoration-2">memecoins</span>
@@ -85,7 +85,7 @@ export default function ThePlan() {
       <ThePlanGraphic />
 
       {/* 2 column text */}
-      <div className="mt-12 grid w-[110%] flex-1 grid-cols-2 gap-16 pr-6">
+      <div className="mt-12 grid w-[110%] max-sm:w-full flex-1 grid-cols-2 gap-16 pr-6 max-sm:px-2 max-sm:flex max-sm:flex-col">
         <div className="flex-1 space-y-2">
           <div className="text-lg">FUNDS ARE SAFU 🙏</div>
           <div className="text-sm font-light">
@@ -95,7 +95,7 @@ export default function ThePlan() {
             enabling you to recover your assets.
           </div>
         </div>
-        <div className="flex-1 space-y-2 text-right">
+        <div className="flex-1 space-y-2 max-sm:text-left text-right">
           <div className="text-lg">GET YOUR ASSETS BACK!</div>
           <div className="text-sm font-light">
             As artists and developers ourselves, we think that it’s important

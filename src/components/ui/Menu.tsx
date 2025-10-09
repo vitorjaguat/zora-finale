@@ -28,12 +28,12 @@ export default function Menu() {
   };
 
   return (
-    <div className="pointer-events-none sticky top-0 left-0 z-[60] w-full pt-8 pl-6 text-neutral-200 mix-blend-difference">
-      <nav className="pointer-events-none flex w-full gap-12 pb-6">
-        <div className="w-[80px]"></div> {/* distance for ZERA */}
+    <div className="pointer-events-none sticky top-0 left-0 z-[60] w-full pt-8 pl-6 max-sm:pl-2 text-neutral-200 mix-blend-difference max-sm:order-first max-sm:pt-8">
+      <nav className="pointer-events-none flex w-full gap-12 pb-6 max-sm:pb-0 max-sm:text-sm max-sm:whitespace-nowrap max-sm:gap-1 max-sm:flex-col">
+        <div className="w-[80px] max-sm:hidden"></div> {/* distance for ZERA */}
         <Link
           href="#the-plan"
-          className={getLinkClassName("the-plan") + " ml-0"}
+          className={getLinkClassName("the-plan") + " ml-0 max-sm:hidden"}
         >
           The Plan
         </Link>
@@ -42,14 +42,14 @@ export default function Menu() {
         </Link> */}
         <Link
           href="#address-checker"
-          className={getLinkClassName("address-checker")}
+          className={getLinkClassName("address-checker") + " max-sm:pt-1"}
         >
           Address Checker
         </Link>
         <Link href="#donate" className={getLinkClassName("donate")}>
           Donate
         </Link>
-        <div className="pointer-events-none h-4 w-[440px]"></div>
+        <div className="pointer-events-none h-4 w-[440px] max-sm:hidden"></div>
         {/* distance for Sphere component */}
       </nav>
     </div>

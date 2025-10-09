@@ -65,12 +65,12 @@ export default function ThePlanGraphic() {
   };
 
   return (
-    <div className="mt-11 flex flex-col items-center gap-0">
+    <div className="mt-11 flex flex-col items-center gap-0 max-sm:gap-6 max-sm:mt-4 max-sm:max-w-[100vw]">
       {/* First row - 2 items */}
-      <div className="flex justify-evenly gap-6">
+      <div className="flex justify-evenly gap-6 max-sm:flex-col max-sm:items-center max-sm:gap-6 max-sm:max-w-[100vw]">
         {/* Market contract */}
         <div
-          className="perspective-1000 relative h-72 w-72 flex-shrink-0"
+          className="perspective-1000 relative h-72 w-72 flex-shrink-0  max-sm:mb-4 "
           onMouseEnter={() => setHoveredCircle("market")}
           onMouseLeave={() => setHoveredCircle(null)}
           style={{ perspective: "1000px" }}
@@ -225,7 +225,7 @@ export default function ThePlanGraphic() {
 
         {/* Auction contract */}
         <div
-          className="perspective-1000 relative h-72 w-72 flex-shrink-0"
+          className="perspective-1000 relative h-72 w-72 flex-shrink-0 max-sm:mb-4"
           onMouseEnter={() => setHoveredCircle("auction")}
           onMouseLeave={() => setHoveredCircle(null)}
           style={{ perspective: "1000px" }}
@@ -379,10 +379,10 @@ export default function ThePlanGraphic() {
       </div>
 
       {/* Second row - 1 item centered */}
-      <div className="flex flex-col items-center justify-center gap-6">
+      <div className="flex flex-col items-center justify-center gap-6 max-sm:gap-4">
         {/* NFTs locked */}
         <div
-          className="perspective-1000 relative h-72 w-72 flex-shrink-0"
+          className="perspective-1000 relative h-72 w-72 flex-shrink-0 "
           onMouseEnter={() => setHoveredCircle("nfts")}
           onMouseLeave={() => setHoveredCircle(null)}
           style={{ perspective: "1000px" }}
@@ -506,10 +506,10 @@ export default function ThePlanGraphic() {
       <div
         onMouseEnter={() => setHoveredCircle("all")}
         onMouseLeave={() => setHoveredCircle(null)}
-        className="mt-6 flex cursor-help items-center gap-4"
+        className="mt-6 flex cursor-help items-center max-sm:px-2 gap-4  max-sm:gap-4 max-sm:mt-16"
       >
-        <div className="h-[2px] w-8 bg-green-400"> </div>
-        <div className="text-sm text-neutral-300">
+        <div className="h-[2px] w-8 bg-green-400 max-sm:w-8"> </div>
+        <div className="text-sm text-neutral-300 max-sm:text-xs">
           <div className="">Assets already reclaimed on ZERA</div>
           <div>(since 10.22.2025)</div>
         </div>

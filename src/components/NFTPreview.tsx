@@ -37,12 +37,14 @@ export function NFTPreview({
   /* eslint-enable @typescript-eslint/prefer-nullish-coalescing */
 
   return (
-    <div className="flex gap-3 bg-white/5">
+    <div className="flex gap-3 max-sm:gap-2 bg-white/5 max-sm:flex-col max-sm:items-center">
       <NFTPreviewMedia
         nftData={nftData}
         id={id}
         loading={loading}
-        className={className}
+        className={
+          className + " max-sm:w-full max-sm:aspect-square max-sm:flex-1"
+        }
       />
 
       {loading ? (
@@ -54,7 +56,7 @@ export function NFTPreview({
           <span className="text-red-400">Error: {error}</span>
         </div>
       ) : (
-        <div className="flex flex-col justify-end gap-2 pr-3 pb-3 text-xs">
+        <div className="flex flex-col justify-end gap-2 pr-3 pb-3 text-xs max-sm:px-2 max-sm:w-full">
           {nftTitle && (
             <div className="font-semibold text-neutral-200">
               {nftTitle as React.ReactNode}
@@ -66,7 +68,7 @@ export function NFTPreview({
             </div>
           )}
           <div className="text-neutral-400">Token ID: {nftData?.tokenId}</div>
-          <div className="text-neutral-400">
+          <div className="text-neutral-400 ">
             Token Contract:{" "}
             <AddressDisplay
               className="inline items-end! text-xs"

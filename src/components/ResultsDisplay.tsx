@@ -125,72 +125,78 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
   }, [resultWithMetadata?.fetchMetadata1]);
 
   return (
-    <div className="flex w-full flex-col gap-12">
+    <div className="flex w-full flex-col gap-12 max-sm:gap-6">
       {/* BREAKDOWN */}
-      <div className="flex w-full flex-col gap-6">
+      <div className="flex w-full flex-col gap-6 max-sm:gap-3">
         {/* Breakdown Header */}
-        <div className="flex w-full items-center justify-center gap-3">
+        <div className="flex w-full items-center justify-center gap-3 max-sm:gap-1">
           <HiArrowTurnLeftDown
             color="white"
             className="translate-y-1.5"
             size={24}
           />
-          <div className="text-2xl text-white">Breakdown</div>
+          <div className="text-2xl text-white max-sm:text-lg">Breakdown</div>
           <HiArrowTurnRightDown
             color="white"
             className="translate-y-1.5"
             size={24}
           />
         </div>
-        <div className="flex w-full gap-4">
+        <div className="flex w-full gap-4 max-sm:flex-row max-sm:gap-1">
           {/* ActiveBids breakdown */}
-          <div className="mb-4 flex-1 rounded-lg border border-neutral-600 bg-neutral-800 p-6">
-            <h2 className="mb-4 text-xl font-semibold text-neutral-200">
+          <div className="mb-4 flex-1 rounded-lg border border-neutral-600 bg-neutral-800 p-6 max-sm:p-3">
+            <h2 className="mb-4 text-xl font-semibold text-neutral-200 max-sm:text-sm">
               Found {result.bids?.bidsCount ?? 0} bid
               {(result.bids?.bidsCount ?? 0) !== 1 ? "s" : ""} for{" "}
               <AddressDisplay address={result.address} />
             </h2>
 
             {/* Active Bids */}
-            <div className="mb-4">
-              <h3 className="mb-2 text-lg font-medium text-green-400">
+            <div className="mb-4 max-sm:text-sm">
+              <h3 className="mb-2 text-lg max-sm:text-sm font-medium text-green-400 max-sm:uppercase">
                 Active Bids
               </h3>
-              <div className="grid grid-cols-1 gap-4 text-sm md:grid-cols-2">
-                <div className="rounded bg-neutral-700 p-3">
-                  <div className="font-semibold text-green-400">
+              <div className="grid grid-cols-1 gap-4 text-sm md:grid-cols-2 max-sm:gap-2">
+                <div className="rounded bg-neutral-700 p-3 max-sm:p-0 max-sm:bg-transparent max-sm:flex max-sm:justify-between">
+                  <div className="font-semibold max-sm:font-normal text-green-400 max-sm:inline">
                     As Token Owner
                   </div>
-                  <div className="text-lg text-neutral-200">
+                  <div className="text-lg max-sm:text-sm max-sm:inline text-neutral-200 max-sm:ml-2">
                     {result.bids?.breakdown?.active?.asTokenOwner ?? 0}
                   </div>
                 </div>
-                <div className="rounded bg-neutral-700 p-3">
-                  <div className="font-semibold text-purple-400">As Bidder</div>
-                  <div className="text-lg text-neutral-200">
+                <div className="rounded bg-neutral-700 p-3 max-sm:p-0 max-sm:bg-transparent max-sm:flex max-sm:justify-between">
+                  <div className="font-semibold max-sm:font-normal text-purple-400">
+                    As Bidder
+                  </div>
+                  <div className="text-lg max-sm:text-sm text-neutral-200">
                     {result.bids?.breakdown?.active?.asBidder ?? 0}
                   </div>
                 </div>
               </div>
             </div>
 
+            <div className="h-[1px] bg-neutral-500 w-full sm:hidden mb-3" />
+
             {/* Settled Bids */}
             <div>
-              <h3 className="mb-2 text-lg font-medium text-neutral-300">
+              <h3 className="mb-2 text-lg font-medium text-neutral-300 max-sm:text-sm max-sm:uppercase">
                 Settled Bids
               </h3>
-              <div className="grid grid-cols-1 gap-4 text-sm md:grid-cols-2">
-                <div className="rounded bg-neutral-700 p-3">
-                  <div className="font-semibold text-green-400">
+              <div className="grid grid-cols-1 gap-4 text-sm md:grid-cols-2 max-sm:gap-2">
+                <div className="rounded bg-neutral-700 p-3 max-sm:p-0 max-sm:bg-transparent max-sm:flex max-sm:justify-between">
+                  <div className="font-semibold max-sm:font-normal text-green-400">
                     As Token Owner
                   </div>
-                  <div className="text-lg text-neutral-200">
+                  <div className="text-lg max-sm:text-sm text-neutral-200">
                     {result.bids?.breakdown?.settled?.asTokenOwner ?? 0}
                   </div>
                 </div>
-                <div className="rounded bg-neutral-700 p-3">
-                  <div className="font-semibold text-purple-400">As Bidder</div>
-                  <div className="text-lg text-neutral-200">
+                <div className="rounded bg-neutral-700 p-3 max-sm:p-0 max-sm:bg-transparent max-sm:flex max-sm:justify-between">
+                  <div className="font-semibold max-sm:font-normal text-purple-400">
+                    As Bidder
+                  </div>
+                  <div className="text-lg text-neutral-200 max-sm:text-sm">
                     {result.bids?.breakdown?.settled?.asBidder ?? 0}
                   </div>
                 </div>
@@ -198,8 +204,8 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
             </div>
           </div>
           {/* Auctions breakdown */}
-          <div className="mb-4 flex-1 rounded-lg border border-neutral-600 bg-neutral-800 p-6">
-            <h2 className="mb-4 text-xl font-semibold text-neutral-200">
+          <div className="mb-4 flex-1 rounded-lg border border-neutral-600 bg-neutral-800 p-6 max-sm:p-3">
+            <h2 className="mb-4 text-xl font-semibold text-neutral-200 max-sm:text-sm">
               Found {result.auctionCount} auction
               {result.auctionCount !== 1 ? "s" : ""} for{" "}
               <AddressDisplay address={result.address} />
@@ -207,56 +213,66 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
 
             {/* Active Auctions */}
             <div className="mb-4">
-              <h3 className="mb-2 text-lg font-medium text-green-400">
+              <h3 className="mb-2 text-lg max-sm:text-sm max-sm:uppercase font-medium text-green-400">
                 Active Auctions
               </h3>
-              <div className="grid grid-cols-1 gap-4 text-sm md:grid-cols-3">
-                <div className="rounded bg-neutral-700 p-3">
-                  <div className="font-semibold text-green-400">
+              <div className="grid grid-cols-1 gap-4 text-sm md:grid-cols-3 max-sm:gap-2">
+                <div className="rounded bg-neutral-700 p-3 max-sm:p-0 max-sm:bg-transparent max-sm:flex max-sm:justify-between">
+                  <div className="font-semibold max-sm:font-normal text-green-400">
                     As Token Owner
                   </div>
-                  <div className="text-lg text-neutral-200">
+                  <div className="text-lg max-sm:text-sm text-neutral-200">
                     {result.breakdown?.active?.asTokenOwner ?? 0}
                   </div>
                 </div>
-                <div className="rounded bg-neutral-700 p-3">
-                  <div className="font-semibold text-blue-400">As Curator</div>
-                  <div className="text-lg text-neutral-200">
+                <div className="rounded bg-neutral-700 p-3 max-sm:p-0 max-sm:bg-transparent max-sm:flex max-sm:justify-between">
+                  <div className="font-semibold max-sm:font-normal text-blue-400">
+                    As Curator
+                  </div>
+                  <div className="text-lg max-sm:text-sm text-neutral-200">
                     {result.breakdown?.active?.asCurator ?? 0}
                   </div>
                 </div>
-                <div className="rounded bg-neutral-700 p-3">
-                  <div className="font-semibold text-purple-400">As Bidder</div>
-                  <div className="text-lg text-neutral-200">
+                <div className="rounded bg-neutral-700 p-3 max-sm:p-0 max-sm:bg-transparent max-sm:flex max-sm:justify-between">
+                  <div className="font-semibold max-sm:font-normal text-purple-400">
+                    As Bidder
+                  </div>
+                  <div className="text-lg max-sm:text-sm text-neutral-200">
                     {result.breakdown?.active?.asBidder ?? 0}
                   </div>
                 </div>
               </div>
             </div>
 
+            <div className="h-[1px] bg-neutral-500 w-full sm:hidden mb-3" />
+
             {/* Settled Auctions */}
             <div>
-              <h3 className="mb-2 text-lg font-medium text-neutral-300">
+              <h3 className="mb-2 text-lg font-medium text-neutral-300 max-sm:text-sm max-sm:uppercase">
                 Settled Auctions
               </h3>
-              <div className="grid grid-cols-1 gap-4 text-sm md:grid-cols-3">
-                <div className="rounded bg-neutral-700 p-3">
-                  <div className="font-semibold text-green-400">
+              <div className="grid grid-cols-1 gap-4 text-sm md:grid-cols-3 max-sm:gap-2 ">
+                <div className="rounded bg-neutral-700 p-3 max-sm:p-0 max-sm:bg-transparent max-sm:flex max-sm:justify-between">
+                  <div className="font-semibold max-sm:font-normal text-green-400">
                     As Token Owner
                   </div>
-                  <div className="text-lg text-neutral-200">
+                  <div className="text-lg max-sm:text-sm text-neutral-200">
                     {result.breakdown?.settled?.asTokenOwner ?? 0}
                   </div>
                 </div>
-                <div className="rounded bg-neutral-700 p-3">
-                  <div className="font-semibold text-blue-400">As Curator</div>
-                  <div className="text-lg text-neutral-200">
+                <div className="rounded bg-neutral-700 p-3 max-sm:p-0 max-sm:bg-transparent max-sm:flex max-sm:justify-between">
+                  <div className="font-semibold max-sm:font-normal text-blue-400">
+                    As Curator
+                  </div>
+                  <div className="text-lg max-sm:text-sm text-neutral-200">
                     {result.breakdown?.settled?.asCurator ?? 0}
                   </div>
                 </div>
-                <div className="rounded bg-neutral-700 p-3">
-                  <div className="font-semibold text-purple-400">As Bidder</div>
-                  <div className="text-lg text-neutral-200">
+                <div className="rounded bg-neutral-700 p-3 max-sm:p-0 max-sm:bg-transparent max-sm:flex max-sm:justify-between">
+                  <div className="font-semibold max-sm:font-normal text-purple-400">
+                    As Bidder
+                  </div>
+                  <div className="text-lg max-sm:text-sm text-neutral-200">
                     {result.breakdown?.settled?.asBidder ?? 0}
                   </div>
                 </div>
@@ -290,12 +306,27 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
 
       {/* Results */}
       <div className="">
-        <div className="mb-3 grid grid-cols-3 gap-3 text-2xl text-neutral-200">
-          <div className="flex items-center gap-2">
+        {/* Show only active MOBILE */}
+        <div className="flex items-end justify-center sm:hidden text-sm mb-6">
+          <label className="flex cursor-pointer items-center gap-2">
+            <input
+              type="checkbox"
+              checked={showOnlyActive}
+              onChange={(e) => setShowOnlyActive(e.target.checked)}
+              className="custom-checkbox h-3 w-3 rounded border-neutral-400 bg-neutral-700"
+            />
+            <span className="text-neutral-200">Show only active</span>
+          </label>
+        </div>
+
+        {/* Cards Header (bids-> auctions->) */}
+        <div className="mb-3 grid grid-cols-3 gap-3 text-2xl text-neutral-200 max-sm:grid-cols-1 max-sm:gap-2 max-sm:text-base max-sm:flex">
+          <div className="flex items-center gap-2 max-sm:justify-center max-sm:w-full">
             <h2>Bids</h2>
             <HiArrowTurnRightDown className="translate-y-1.5 text-neutral-200" />
           </div>
-          <div className="flex items-end justify-center text-sm">
+          {/* Show only active DESKTOP */}
+          <div className="flex items-end justify-center text-sm max-sm:hidden">
             <label className="flex cursor-pointer items-center gap-2">
               <input
                 type="checkbox"
@@ -306,17 +337,17 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
               <span className="text-neutral-200">Show only active</span>
             </label>
           </div>
-          <div className="flex w-full items-center justify-end gap-2 text-right">
+          <div className="flex w-full items-center justify-end gap-2 text-right max-sm:hidden">
             <HiArrowTurnLeftDown className="translate-y-1.5 text-neutral-200" />
             <h2>Auctions</h2>
           </div>
         </div>
-        <div className="grid min-h-0 grid-cols-2 gap-6">
+        <div className="grid min-h-0 grid-cols-2 gap-6 max-sm:grid-cols-1 max-sm:gap-3 max-sm:px-2">
           {/* Left Column - Active Bids */}
-          <div className="w-full">
+          <div className="w-full max-sm:mb-3">
             {filteredBids && filteredBids.length === 0 ? (
-              <div className="rounded-lg border border-neutral-600 bg-neutral-800 p-6">
-                <h2 className="mb-4 text-xl font-semibold text-neutral-200">
+              <div className="rounded-lg border border-neutral-600 bg-neutral-800 p-6 max-sm:p-3">
+                <h2 className="mb-4 text-xl font-semibold text-neutral-200 max-sm:text-sm">
                   {showOnlyActive ? "No active bids found" : "No bids found"}{" "}
                   for <AddressDisplay address={result.address} />
                 </h2>
@@ -327,7 +358,7 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
                 </p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 gap-6">
+              <div className="grid grid-cols-1 gap-6 max-sm:gap-3">
                 {resultWithMetadata
                   ? filteredBids?.map((bid) => (
                       <BidCard
@@ -344,8 +375,8 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
           {/* Right Column - Auctions */}
           <div className="w-full">
             {filteredAuctions.length === 0 ? (
-              <div className="rounded-lg border border-neutral-600 bg-neutral-800 p-6">
-                <h2 className="mb-4 text-xl font-semibold text-neutral-200">
+              <div className="rounded-lg border border-neutral-600 bg-neutral-800 p-6 max-sm:p-3">
+                <h2 className="mb-4 text-xl font-semibold text-neutral-200 max-sm:text-sm">
                   {showOnlyActive
                     ? "No active auctions found"
                     : "No auctions found"}{" "}
@@ -358,7 +389,7 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
                 </p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 gap-6">
+              <div className="grid grid-cols-1 gap-6 max-sm:gap-3">
                 {resultWithMetadata
                   ? filteredAuctions.map((auction) => (
                       <AuctionCard

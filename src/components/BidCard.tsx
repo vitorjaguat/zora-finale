@@ -233,8 +233,8 @@ export default function BidCard({
   // console.dir(bid.metadata);
 
   return (
-    <div className="flex justify-stretch gap-3 overflow-hidden rounded bg-neutral-700/90 duration-200 hover:bg-neutral-700/100">
-      <div className="flex w-full flex-col gap-3 p-3 pr-0">
+    <div className="flex justify-stretch gap-3 overflow-hidden rounded bg-neutral-700/90 duration-200 hover:bg-neutral-700/100 max-sm:bg-neutral-700 max-sm:border max-sm:border-neutral-500">
+      <div className="flex w-full flex-col gap-3 p-3 pr-0 max-sm:p-2">
         {/* NFT PREVIEW */}
         <NFTPreview
           id={bid.tokenId}
@@ -245,7 +245,7 @@ export default function BidCard({
         <div className="flex h-full min-h-[100px] items-stretch">
           {/* COL 1 - Bid Content */}
           <div className="flex flex-1 flex-col justify-center">
-            <div className="pb-5 font-semibold text-neutral-200">
+            <div className="pb-5 max-sm:pb-2 max-sm:pt-2 font-semibold text-neutral-200">
               Token #{bid.tokenId}
             </div>
             <div className="space-y-1 space-x-3 pr-10 text-sm text-neutral-400">
@@ -475,7 +475,12 @@ export default function BidCard({
         )}
       </div>
       {/* COLOR BAR */}
-      <div className={cn("h-full max-w-2 min-w-2", getColorBarColor())} />
+      <div
+        className={cn(
+          "h-full max-w-2 min-w-2 max-sm:hidden",
+          getColorBarColor(),
+        )}
+      />
     </div>
   );
 }

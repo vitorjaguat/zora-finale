@@ -5,6 +5,7 @@ import { ConnectButtonCustom } from "./ConnectButton";
 import { BsQuestionCircle } from "react-icons/bs";
 import HowToModal from "./ui/HowToModal";
 import { IoClose } from "react-icons/io5";
+import { useIsMobile } from "@/hooks/useIsMobile";
 
 interface AddressSearchProps {
   onSubmit: (address: string) => void;
@@ -21,6 +22,7 @@ export function AddressSearch({
   const { address: connectedAddress, isConnected } = useAccount();
   const [hasAutoSubmitted, setHasAutoSubmitted] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const isMobile = useIsMobile();
 
   // Set initial value when component mounts or initialValue changes
   useEffect(() => {
@@ -51,23 +53,23 @@ export function AddressSearch({
   };
 
   return (
-    <div className="relative z-10 flex flex-col items-center gap-8 rounded-lg border border-neutral-600 bg-neutral-800 p-6">
+    <div className="relative z-10 flex flex-col items-center gap-8 rounded-lg max-sm:rounded-none max-sm:border-x-0 border border-neutral-600 bg-neutral-800 p-6 max-sm:gap-4 max-sm:pt-8 max-sm:px-2 max-sm:w-full max-sm:pb-10">
       {/* HowTo link */}
       <button
         onClick={() => setIsModalOpen(true)}
         className="absolute top-3 left-3 flex cursor-pointer items-center gap-3 text-sm text-neutral-200 transition-colors hover:text-white"
       >
-        <BsQuestionCircle color="#e5e5e5" size={20} />
+        <BsQuestionCircle color="#e5e5e5" size={isMobile ? 16 : 20} />
       </button>
 
       {/* Address search */}
-      <div className="w-full text-center text-4xl text-neutral-200">
+      <div className="w-full text-center text-4xl text-neutral-200 max-sm:text-2xl max-sm:mb-4">
         Address Checker
       </div>
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-4 max-sm:gap-8 max-sm:w-full">
         <input
           ref={addressRef}
-          className="w-2xl max-w-full rounded-lg bg-neutral-700 px-4 py-2.5 text-center text-white outline-0"
+          className="w-2xl max-w-full rounded-lg bg-neutral-700 px-4 py-2.5 text-center text-white outline-0 max-sm:w-full max-sm:max-w-none max-sm:text-xs max-sm:py-2"
           type="text"
           name="address"
           id="address"
@@ -77,10 +79,10 @@ export function AddressSearch({
           defaultValue={initialValue}
         />
 
-        <div className="flex w-2xl gap-4">
+        <div className="flex w-2xl gap-4 max-sm:flex-col max-sm:w-full max-sm:gap-2">
           {/* Connect Wallet Button */}
           <ConnectButtonCustom
-            className="w-full flex-1 cursor-pointer rounded-lg bg-neutral-300 px-4 py-2.5 tracking-wider text-black uppercase duration-300 ease-out hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
+            className="w-full flex-1 cursor-pointer rounded-lg bg-neutral-300 px-4 py-2.5 tracking-wider text-black uppercase duration-300 ease-out hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-50 max-sm:text-sm max-sm:py-2"
             text={loading ? "Connecting..." : "CONNECT WALLET"}
             isSearch
           />
@@ -89,7 +91,7 @@ export function AddressSearch({
           <button
             onClick={handleSubmit}
             disabled={loading}
-            className="flex-1 cursor-pointer rounded-lg bg-neutral-300 px-4 py-2.5 tracking-wider uppercase duration-300 ease-out hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex-1 cursor-pointer rounded-lg bg-neutral-300 px-4 py-2.5 tracking-wider uppercase duration-300 ease-out hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-50 max-sm:text-sm max-sm:py-2"
           >
             {loading ? "Checking..." : "Check Another Address"}
           </button>
@@ -105,7 +107,7 @@ export function AddressSearch({
           onScrollCapture={(e) => e.stopPropagation()}
         >
           <div
-            className="relative mx-4 max-h-[80vh] w-full max-w-4xl overflow-y-auto rounded-lg border border-neutral-600 bg-neutral-800 p-8"
+            className="relative mx-4 max-h-[80vh] w-full max-w-4xl overflow-y-auto rounded-lg border border-neutral-600 bg-neutral-800 p-8 max-sm:p-3 max-sm:max-w-xs"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Close Button */}
@@ -117,7 +119,9 @@ export function AddressSearch({
             </button>
 
             {/* Modal Title */}
-            <div className="mb-6 text-2xl text-neutral-200">How To</div>
+            <div className="mb-6 text-2xl text-neutral-200 max-sm:text-lg">
+              How To
+            </div>
 
             {/* Modal Content */}
             <div className="text-neutral-200">
