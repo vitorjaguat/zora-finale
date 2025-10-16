@@ -447,13 +447,18 @@ export default function BidCard({
             {(error ?? writeError) && (
               <div className="bg-red-900/50 p-2 text-xs text-red-200">
                 <strong>Error:</strong>{" "}
-                {error ?? writeError?.message ?? "An error occurred"}
-                <button
+                {error ??
+                  writeError?.message?.slice(
+                    0,
+                    writeError?.message?.indexOf("."),
+                  ) ??
+                  "An error occurred"}
+                {/* <button
                   onClick={reset}
                   className="ml-2 cursor-pointer underline hover:no-underline"
                 >
                   Retry
-                </button>
+                </button> */}
               </div>
             )}
 
