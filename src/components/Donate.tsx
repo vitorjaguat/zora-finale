@@ -28,9 +28,8 @@ export default function Donate() {
           cryptomedia scene.
         </div>
         <div className="font-light max-sm:text-sm max-sm:text-center">
-          If you managed to reclaim your funds that were stuck at Zora Media and
-          Zora Auction House smart contracts, please consider making a donation
-          to
+          If you managed to reclaim assets that were trapped into Zora, please
+          consider making a donation to
         </div>
         <div className="max-sm:flex max-sm:justify-center">
           <AddressDisplay

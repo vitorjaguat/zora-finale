@@ -57,7 +57,8 @@ export function AddressSearch({
       {/* HowTo link */}
       <button
         onClick={() => setIsModalOpen(true)}
-        className="absolute top-3 left-3 flex cursor-pointer items-center gap-3 text-sm text-neutral-200 transition-colors hover:text-white"
+        className="absolute top-3 left-3 flex items-center gap-3 text-sm text-neutral-200 transition-colors hover:text-white cursor-help"
+        title="How to use ZERA?"
       >
         <BsQuestionCircle color="#e5e5e5" size={isMobile ? 16 : 20} />
       </button>
