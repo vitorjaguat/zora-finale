@@ -56,7 +56,7 @@ export function NFTPreview({
           <span className="text-red-400">Error: {error}</span>
         </div>
       ) : (
-        <div className="flex flex-col justify-end gap-2 pr-3 pb-3 text-xs max-sm:px-2 max-sm:w-full">
+        <div className="flex flex-col justify-end gap-2 pt-3 pr-3 pb-3 text-xs max-sm:px-2 max-sm:w-full">
           {nftTitle && (
             <div className="font-semibold text-neutral-200">
               {nftTitle as React.ReactNode}
