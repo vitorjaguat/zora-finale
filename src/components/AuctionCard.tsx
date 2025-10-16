@@ -429,12 +429,12 @@ export function AuctionCard({
           {error && (
             <div className="bg-red-900/50 p-2 text-xs text-red-200">
               <strong>Error:</strong> {error}
-              <button
+              {/* <button
                 onClick={reset}
                 className="ml-2 cursor-pointer underline hover:no-underline"
               >
                 Retry
-              </button>
+              </button> */}
             </div>
           )}
 

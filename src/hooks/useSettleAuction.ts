@@ -99,7 +99,8 @@ export function useSettleAuction() {
   return {
     settleAuction,
     loading: isPending || isConfirming || isSettling,
-    error: writeError?.message ?? null, // Fixed: Use nullish coalescing
+    error:
+      writeError?.message?.slice(0, writeError?.message?.indexOf(".")) ?? null, // Fixed: Use nullish coalescing
     success: isSuccess,
     transactionHash: hash,
     reset,
