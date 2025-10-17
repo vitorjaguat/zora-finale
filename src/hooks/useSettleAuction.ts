@@ -31,19 +31,22 @@ export function useSettleAuction() {
 
   // Update database when transaction is confirmed
   useEffect(() => {
-    if (isSuccess && auctionIdToUpdate) {
-      void updateAuctionInDatabase(auctionIdToUpdate);
+    if (isSuccess && auctionIdToUpdate && hash) {
+      void updateAuctionInDatabase(auctionIdToUpdate, hash);
       setAuctionIdToUpdate(null);
     }
-  }, [isSuccess, auctionIdToUpdate]);
+  }, [isSuccess, auctionIdToUpdate, hash]);
 
-  const updateAuctionInDatabase = async (auctionId: string) => {
+  const updateAuctionInDatabase = async (auctionId: string, txHash: string) => {
     try {
-      // Call API to update auction settlement status
+      // Call API to update both settlement status and tx hash when confirmed
       const response = await fetch(`/api/auctions/${auctionId}/settle`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ isSettled: true }),
+        body: JSON.stringify({
+          isSettled: true,
+          settledTxHash: txHash,
+        }),
       });
 
       if (!response.ok) {

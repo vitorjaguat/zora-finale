@@ -56,14 +56,14 @@ export function NFTPreview({
           <span className="text-red-400">Error: {error}</span>
         </div>
       ) : (
-        <div className="flex flex-col justify-end gap-2 pt-3 pr-3 pb-3 text-xs max-sm:px-2 max-sm:w-full">
+        <div className="flex flex-col justify-end gap-2 pt-3 pr-3 pb-3 text-xs max-sm:px-2 max-sm:w-full overflow-hidden">
           {nftTitle && (
             <div className="font-semibold text-neutral-200">
               {nftTitle as React.ReactNode}
             </div>
           )}
           {(nftData?.metadataUri?.description ?? nftData?.description) && (
-            <div className="text-neutral-400">
+            <div className="text-neutral-400 whitespace-pre-line break-words overflow-hidden">
               {nftData?.metadataUri?.description ?? nftData?.description}
             </div>
           )}

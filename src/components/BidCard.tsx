@@ -62,9 +62,8 @@ export default function BidCard({
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            tokenId: bid.tokenId,
-            bidder: bid.bidder,
-            transactionHash: bid.transactionHash,
+            bidId: bid.id,
+            settledTxHash: hash,
             action: action,
           }),
         });
@@ -79,6 +78,7 @@ export default function BidCard({
             message: string;
             success: boolean;
             action: string;
+            settledTxHash: string;
           };
           // console.log("Bid state successfully updated:", result.message);
         }
@@ -90,15 +90,7 @@ export default function BidCard({
     if (isSuccess && hash && address) {
       void updateBidState();
     }
-  }, [
-    isSuccess,
-    hash,
-    bid.tokenId,
-    bid.bidder,
-    bid.transactionHash,
-    address,
-    bid.tokenOwner,
-  ]);
+  }, [isSuccess, hash, bid.id, bid.bidder, address, bid.tokenOwner]);
 
   useEffect(() => {
     // Clear errors when the connected address changes
@@ -350,6 +342,18 @@ export default function BidCard({
                     className="text-blue-400 underline hover:no-underline"
                   >
                     View Bid Transaction
+                  </a>
+                </div>
+              )}
+              {bid.settledTxHash && (
+                <div className="mt-2 text-xs">
+                  <a
+                    href={`https://etherscan.io/tx/${bid.settledTxHash}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-400 underline hover:no-underline"
+                  >
+                    View Settlement Transaction
                   </a>
                 </div>
               )}

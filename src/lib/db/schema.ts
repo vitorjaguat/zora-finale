@@ -37,6 +37,7 @@ export const auctions = pgTable("auctions", {
 
   // Status
   isSettled: boolean("is_settled").notNull(),
+  settledTxHash: text("settled_tx_hash"),
 
   // Full JSON data for complete information
   data: jsonb("data").notNull(),
@@ -122,6 +123,7 @@ export const bids = pgTable("bids", {
   isActive: boolean("is_active").notNull().default(true),
   isWithdrawn: boolean("is_withdrawn").notNull().default(false),
   isAccepted: boolean("is_accepted").notNull().default(false),
+  settledTxHash: text("settled_tx_hash"),
 
   // Sell on share value (from original bid data)
   sellOnShareValue: numeric("sell_on_share_value", { precision: 38, scale: 0 }), // Raw wei amount, nullable for migration

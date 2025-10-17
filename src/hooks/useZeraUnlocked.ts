@@ -43,7 +43,7 @@ export function useZeraUnlocked(): UseZeraUnlockedReturn {
       setData(result);
 
       // Console log the data for debugging
-      console.log("🔓 Zera Unlocked Assets Data:", result);
+      // console.log("🔓 Zera Unlocked Assets Data:", result);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Unknown error";
       setError(errorMessage);

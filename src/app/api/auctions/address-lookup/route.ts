@@ -110,7 +110,8 @@ export async function GET(request: NextRequest) {
         currency,
         currency_symbol as "currencySymbol",
         currency_decimals as "currencyDecimals",
-        is_settled as "isSettled"
+        is_settled as "isSettled",
+        settled_tx_hash as "settledTxHash"
       FROM auctions 
       WHERE id IN (${sql.join(
         auctionIdsArray.map((id) => sql`${Number(id)}`),

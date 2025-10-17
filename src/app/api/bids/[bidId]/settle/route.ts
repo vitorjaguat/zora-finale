@@ -1,15 +1,15 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { auctions } from "@/lib/db/schema";
+import { bids } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { auctionId: string } },
+  { params }: { params: { bidId: string } },
 ) {
   try {
-    const { auctionId } = params;
+    const { bidId } = params;
     const body = (await request.json()) as {
       isSettled?: boolean;
       settledTxHash?: string;
@@ -38,47 +38,43 @@ export async function POST(
       );
     }
 
-    // Get the current auction data
-    const [auction] = await db
-      .select()
-      .from(auctions)
-      .where(eq(auctions.id, BigInt(auctionId)));
+    // Get the current bid data
+    const [bid] = await db.select().from(bids).where(eq(bids.id, bidId));
 
-    if (!auction) {
-      return NextResponse.json({ error: "Auction not found" }, { status: 404 });
+    if (!bid) {
+      return NextResponse.json({ error: "Bid not found" }, { status: 404 });
     }
 
     // Build the update object dynamically
     const updateFields: {
-      isSettled?: boolean;
+      isAccepted?: boolean;
       settledTxHash?: string;
       updatedAt: Date;
     } = {
       updatedAt: new Date(),
     };
 
-    // Update isSettled if provided
+    // Update isAccepted if provided (for bids, settlement means acceptance)
     if (isSettled !== undefined) {
-      updateFields.isSettled = isSettled;
+      updateFields.isAccepted = isSettled;
     }
 
     // Update settledTxHash if provided
     if (settledTxHash !== undefined) {
       updateFields.settledTxHash = settledTxHash;
-    } // Update the auction
-    await db
-      .update(auctions)
-      .set(updateFields)
-      .where(eq(auctions.id, BigInt(auctionId)));
+    }
+
+    // Update the bid
+    await db.update(bids).set(updateFields).where(eq(bids.id, bidId));
 
     return NextResponse.json({
       success: true,
-      auctionId,
-      ...(isSettled !== undefined && { isSettled }),
+      bidId,
+      ...(isSettled !== undefined && { isAccepted: isSettled }),
       ...(settledTxHash !== undefined && { settledTxHash }),
     });
   } catch (error) {
-    console.error("Error updating auction settlement:", error);
+    console.error("Error updating bid settlement:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 },

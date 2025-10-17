@@ -109,7 +109,7 @@ export async function GET() {
       },
     };
 
-    console.log("🔓 Zera unlocked data:", data);
+    // console.log("🔓 Zera unlocked data:", data);
     return NextResponse.json(data);
   } catch (error) {
     console.error("Error fetching Zera unlocked data:", error);

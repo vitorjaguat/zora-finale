@@ -25,6 +25,7 @@ export interface Bid {
   isActive: boolean;
   isWithdrawn: boolean;
   isAccepted: boolean;
+  settledTxHash: string; // transaction hash for settlement
   processedAt: string;
   status: "active" | "withdrawn" | "accepted" | "inactive";
   // Legacy fields for backwards compatibility
@@ -130,6 +131,7 @@ export async function GET(request: NextRequest) {
           is_active,
           is_withdrawn,
           is_accepted,
+          settled_tx_hash,
           created_at,
           bid_shares
         FROM bids 
@@ -193,6 +195,7 @@ export async function GET(request: NextRequest) {
           isActive,
           isWithdrawn,
           isAccepted,
+          settledTxHash: bid.settled_tx_hash as string,
           processedAt: bid.created_at as string,
           status,
           metadata: {} as AlchemyNFTResponse,

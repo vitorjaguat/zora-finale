@@ -1,7 +1,7 @@
-import { useState, useCallback } from "react"; // Removed unused useEffect
+import { useState, useCallback } from "react";
 import { isAddress } from "viem";
 import { isLikelyENSName, resolveAddressOrENS } from "@/lib/ensUtils";
-import { type Bid, type BidsResult } from "@/app/api/bids/address-lookup/route";
+import { type BidsResult } from "@/app/api/bids/address-lookup/route";
 // import type { AuctionDataWithMetadata } from "@/app/api/nft/firstMetadataBatch/route";
 import type { AlchemyNFTResponse } from "./useNFTMetadata";
 
@@ -23,6 +23,7 @@ export interface AuctionData {
   currencySymbol: string;
   currencyDecimals: number;
   isSettled: boolean;
+  settledTxHash: string;
   metadata: AlchemyNFTResponse;
 }
 

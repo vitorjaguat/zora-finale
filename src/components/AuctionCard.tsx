@@ -314,6 +314,19 @@ export function AuctionCard({
                   </div>
                 )}
 
+              {auction.isSettled && auction.settledTxHash && (
+                <div className="mt-2 text-xs">
+                  <a
+                    href={`https://etherscan.io/tx/${auction.settledTxHash}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-400 underline hover:no-underline"
+                  >
+                    View Settlement Transaction
+                  </a>
+                </div>
+              )}
+
               {/* FEES distribution */}
               {(auction.bidder !== zeroAddress ||
                 (auction?.curator.toLowerCase() !==
