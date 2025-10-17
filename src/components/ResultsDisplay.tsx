@@ -5,7 +5,6 @@ import { HiArrowTurnRightDown, HiArrowTurnLeftDown } from "react-icons/hi2";
 import { useState, useEffect } from "react";
 import type { Bid } from "@/app/api/bids/address-lookup/route";
 import type { AuctionData, Result } from "@/hooks/useAddressLookup";
-import motion from "motion";
 // import type { ResultWithFirstMetadata } from "@/app/api/nft/firstMetadataBatch/route";
 
 // interface CheckResult {
