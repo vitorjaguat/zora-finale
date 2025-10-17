@@ -41,15 +41,13 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  // TODO: remove getNFTMetadata, as the basic metadata is already being batch fetched with alchemy SDK in api/nft/firstMetadataBatch; return only the metadataUri property object and use it on BidCard and AuctionCard
-
   // Enhanced metadata fetching from Media contract
   try {
     // Only fetch from Media contract if it's the Zora Media contract
     if (
       contractAddress.toLowerCase() === MEDIA_CONTRACT.address.toLowerCase()
     ) {
-      console.log(`Fetching tokenMetadataURI for token ${tokenId}...`);
+      // console.log(`Fetching tokenMetadataURI for token ${tokenId}...`);
 
       const metadataURI = await publicClient.readContract({
         address: MEDIA_CONTRACT.address,
@@ -58,7 +56,7 @@ export async function GET(request: NextRequest) {
         args: [BigInt(tokenId)],
       });
 
-      console.log(`TokenMetadataURI: ${metadataURI}`);
+      // console.log(`TokenMetadataURI: ${metadataURI}`);
 
       if (metadataURI && metadataURI.trim() !== "") {
         // Resolve IPFS URLs to gateway URLs
@@ -66,7 +64,7 @@ export async function GET(request: NextRequest) {
           ? metadataURI.replace("ipfs://", "https://ipfs.io/ipfs/")
           : metadataURI;
 
-        console.log(`Fetching metadata from: ${resolvedURI}`);
+        // console.log(`Fetching metadata from: ${resolvedURI}`);
 
         // Fetch the metadata JSON
         const metadataResponse = await fetch(resolvedURI, {
@@ -77,13 +75,15 @@ export async function GET(request: NextRequest) {
 
         if (metadataResponse.ok) {
           const metadata = (await metadataResponse.json()) as TokenMetadataUri;
-          console.log("Successfully fetched metadata:", metadata);
+          // console.log("Successfully fetched metadata:", metadata);
 
           return NextResponse.json(metadata);
         } else {
           console.warn(
             `Failed to fetch metadata from URI: ${metadataResponse.status} ${metadataResponse.statusText}`,
           );
+          const emptyMetadata: TokenMetadataUri = {};
+          return NextResponse.json(emptyMetadata);
         }
       } else {
         console.log("No metadata URI found for this token");

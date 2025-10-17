@@ -93,6 +93,22 @@ export function useNFTMetadata({
               ...tokenData,
               metadataUri: { ...(rawData as TokenMetadataUri) },
             };
+            if (!data.metadataUri.description) {
+              const bodyData = rawData as {
+                body?: { artist?: string; title?: string; notes?: string };
+              };
+              if (bodyData?.body?.artist) {
+                data.metadataUri.description = "By " + bodyData.body.artist;
+              }
+              if (bodyData?.body?.title) {
+                data.metadataUri.title = bodyData.body.title;
+                data.name = bodyData.body.title;
+              }
+              if (bodyData?.body?.notes) {
+                data.metadataUri.description =
+                  data.metadataUri.description + "\n" + bodyData.body.notes;
+              }
+            }
             setNftData(data);
           } else {
             throw new Error("Invalid response format from API");
