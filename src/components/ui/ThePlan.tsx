@@ -14,7 +14,7 @@ export default function ThePlan() {
       <div className="text-4xl  max-sm:px-2">The Plan</div>
       <div className="font-light max-sm:px-2">
         Web3 doesn’t stand still: it evolves, it mutates, it leaves fossils
-        behind. Nonetheless, blockchains are immutable record-stating memory
+        behind. Nonetheless, blockchains are immutable state-recording memory
         machines.{" "}
       </div>
       <div className="font-light max-sm:px-2">
@@ -75,10 +75,11 @@ export default function ThePlan() {
         <span className="ml-1 line-through decoration-2">memecoins</span>
         <span className="mx-1 line-through decoration-2">contentcoins</span>
         creatorcoins) the contracts that once carried this golden age were
-        abandoned. Hundreds of WETH from past bids - and lots of NFTs - are
-        currently escrowed inside those contracts. A buried layer of fungies and
-        non-fungies sealed inside fossilized chests - waiting to be unearthed.
-        Until now.
+        abandoned, after their UI was taked down. WETH, stables, ERC-20`s from
+        past bids; and thousands of NFTs are currently escrowed inside those
+        contracts. A buried layer of fungies and non-fungies sealed inside
+        fossilized chests - waiting to be unearthed.{" "}
+        <span className="font-bold">Until now.</span>
       </div>
 
       {/* Graphic */}

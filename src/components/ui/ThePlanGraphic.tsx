@@ -98,7 +98,10 @@ export default function ThePlanGraphic() {
 
           <div
             className={`relative h-full w-full transition-transform duration-700 ease-in-out ${hoveredCircle === "market" || hoveredCircle === "all" ? "rotate-y-180" : ""} `}
-            style={{ transformStyle: "preserve-3d" }}
+            style={{
+              transformStyle: "preserve-3d",
+              transitionDelay: hoveredCircle === "all" ? "0s" : "0s",
+            }}
           >
             {/* Front side (original content) */}
             <div
@@ -184,6 +187,7 @@ export default function ThePlanGraphic() {
               style={{
                 backfaceVisibility: "hidden",
                 transform: "rotateY(180deg)",
+                animationDelay: "0s",
               }}
             >
               <div className="flex h-72 w-72 flex-col items-center justify-center rounded-full border-2 border-green-400 bg-green-900/20 p-6">
@@ -225,7 +229,7 @@ export default function ThePlanGraphic() {
                       <span>{zeraData.data.market.lastActivity}</span>
                     </div> */}
                     <div className="mt-6 text-neutral-500">
-                      since 10.22.2025
+                      since Oct. 22, 2025
                     </div>
                   </div>
                 </div>
@@ -255,7 +259,10 @@ export default function ThePlanGraphic() {
 
           <div
             className={`relative h-full w-full transition-transform duration-700 ease-in-out ${hoveredCircle === "auction" || hoveredCircle === "all" ? "rotate-y-180" : ""} `}
-            style={{ transformStyle: "preserve-3d" }}
+            style={{
+              transformStyle: "preserve-3d",
+              transitionDelay: hoveredCircle === "all" ? "0.2s" : "0s",
+            }}
           >
             {/* Front side (original content) */}
             <div
@@ -381,7 +388,7 @@ export default function ThePlanGraphic() {
                       </span>
                     </div> */}
                     <div className="mt-6 text-neutral-500">
-                      since 10.22.2025
+                      since Oct. 22, 2025
                     </div>
                   </div>
                 </div>
@@ -412,7 +419,10 @@ export default function ThePlanGraphic() {
 
           <div
             className={`relative h-full w-full transition-transform duration-700 ease-in-out ${hoveredCircle === "nfts" || hoveredCircle === "all" ? "rotate-y-180" : ""} `}
-            style={{ transformStyle: "preserve-3d" }}
+            style={{
+              transformStyle: "preserve-3d",
+              transitionDelay: hoveredCircle === "all" ? "0.4s" : "0s",
+            }}
           >
             {/* Front side (original content) */}
             <div
@@ -505,7 +515,7 @@ export default function ThePlanGraphic() {
                       <span>0.5 WETH</span>
                     </div> */}
                     <div className="mt-6 text-neutral-500">
-                      since 10.22.2025
+                      since Oct. 22, 2025
                     </div>
                   </div>
                 </div>
@@ -524,7 +534,7 @@ export default function ThePlanGraphic() {
         <div className="h-[2px] w-8 bg-green-400 max-sm:w-8"> </div>
         <div className="text-sm text-neutral-300 max-sm:text-xs">
           <div className="">Assets already reclaimed on ZERA</div>
-          <div>(since 10.22.2025)</div>
+          <div>(since Oct. 22, 2025)</div>
         </div>
       </div>
     </div>

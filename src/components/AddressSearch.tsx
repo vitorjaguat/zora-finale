@@ -84,7 +84,7 @@ export function AddressSearch({
           {/* Connect Wallet Button */}
           <ConnectButtonCustom
             className="w-full flex-1 cursor-pointer rounded-lg bg-neutral-300 px-4 py-2.5 tracking-wider text-black uppercase duration-300 ease-out hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-50 max-sm:text-sm max-sm:py-2"
-            text={loading ? "Connecting..." : "CONNECT WALLET"}
+            text={loading ? "CONNECTING..." : "CONNECT WALLET"}
             isSearch
           />
 

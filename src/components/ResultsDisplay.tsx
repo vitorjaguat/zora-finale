@@ -137,7 +137,7 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
           <div className="text-2xl text-white max-sm:text-lg">Breakdown</div>
           <HiArrowTurnRightDown
             color="white"
-            className="translate-y-1.5"
+            className="translate-y-1.5 md:-translate-x-0.5"
             size={24}
           />
         </div>
