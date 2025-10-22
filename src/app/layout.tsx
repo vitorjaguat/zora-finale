@@ -4,6 +4,7 @@ import "@/styles/globals.css";
 import { type Metadata } from "next";
 
 import Providers from "../components/provider/rainbow-provider";
+import Analytics from "../components/Analytics";
 
 export const metadata: Metadata = {
   title: "ZERA",
@@ -38,6 +39,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
+        <Analytics />
         <Providers>{children}</Providers>
       </body>
     </html>
