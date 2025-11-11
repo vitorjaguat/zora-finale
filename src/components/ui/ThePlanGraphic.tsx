@@ -365,7 +365,7 @@ export default function ThePlanGraphic() {
                     </div>
                     <div className="flex justify-center">
                       <span className="text-green-400">
-                        {zeraData.data.auctionHouse.reclaimedWETH}
+                        {zeraData.data.auctionHouse.reclaimedWETH.toFixed(4)}
                       </span>
                       <span className="ml-1.5">
                         / {ethAmountAuctionHouse.toFixed(4)} WETH reclaimed
