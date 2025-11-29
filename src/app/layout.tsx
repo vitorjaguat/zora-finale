@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     url: "https://zera.uint.studio",
     images: [
       {
-        url: "/assets/og-image.png",
+        url: "https://zera.uint.studio/assets/og-image.png",
         width: 1200,
         height: 630,
         alt: "ZERA",
@@ -29,7 +29,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "ZERA",
     description: "Reclaim your assets trapped inside old Zora smart contracts",
-    images: ["/assets/og-image.png"],
+    images: ["https://zera.uint.studio/assets/og-image.png"],
   },
 };
 
